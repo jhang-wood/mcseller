@@ -3020,28 +3020,33 @@
                 // 로그인 상태 확인 및 UI 업데이트 함수
                 async function checkAndUpdateUI() {
                     try {
-                        const isLoggedIn = await checkLoginStatus();
-                        if (isLoggedIn) {
-                            // 사용자 정보 가져오기
-                            const testUser = localStorage.getItem('testUser');
-                            if (testUser) {
-                                const user = JSON.parse(testUser);
-                                updateNavigationUI(user);
-                            } else if (window.getCurrentUser) {
-                                const user = await window.getCurrentUser();
-                                if (user) {
-                                    // Supabase 사용자는 기본적으로 일반 사용자
-                                    updateNavigationUI({ ...user, isAdmin: false });
-                                }
-                            }
-                        } else {
-                            updateNavigationUI(null);
+                        // 테스트 사용자 우선 확인
+                        const testUser = localStorage.getItem('testUser');
+                        if (testUser) {
+                            const user = JSON.parse(testUser);
+                            updateNavigationUI(user);
+                            return;
                         }
+                        
+                        // Supabase 사용자 확인
+                        if (window.getCurrentUser) {
+                            const user = await window.getCurrentUser();
+                            if (user) {
+                                updateNavigationUI({ ...user, isAdmin: false });
+                                return;
+                            }
+                        }
+                        
+                        // 로그인된 사용자가 없음
+                        updateNavigationUI(null);
                     } catch (error) {
                         console.error('UI 업데이트 오류:', error);
                         updateNavigationUI(null);
                     }
                 }
+                
+                // 페이지 포커스시 UI 재확인
+                window.addEventListener('focus', checkAndUpdateUI);
             });
             
             // Toast 메시지 표시 함수 (간단한 버전)

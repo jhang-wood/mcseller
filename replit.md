@@ -147,6 +147,12 @@ Changelog:
   * Implemented test account system: user@test.com/123456, admin@test.com/admin123
   * Updated index.html navigation: "사전예약 신청하기" → ai-master-landing.html
   * Created conversion-optimized payment page with countdown timer, stock counter, recommendations
+- June 28, 2025. Content viewers and navigation enhancement:
+  * Fixed login state bug in index.html navigation (login/logout buttons showing simultaneously)
+  * Created ebook-viewer.html with sidebar table of contents and chapter navigation
+  * Created video-viewer.html with lesson progress tracking and structured course content
+  * Added dynamic navigation based on user role (member/admin) with compact user info display
+  * Enhanced mypage.html with test content and proper access control
 ```
 
 ## User Preferences

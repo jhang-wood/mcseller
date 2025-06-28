@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전자책 뷰어 - MCSELLER</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+        .sidebar { 
+            position: fixed; left: 0; top: 0; height: 100vh; width: 300px; 
+            background: #f8f9fa; border-right: 1px solid #dee2e6; z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+        .sidebar.hidden { transform: translateX(-300px); }
+        .content { margin-left: 300px; padding: 20px; transition: margin-left 0.3s ease; }
+        .content.expanded { margin-left: 0; }
+        .chapter { padding: 20px; margin-bottom: 30px; border-bottom: 1px solid #eee; }
+        .toc-item { padding: 8px 15px; cursor: pointer; border-bottom: 1px solid #eee; }
+        .toc-item:hover { background: #e9ecef; }
+        .toc-item.active { background: #007bff; color: white; }
+        .toggle-btn { position: fixed; top: 70px; left: 310px; z-index: 1001; transition: left 0.3s ease; }
+        .toggle-btn.expanded { left: 10px; }
+    </style>
+</head>
+<body>
+    <!-- 사이드바 -->
+    <div class="sidebar" id="sidebar">
+        <div class="p-3 border-bottom">
+            <h5><i class="fas fa-book-open me-2"></i>목차</h5>
+            <button class="btn btn-sm btn-outline-secondary" onclick="toggleSidebar()">
+                <i class="fas fa-times"></i> 숨기기
+            </button>
+        </div>
+        <div id="table-of-contents">
+            <!-- 목차가 여기에 동적으로 추가됩니다 -->
+        </div>
+    </div>
+
+    <!-- 사이드바 토글 버튼 -->
+    <button class="btn btn-primary toggle-btn" id="toggleBtn" onclick="toggleSidebar()" style="display: none;">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- 상단 네비게이션 -->
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="mypage.html">
+                <i class="fas fa-arrow-left me-2"></i>마이페이지로 돌아가기
+            </a>
+            <div class="d-flex gap-2">
+                <span class="navbar-text" id="book-title">전자책 제목</span>
+                <button class="btn btn-outline-light btn-sm" onclick="logout()">로그아웃</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 메인 콘텐츠 -->
+    <div class="content" id="content">
+        <div id="ebook-content">
+            <!-- 전자책 내용이 여기에 표시됩니다 -->
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 테스트용 전자책 데이터
+        const ebookData = {
+            ebook1: {
+                title: "온라인 수익화 전략서 1탄",
+                chapters: [
+                    {
+                        id: "ch1",
+                        title: "1장. 온라인 수익화의 기초",
+                        content: `
+                            <h2>1장. 온라인 수익화의 기초</h2>
+                            <p>온라인에서 수익을 창출하는 것은 더 이상 꿈이 아닙니다. 올바른 전략과 방법을 알면 누구나 시작할 수 있습니다.</p>
+                            
+                            <h3>1.1 수익화 모델의 종류</h3>
+                            <p>온라인 수익화에는 여러 가지 모델이 있습니다:</p>
+                            <ul>
+                                <li><strong>제품 판매:</strong> 물리적 또는 디지털 제품을 직접 판매</li>
+                                <li><strong>서비스 제공:</strong> 컨설팅, 코칭, 강의 등</li>
+                                <li><strong>광고 수익:</strong> 블로그, 유튜브 등을 통한 광고 수익</li>
+                                <li><strong>구독 모델:</strong> 정기적인 수익 창출</li>
+                            </ul>
+                            
+                            <h3>1.2 성공을 위한 핵심 요소</h3>
+                            <p>온라인 수익화 성공을 위해서는 다음 요소들이 중요합니다:</p>
+                            <ol>
+                                <li>명확한 타겟 고객 설정</li>
+                                <li>가치 있는 콘텐츠 제공</li>
+                                <li>꾸준한 마케팅 활동</li>
+                                <li>데이터 기반 의사결정</li>
+                            </ol>
+                        `
+                    },
+                    {
+                        id: "ch2",
+                        title: "2장. 플랫폼 선택 전략",
+                        content: `
+                            <h2>2장. 플랫폼 선택 전략</h2>
+                            <p>적절한 플랫폼 선택은 온라인 수익화의 핵심입니다. 각 플랫폼의 특성을 이해하고 자신에게 맞는 플랫폼을 선택해야 합니다.</p>
+                            
+                            <h3>2.1 전자상거래 플랫폼</h3>
+                            <p>상품 판매를 위한 주요 플랫폼들:</p>
+                            <ul>
+                                <li><strong>네이버 스마트스토어:</strong> 국내 최대 규모, 높은 신뢰도</li>
+                                <li><strong>쿠팡:</strong> 빠른 배송, 높은 고객 만족도</li>
+                                <li><strong>아마존:</strong> 글로벌 진출 가능</li>
+                                <li><strong>자체 쇼핑몰:</strong> 높은 수익률, 브랜딩 가능</li>
+                            </ul>
+                            
+                            <h3>2.2 콘텐츠 플랫폼</h3>
+                            <p>콘텐츠를 통한 수익화 플랫폼:</p>
+                            <ul>
+                                <li><strong>유튜브:</strong> 영상 콘텐츠, 광고 수익</li>
+                                <li><strong>인스타그램:</strong> 시각적 콘텐츠, 인플루언서 마케팅</li>
+                                <li><strong>블로그:</strong> 검색 트래픽, 장기적 수익</li>
+                                <li><strong>클래스101:</strong> 온라인 강의 플랫폼</li>
+                            </ul>
+                        `
+                    },
+                    {
+                        id: "ch3",
+                        title: "3장. 실전 수익화 사례",
+                        content: `
+                            <h2>3장. 실전 수익화 사례</h2>
+                            <p>실제 성공 사례를 통해 온라인 수익화의 실전 노하우를 알아보겠습니다.</p>
+                            
+                            <h3>3.1 사례 1: 블로그를 통한 수익화</h3>
+                            <p><strong>배경:</strong> 직장인 A씨, 취미로 시작한 요리 블로그</p>
+                            <p><strong>전략:</strong></p>
+                            <ul>
+                                <li>매일 1개씩 레시피 포스팅</li>
+                                <li>SEO 최적화로 검색 상위 노출</li>
+                                <li>광고 및 제휴 마케팅 활용</li>
+                            </ul>
+                            <p><strong>결과:</strong> 6개월 만에 월 100만원 수익 달성</p>
+                            
+                            <h3>3.2 사례 2: 온라인 강의 제작</h3>
+                            <p><strong>배경:</strong> 프리랜서 디자이너 B씨</p>
+                            <p><strong>전략:</strong></p>
+                            <ul>
+                                <li>포토샵 기초 강의 제작</li>
+                                <li>무료 샘플 강의로 신뢰도 구축</li>
+                                <li>수강생 피드백 반영한 지속적 업데이트</li>
+                            </ul>
+                            <p><strong>결과:</strong> 첫 달 200만원 매출, 현재 월 500만원 수익</p>
+                            
+                            <h3>3.3 핵심 성공 요인 분석</h3>
+                            <p>위 사례들의 공통점:</p>
+                            <ol>
+                                <li><strong>전문성:</strong> 자신만의 전문 분야 확보</li>
+                                <li><strong>꾸준함:</strong> 지속적인 콘텐츠 업데이트</li>
+                                <li><strong>고객 중심:</strong> 고객 니즈에 맞는 콘텐츠 제작</li>
+                                <li><strong>데이터 활용:</strong> 성과 분석 후 개선</li>
+                            </ol>
+                        `
+                    }
+                ]
+            },
+            ebook2: {
+                title: "실전 수익화 가이드북 2탄",
+                chapters: [
+                    {
+                        id: "ch1",
+                        title: "1장. 고급 마케팅 전략",
+                        content: `<h2>1장. 고급 마케팅 전략</h2><p>더욱 효과적인 마케팅 방법들을 알아보겠습니다...</p>`
+                    },
+                    {
+                        id: "ch2", 
+                        title: "2장. 자동화 시스템 구축",
+                        content: `<h2>2장. 자동화 시스템 구축</h2><p>수익을 자동화하는 방법을 배워보겠습니다...</p>`
+                    }
+                ]
+            }
+        };
+
+        let currentBook = null;
+        let sidebarVisible = true;
+
+        // 페이지 로드시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAccess();
+            loadEbook();
+        });
+
+        function checkAccess() {
+            // 로그인 확인
+            const testUser = localStorage.getItem('testUser');
+            if (!testUser) {
+                alert('로그인이 필요합니다.');
+                window.location.href = 'auth.html';
+                return;
+            }
+        }
+
+        function loadEbook() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookId = urlParams.get('id');
+            
+            if (!bookId || !ebookData[bookId]) {
+                alert('존재하지 않는 전자책입니다.');
+                window.location.href = 'mypage.html';
+                return;
+            }
+
+            currentBook = ebookData[bookId];
+            document.getElementById('book-title').textContent = currentBook.title;
+            
+            generateTableOfContents();
+            loadChapter(currentBook.chapters[0].id);
+        }
+
+        function generateTableOfContents() {
+            const tocContainer = document.getElementById('table-of-contents');
+            tocContainer.innerHTML = '';
+
+            currentBook.chapters.forEach((chapter, index) => {
+                const tocItem = document.createElement('div');
+                tocItem.className = 'toc-item';
+                tocItem.innerHTML = `<i class="fas fa-file-text me-2"></i>${chapter.title}`;
+                tocItem.onclick = () => loadChapter(chapter.id);
+                tocItem.setAttribute('data-chapter', chapter.id);
+                tocContainer.appendChild(tocItem);
+            });
+        }
+
+        function loadChapter(chapterId) {
+            const chapter = currentBook.chapters.find(ch => ch.id === chapterId);
+            if (!chapter) return;
+
+            // 활성 목차 업데이트
+            document.querySelectorAll('.toc-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-chapter="${chapterId}"]`).classList.add('active');
+
+            // 챕터 내용 표시
+            const contentDiv = document.getElementById('ebook-content');
+            contentDiv.innerHTML = `<div class="chapter">${chapter.content}</div>`;
+
+            // 스크롤 맨 위로
+            window.scrollTo(0, 0);
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            const toggleBtn = document.getElementById('toggleBtn');
+
+            sidebarVisible = !sidebarVisible;
+
+            if (sidebarVisible) {
+                sidebar.classList.remove('hidden');
+                content.classList.remove('expanded');
+                toggleBtn.classList.remove('expanded');
+                toggleBtn.style.display = 'none';
+            } else {
+                sidebar.classList.add('hidden');
+                content.classList.add('expanded');
+                toggleBtn.classList.add('expanded');
+                toggleBtn.style.display = 'block';
+            }
+        }
+
+        function logout() {
+            if (localStorage.getItem('testUser')) {
+                localStorage.removeItem('testUser');
+            }
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

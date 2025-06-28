@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>강의 뷰어 - MCSELLER</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+        .sidebar { 
+            position: fixed; left: 0; top: 0; height: 100vh; width: 300px; 
+            background: #f8f9fa; border-right: 1px solid #dee2e6; z-index: 1000;
+            transition: transform 0.3s ease; overflow-y: auto;
+        }
+        .sidebar.hidden { transform: translateX(-300px); }
+        .content { margin-left: 300px; padding: 20px; transition: margin-left 0.3s ease; }
+        .content.expanded { margin-left: 0; }
+        .video-container { position: relative; width: 100%; height: 0; padding-bottom: 56.25%; margin-bottom: 20px; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .lesson-description { background: #f8f9fa; padding: 20px; border-radius: 8px; }
+        .lesson-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #eee; }
+        .lesson-item:hover { background: #e9ecef; }
+        .lesson-item.active { background: #007bff; color: white; }
+        .lesson-item.completed { background: #28a745; color: white; }
+        .toggle-btn { position: fixed; top: 70px; left: 310px; z-index: 1001; transition: left 0.3s ease; }
+        .toggle-btn.expanded { left: 10px; }
+        .progress-indicator { font-size: 12px; margin-left: auto; }
+    </style>
+</head>
+<body>
+    <!-- 사이드바 -->
+    <div class="sidebar" id="sidebar">
+        <div class="p-3 border-bottom">
+            <h5><i class="fas fa-play-circle me-2"></i>강의 목차</h5>
+            <button class="btn btn-sm btn-outline-secondary" onclick="toggleSidebar()">
+                <i class="fas fa-times"></i> 숨기기
+            </button>
+        </div>
+        <div id="lesson-list">
+            <!-- 강의 목록이 여기에 동적으로 추가됩니다 -->
+        </div>
+        <div class="p-3 border-top">
+            <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                진행률: <span id="progress-text">0%</span>
+            </small>
+            <div class="progress mt-2" style="height: 5px;">
+                <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 사이드바 토글 버튼 -->
+    <button class="btn btn-primary toggle-btn" id="toggleBtn" onclick="toggleSidebar()" style="display: none;">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- 상단 네비게이션 -->
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="mypage.html">
+                <i class="fas fa-arrow-left me-2"></i>마이페이지로 돌아가기
+            </a>
+            <div class="d-flex gap-2">
+                <span class="navbar-text" id="course-title">강의 제목</span>
+                <button class="btn btn-outline-light btn-sm" onclick="logout()">로그아웃</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 메인 콘텐츠 -->
+    <div class="content" id="content">
+        <div id="lesson-content">
+            <!-- 현재 강의 내용이 여기에 표시됩니다 -->
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 테스트용 강의 데이터
+        const courseData = {
+            'ai-master': {
+                title: "AI 마스터 실전 과정",
+                lessons: [
+                    {
+                        id: "lesson1",
+                        title: "1강. AI 시대의 비즈니스 이해",
+                        videoId: "dQw4w9WgXcQ", // 테스트용 YouTube ID
+                        description: `
+                            <h3>1강. AI 시대의 비즈니스 이해</h3>
+                            <p>이번 강의에서는 AI가 비즈니스에 미치는 영향과 기회에 대해 학습합니다.</p>
+                            
+                            <h4>핵심 내용</h4>
+                            <ul>
+                                <li>AI 기술의 현재와 미래</li>
+                                <li>비즈니스 모델의 변화</li>
+                                <li>AI 도구 활용 전략</li>
+                                <li>경쟁 우위 확보 방법</li>
+                            </ul>
+                            
+                            <h4>실습 과제</h4>
+                            <p>자신의 비즈니스 분야에서 AI를 어떻게 활용할 수 있는지 3가지 아이디어를 작성해보세요.</p>
+                            
+                            <div class="alert alert-info">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                <strong>TIP:</strong> 이번 강의 내용을 바탕으로 다음 강의에서 실제 AI 도구를 사용해보겠습니다.
+                            </div>
+                        `,
+                        completed: false
+                    },
+                    {
+                        id: "lesson2",
+                        title: "2강. ChatGPT 활용 전략",
+                        videoId: "dQw4w9WgXcQ",
+                        description: `
+                            <h3>2강. ChatGPT 활용 전략</h3>
+                            <p>ChatGPT를 비즈니스에 효과적으로 활용하는 방법을 배웁니다.</p>
+                            
+                            <h4>학습 목표</h4>
+                            <ul>
+                                <li>효과적인 프롬프트 작성법</li>
+                                <li>업무 자동화 방법</li>
+                                <li>콘텐츠 제작 활용</li>
+                                <li>고객 서비스 개선</li>
+                            </ul>
+                            
+                            <h4>실무 적용 사례</h4>
+                            <ol>
+                                <li><strong>마케팅:</strong> 광고 문구 및 콘텐츠 아이디어 생성</li>
+                                <li><strong>고객서비스:</strong> FAQ 자동 답변 시스템</li>
+                                <li><strong>기획:</strong> 비즈니스 아이디어 브레인스토밍</li>
+                            </ol>
+                            
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>주의:</strong> AI 도구 사용시 개인정보 보호에 주의하세요.
+                            </div>
+                        `,
+                        completed: false
+                    },
+                    {
+                        id: "lesson3",
+                        title: "3강. 이미지 생성 AI 활용법",
+                        videoId: "dQw4w9WgXcQ",
+                        description: `
+                            <h3>3강. 이미지 생성 AI 활용법</h3>
+                            <p>Midjourney, DALL-E 등을 활용한 비즈니스 이미지 제작 방법을 배웁니다.</p>
+                            
+                            <h4>다룰 내용</h4>
+                            <ul>
+                                <li>주요 이미지 생성 AI 소개</li>
+                                <li>효과적인 프롬프트 작성</li>
+                                <li>상업적 활용 가능 이미지 제작</li>
+                                <li>브랜딩에 활용하는 방법</li>
+                            </ul>
+                            
+                            <h4>실습 예제</h4>
+                            <p>다음과 같은 이미지들을 직접 생성해보겠습니다:</p>
+                            <ul>
+                                <li>로고 디자인</li>
+                                <li>소셜미디어 포스트 이미지</li>
+                                <li>제품 모크업</li>
+                                <li>웹사이트 배너</li>
+                            </ul>
+                        `,
+                        completed: false
+                    },
+                    {
+                        id: "lesson4",
+                        title: "4강. AI 자동화 시스템 구축",
+                        videoId: "dQw4w9WgXcQ",
+                        description: `
+                            <h3>4강. AI 자동화 시스템 구축</h3>
+                            <p>Zapier, Make.com 등을 활용해 AI 기반 자동화 워크플로우를 만들어봅니다.</p>
+                            
+                            <h4>자동화 가능한 업무</h4>
+                            <ul>
+                                <li>이메일 자동 분류 및 답변</li>
+                                <li>소셜미디어 포스팅 자동화</li>
+                                <li>고객 데이터 분석 및 리포트 생성</li>
+                                <li>콘텐츠 큐레이션</li>
+                            </ul>
+                            
+                            <h4>구축 단계</h4>
+                            <ol>
+                                <li>워크플로우 설계</li>
+                                <li>API 연결 설정</li>
+                                <li>자동화 규칙 정의</li>
+                                <li>테스트 및 최적화</li>
+                            </ol>
+                            
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>
+                                <strong>수료 후:</strong> 이 과정을 완료하면 실제 비즈니스에 바로 적용 가능합니다!
+                            </div>
+                        `,
+                        completed: false
+                    }
+                ]
+            }
+        };
+
+        let currentCourse = null;
+        let currentLessonIndex = 0;
+        let sidebarVisible = true;
+
+        // 페이지 로드시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAccess();
+            loadCourse();
+        });
+
+        function checkAccess() {
+            // 로그인 확인
+            const testUser = localStorage.getItem('testUser');
+            if (!testUser) {
+                alert('로그인이 필요합니다.');
+                window.location.href = 'auth.html';
+                return;
+            }
+        }
+
+        function loadCourse() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const courseId = urlParams.get('id');
+            
+            if (!courseId || !courseData[courseId]) {
+                alert('존재하지 않는 강의입니다.');
+                window.location.href = 'mypage.html';
+                return;
+            }
+
+            currentCourse = courseData[courseId];
+            document.getElementById('course-title').textContent = currentCourse.title;
+            
+            generateLessonList();
+            loadLesson(0);
+            updateProgress();
+        }
+
+        function generateLessonList() {
+            const listContainer = document.getElementById('lesson-list');
+            listContainer.innerHTML = '';
+
+            currentCourse.lessons.forEach((lesson, index) => {
+                const lessonItem = document.createElement('div');
+                lessonItem.className = 'lesson-item d-flex align-items-center';
+                lessonItem.innerHTML = `
+                    <div>
+                        <i class="fas fa-play-circle me-2"></i>
+                        ${lesson.title}
+                    </div>
+                    <div class="progress-indicator">
+                        ${lesson.completed ? '<i class="fas fa-check text-success"></i>' : '<i class="fas fa-clock text-muted"></i>'}
+                    </div>
+                `;
+                lessonItem.onclick = () => loadLesson(index);
+                lessonItem.setAttribute('data-lesson', index);
+                
+                if (lesson.completed) {
+                    lessonItem.classList.add('completed');
+                }
+                
+                listContainer.appendChild(lessonItem);
+            });
+        }
+
+        function loadLesson(lessonIndex) {
+            if (lessonIndex < 0 || lessonIndex >= currentCourse.lessons.length) return;
+
+            currentLessonIndex = lessonIndex;
+            const lesson = currentCourse.lessons[lessonIndex];
+
+            // 활성 강의 업데이트
+            document.querySelectorAll('.lesson-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-lesson="${lessonIndex}"]`).classList.add('active');
+
+            // 강의 내용 표시
+            const contentDiv = document.getElementById('lesson-content');
+            contentDiv.innerHTML = `
+                <div class="video-container">
+                    <iframe 
+                        src="https://www.youtube.com/embed/${lesson.videoId}?autoplay=0&rel=0" 
+                        frameborder="0" 
+                        allowfullscreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+                    </iframe>
+                </div>
+                <div class="lesson-description">
+                    ${lesson.description}
+                </div>
+                <div class="d-flex justify-content-between mt-4">
+                    <button class="btn btn-outline-secondary" onclick="loadLesson(${lessonIndex - 1})" ${lessonIndex === 0 ? 'disabled' : ''}>
+                        <i class="fas fa-chevron-left me-2"></i>이전 강의
+                    </button>
+                    <button class="btn btn-success" onclick="markCompleted(${lessonIndex})">
+                        <i class="fas fa-check me-2"></i>완료 표시
+                    </button>
+                    <button class="btn btn-primary" onclick="loadLesson(${lessonIndex + 1})" ${lessonIndex === currentCourse.lessons.length - 1 ? 'disabled' : ''}>
+                        다음 강의<i class="fas fa-chevron-right ms-2"></i>
+                    </button>
+                </div>
+            `;
+
+            // 스크롤 맨 위로
+            window.scrollTo(0, 0);
+        }
+
+        function markCompleted(lessonIndex) {
+            currentCourse.lessons[lessonIndex].completed = true;
+            generateLessonList();
+            updateProgress();
+            
+            // 다음 강의로 자동 이동 (마지막 강의가 아닌 경우)
+            if (lessonIndex < currentCourse.lessons.length - 1) {
+                setTimeout(() => {
+                    loadLesson(lessonIndex + 1);
+                }, 1000);
+            } else {
+                alert('🎉 축하합니다! 모든 강의를 완료하셨습니다!');
+            }
+        }
+
+        function updateProgress() {
+            const completedLessons = currentCourse.lessons.filter(lesson => lesson.completed).length;
+            const totalLessons = currentCourse.lessons.length;
+            const progressPercent = Math.round((completedLessons / totalLessons) * 100);
+            
+            document.getElementById('progress-text').textContent = `${progressPercent}%`;
+            document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            const toggleBtn = document.getElementById('toggleBtn');
+
+            sidebarVisible = !sidebarVisible;
+
+            if (sidebarVisible) {
+                sidebar.classList.remove('hidden');
+                content.classList.remove('expanded');
+                toggleBtn.classList.remove('expanded');
+                toggleBtn.style.display = 'none';
+            } else {
+                sidebar.classList.add('hidden');
+                content.classList.add('expanded');
+                toggleBtn.classList.add('expanded');
+                toggleBtn.style.display = 'block';
+            }
+        }
+
+        function logout() {
+            if (localStorage.getItem('testUser')) {
+                localStorage.removeItem('testUser');
+            }
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
