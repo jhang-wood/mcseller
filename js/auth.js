@@ -165,12 +165,17 @@ async function handleLogin(e) {
     submitBtn.disabled = true;
     
     try {
+        console.log('로그인 처리');
+        
         // 테스트 계정 확인
         const testAccount = Object.values(TEST_ACCOUNTS).find(account => 
             account.email === email && account.password === password
         );
         
+        console.log('테스트 계정 확인:', email, password, testAccount);
+        
         if (testAccount) {
+            console.log('테스트 계정 로그인 성공');
             localStorage.setItem('testUser', JSON.stringify({
                 email: testAccount.email,
                 isAdmin: testAccount.isAdmin,
@@ -627,5 +632,52 @@ function showTestAccounts() {
         if (!form.querySelector('.alert-info')) {
             form.insertAdjacentHTML('beforeend', testInfoHtml);
         }
+    });
+}
+
+// Toast 메시지 표시 함수
+function showToast(message, type = 'info') {
+    // 기존 toast 제거
+    const existingToast = document.querySelector('.toast-container');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    // Toast 컨테이너 생성
+    const toastContainer = document.createElement('div');
+    toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+    toastContainer.style.zIndex = '9999';
+    
+    // Toast 메시지 생성
+    const toastId = 'toast-' + Date.now();
+    const toastClass = type === 'success' ? 'text-bg-success' : 
+                     type === 'error' ? 'text-bg-danger' : 
+                     type === 'warning' ? 'text-bg-warning' : 'text-bg-info';
+    
+    toastContainer.innerHTML = `
+        <div id="${toastId}" class="toast ${toastClass}" role="alert">
+            <div class="d-flex">
+                <div class="toast-body text-white">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(toastContainer);
+    
+    // Bootstrap Toast 초기화 및 표시
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement, {
+        autohide: true,
+        delay: 3000
+    });
+    
+    toast.show();
+    
+    // Toast가 숨겨진 후 컨테이너 제거
+    toastElement.addEventListener('hidden.bs.toast', () => {
+        toastContainer.remove();
     });
 }

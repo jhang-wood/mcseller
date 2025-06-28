@@ -1,163 +1,1503 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>수강신청 - MCSELLER</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        .progress-steps { display: flex; justify-content: center; margin: 30px 0; }
-        .step { flex: 1; text-align: center; padding: 15px; border-bottom: 3px solid #ddd; position: relative; }
-        .step.active { border-color: #0066cc; color: #0066cc; font-weight: bold; }
-        .step.completed { border-color: #28a745; color: #28a745; }
-        .urgency-banner { background: linear-gradient(45deg, #ff4757, #ff6b7a); color: white; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
-        .trust-badges { display: flex; gap: 15px; margin: 15px 0; font-size: 14px; flex-wrap: wrap; }
-        .trust-badge { display: flex; align-items: center; gap: 5px; }
-        .payment-btn { background: linear-gradient(135deg, #0066cc, #004499); border: none; padding: 16px; border-radius: 8px; font-size: 18px; font-weight: bold; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,102,204,0.3); }
-        .payment-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,102,204,0.4); }
-        .payment-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-        .countdown { font-size: 20px; font-weight: bold; color: #ff4757; }
-        .stock-counter { background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 5px; margin: 15px 0; }
-        .cart-item { border: 1px solid #dee2e6; padding: 15px; border-radius: 8px; margin: 10px 0; }
-        .recommendation { border: 1px solid #e3f2fd; background: #f8f9ff; padding: 15px; border-radius: 8px; margin: 15px 0; }
-        .loading-spinner { border: 2px solid #f3f3f3; border-top: 2px solid #0066cc; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; margin-right: 10px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
-</head>
-<body class="bg-light">
-    <div class="container py-4">
-        <!-- 진행률 표시 -->
-        <div class="progress-steps">
-            <div class="step completed">수강신청</div>
-            <div class="step active">결제</div>
-            <div class="step">바로시청하기</div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>수강신청 - MCSELLER</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap"
+            rel="stylesheet"
+        />
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+        <style>
+            /* MCSELLER Payment Theme */
+            :root {
+                --primary-gradient: linear-gradient(
+                    135deg,
+                    #111111 0%,
+                    #23272f 100%
+                );
+                --accent-gradient: linear-gradient(90deg, #ff9900, #ffe259);
+                --success-gradient: linear-gradient(90deg, #28a745, #34d058);
+                --danger-gradient: linear-gradient(90deg, #dc3545, #f56565);
+                --glass-gradient: linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.1) 0%,
+                    rgba(255, 255, 255, 0.05) 100%
+                );
+                --text-light: #e0e0e0;
+                --text-muted: #b5b5b5;
+                --white: #ffffff;
+                --dark: #111111;
+                --border-color: rgba(255, 153, 0, 0.2);
+                --shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: "Noto Sans KR", sans-serif;
+                background: var(--primary-gradient);
+                color: var(--text-light);
+                line-height: 1.6;
+                min-height: 100vh;
+                overflow-x: hidden;
+            }
+
+            /* Animated Background */
+            body::before {
+                content: "";
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(
+                        circle at 30% 20%,
+                        rgba(255, 153, 0, 0.08) 0%,
+                        transparent 50%
+                    ),
+                    radial-gradient(
+                        circle at 70% 80%,
+                        rgba(255, 226, 89, 0.06) 0%,
+                        transparent 50%
+                    ),
+                    radial-gradient(
+                        circle at 20% 70%,
+                        rgba(255, 153, 0, 0.04) 0%,
+                        transparent 50%
+                    );
+                animation: backgroundFloat 20s ease-in-out infinite;
+                z-index: -1;
+            }
+
+            @keyframes backgroundFloat {
+                0%,
+                100% {
+                    transform: translate(0, 0) scale(1);
+                }
+                33% {
+                    transform: translate(-20px, 30px) scale(1.1);
+                }
+                66% {
+                    transform: translate(30px, -20px) scale(0.9);
+                }
+            }
+
+            .container {
+                max-width: 1000px;
+            }
+
+            /* Progress Steps */
+            .progress-steps {
+                display: flex;
+                justify-content: center;
+                margin: 40px 0;
+                position: relative;
+            }
+
+            .progress-steps::before {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 10%;
+                right: 10%;
+                height: 3px;
+                background: linear-gradient(90deg, #28a745, #ff9900, #ddd);
+                border-radius: 3px;
+                z-index: 1;
+            }
+
+            .step {
+                flex: 1;
+                text-align: center;
+                padding: 20px 15px;
+                position: relative;
+                z-index: 2;
+                background: var(--primary-gradient);
+                border-radius: 10px;
+                margin: 0 10px;
+                transition: all 0.3s ease;
+            }
+
+            .step::before {
+                content: "";
+                position: absolute;
+                top: -5px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                background: #ddd;
+                transition: all 0.3s ease;
+            }
+
+            .step.completed::before {
+                background: var(--success-gradient);
+                content: "✓";
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: bold;
+            }
+
+            .step.active {
+                color: #ff9900;
+                font-weight: 700;
+                transform: translateY(-5px);
+            }
+
+            .step.active::before {
+                background: var(--accent-gradient);
+                box-shadow: 0 5px 15px rgba(255, 153, 0, 0.4);
+            }
+
+            .step.completed {
+                color: #28a745;
+                font-weight: 600;
+            }
+
+            /* Urgency Banner */
+            .urgency-banner {
+                background: var(--danger-gradient);
+                color: white;
+                padding: 20px;
+                border-radius: 15px;
+                margin: 30px 0;
+                text-align: center;
+                animation: urgentPulse 2s infinite;
+                box-shadow: var(--shadow);
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .urgency-banner::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.2),
+                    transparent
+                );
+                animation: shimmer 3s infinite;
+            }
+
+            @keyframes urgentPulse {
+                0%,
+                100% {
+                    transform: scale(1);
+                    box-shadow: var(--shadow);
+                }
+                50% {
+                    transform: scale(1.02);
+                    box-shadow: 0 25px 70px rgba(220, 53, 69, 0.4);
+                }
+            }
+
+            @keyframes shimmer {
+                0% {
+                    left: -100%;
+                }
+                100% {
+                    left: 100%;
+                }
+            }
+
+            /* Card Styling */
+            .card {
+                background: var(--glass-gradient);
+                border: 1px solid var(--border-color);
+                border-radius: 25px;
+                backdrop-filter: blur(20px);
+                box-shadow: var(--shadow);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .card::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: var(--accent-gradient);
+                border-radius: 25px 25px 0 0;
+            }
+
+            .card-body {
+                padding: 40px;
+                color: var(--text-light);
+            }
+
+            /* Product Info */
+            #product-info h4 {
+                color: var(--white);
+                font-weight: 800;
+                margin-bottom: 15px;
+                background: var(--accent-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            #product-price {
+                font-size: 2.5rem;
+                font-weight: 900;
+                background: var(--accent-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            /* Trust Badges */
+            .trust-badges {
+                display: flex;
+                gap: 20px;
+                margin: 25px 0;
+                font-size: 14px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .trust-badge {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                background: rgba(255, 153, 0, 0.1);
+                border: 1px solid var(--border-color);
+                padding: 12px 18px;
+                border-radius: 25px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(10px);
+            }
+
+            .trust-badge:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 25px rgba(255, 153, 0, 0.2);
+                background: rgba(255, 153, 0, 0.2);
+            }
+
+            .trust-badge i {
+                font-size: 1.2rem;
+            }
+
+            /* Stock Counter */
+            .stock-counter {
+                background: linear-gradient(
+                    135deg,
+                    rgba(255, 193, 7, 0.15),
+                    rgba(255, 226, 89, 0.1)
+                );
+                border: 2px solid rgba(255, 193, 7, 0.3);
+                padding: 20px;
+                border-radius: 15px;
+                margin: 25px 0;
+                text-align: center;
+                backdrop-filter: blur(10px);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .stock-counter::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(
+                    45deg,
+                    transparent,
+                    rgba(255, 193, 7, 0.1),
+                    transparent
+                );
+                animation: stockGlow 2s infinite;
+            }
+
+            @keyframes stockGlow {
+                0%,
+                100% {
+                    opacity: 0;
+                }
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            .stock-counter .text-danger {
+                color: #ff4757 !important;
+                font-weight: 700;
+                font-size: 1.1rem;
+            }
+
+            /* Cart and Recommendation Sections */
+            .cart-item,
+            .recommendation {
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid var(--border-color);
+                padding: 20px;
+                border-radius: 15px;
+                margin: 20px 0;
+                backdrop-filter: blur(10px);
+                transition: all 0.3s ease;
+            }
+
+            .cart-item:hover,
+            .recommendation:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 15px 35px rgba(255, 153, 0, 0.15);
+            }
+
+            .recommendation {
+                border-color: rgba(23, 162, 184, 0.3);
+                background: linear-gradient(
+                    135deg,
+                    rgba(23, 162, 184, 0.1),
+                    rgba(56, 178, 172, 0.05)
+                );
+            }
+
+            /* Form Controls */
+            .form-label {
+                color: var(--text-light);
+                font-weight: 600;
+                margin-bottom: 10px;
+                font-size: 1rem;
+            }
+
+            .form-control {
+                background: rgba(255, 255, 255, 0.08);
+                border: 2px solid rgba(255, 153, 0, 0.2);
+                border-radius: 12px;
+                color: var(--white);
+                padding: 15px 20px;
+                font-size: 1rem;
+                transition: all 0.3s ease;
+            }
+
+            .form-control:focus {
+                background: rgba(255, 255, 255, 0.12);
+                border-color: #ff9900;
+                box-shadow: 0 0 0 0.2rem rgba(255, 153, 0, 0.25);
+                color: var(--white);
+                transform: translateY(-2px);
+            }
+
+            .form-control::placeholder {
+                color: var(--text-muted);
+            }
+
+            .input-group-text {
+                background: rgba(255, 153, 0, 0.1);
+                border: 2px solid rgba(255, 153, 0, 0.2);
+                color: var(--text-light);
+                font-weight: 600;
+            }
+
+            /* Payment Summary */
+            .payment-summary {
+                background: linear-gradient(
+                    135deg,
+                    rgba(255, 153, 0, 0.1),
+                    rgba(255, 226, 89, 0.05)
+                );
+                border: 2px solid var(--border-color);
+                padding: 30px;
+                border-radius: 20px;
+                margin: 30px 0;
+                backdrop-filter: blur(10px);
+            }
+
+            .payment-summary .h4 {
+                color: var(--white);
+                font-weight: 800;
+            }
+
+            .text-primary {
+                background: var(--accent-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                font-weight: 800;
+            }
+
+            /* Payment Method Selection */
+            .payment-methods {
+                margin: 30px 0;
+            }
+
+            .btn-check:checked + .btn {
+                background: var(--accent-gradient) !important;
+                border-color: #ff9900 !important;
+                color: var(--dark) !important;
+                font-weight: 700;
+                transform: translateY(-3px);
+                box-shadow: 0 10px 25px rgba(255, 153, 0, 0.3);
+            }
+
+            .btn-outline-primary,
+            .btn-outline-warning,
+            .btn-outline-success,
+            .btn-outline-info {
+                border: 2px solid rgba(255, 153, 0, 0.3);
+                color: var(--text-light);
+                background: rgba(255, 255, 255, 0.05);
+                font-weight: 600;
+                padding: 15px 20px;
+                border-radius: 12px;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(10px);
+            }
+
+            .btn-outline-primary:hover {
+                border-color: #0d6efd;
+                background: rgba(13, 110, 253, 0.1);
+                color: #0d6efd;
+            }
+
+            .btn-outline-warning:hover {
+                border-color: #ffc107;
+                background: rgba(255, 193, 7, 0.1);
+                color: #ffc107;
+            }
+
+            .btn-outline-success:hover {
+                border-color: #28a745;
+                background: rgba(40, 167, 69, 0.1);
+                color: #28a745;
+            }
+
+            .btn-outline-info:hover {
+                border-color: #17a2b8;
+                background: rgba(23, 162, 184, 0.1);
+                color: #17a2b8;
+            }
+
+            /* Payment Button */
+            .payment-btn {
+                background: var(--accent-gradient);
+                border: none;
+                padding: 20px 40px;
+                border-radius: 15px;
+                font-size: 1.3rem;
+                font-weight: 800;
+                transition: all 0.3s ease;
+                box-shadow: 0 15px 40px rgba(255, 153, 0, 0.4);
+                color: var(--dark);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .payment-btn::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.3),
+                    transparent
+                );
+                transition: left 0.5s;
+            }
+
+            .payment-btn:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 20px 50px rgba(255, 153, 0, 0.5);
+                color: var(--dark);
+            }
+
+            .payment-btn:hover::before {
+                left: 100%;
+            }
+
+            .payment-btn:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                transform: none;
+                box-shadow: 0 8px 20px rgba(255, 153, 0, 0.2);
+            }
+
+            .payment-btn:disabled::before {
+                display: none;
+            }
+
+            /* Countdown Timer */
+            .countdown {
+                font-size: 1.8rem;
+                font-weight: 900;
+                color: #fff;
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .countdown .time-unit {
+                background: rgba(255, 255, 255, 0.2);
+                padding: 8px 12px;
+                border-radius: 8px;
+                backdrop-filter: blur(10px);
+                min-width: 50px;
+                text-align: center;
+            }
+
+            /* Loading Spinner */
+            .loading-spinner {
+                border: 3px solid rgba(255, 153, 0, 0.2);
+                border-top: 3px solid #ff9900;
+                border-radius: 50%;
+                width: 24px;
+                height: 24px;
+                animation: spin 1s linear infinite;
+                display: inline-block;
+                margin-right: 10px;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            /* Alert Messages */
+            .alert {
+                background: var(--glass-gradient);
+                border: 2px solid;
+                border-radius: 12px;
+                backdrop-filter: blur(10px);
+                color: var(--white);
+            }
+
+            .alert-danger {
+                border-color: rgba(220, 53, 69, 0.5);
+                background: linear-gradient(
+                    135deg,
+                    rgba(220, 53, 69, 0.15),
+                    rgba(245, 101, 101, 0.1)
+                );
+            }
+
+            .alert-success {
+                border-color: rgba(40, 167, 69, 0.5);
+                background: linear-gradient(
+                    135deg,
+                    rgba(40, 167, 69, 0.15),
+                    rgba(52, 208, 88, 0.1)
+                );
+            }
+
+            .alert-info {
+                border-color: rgba(23, 162, 184, 0.5);
+                background: linear-gradient(
+                    135deg,
+                    rgba(23, 162, 184, 0.15),
+                    rgba(56, 178, 172, 0.1)
+                );
+            }
+
+            /* Success States */
+            .text-success {
+                color: #28a745 !important;
+            }
+
+            .text-danger {
+                color: #ff4757 !important;
+            }
+
+            .text-warning {
+                color: #ffc107 !important;
+            }
+
+            .text-info {
+                color: #17a2b8 !important;
+            }
+
+            /* Buttons */
+            .btn-outline-secondary {
+                border: 2px solid var(--text-muted);
+                color: var(--text-light);
+                background: transparent;
+                font-weight: 600;
+                padding: 10px 20px;
+                border-radius: 10px;
+                transition: all 0.3s ease;
+            }
+
+            .btn-outline-secondary:hover {
+                background: var(--text-light);
+                color: var(--dark);
+                border-color: var(--text-light);
+                transform: translateY(-2px);
+            }
+
+            /* Small Text */
+            .text-muted {
+                color: var(--text-muted) !important;
+            }
+
+            small {
+                font-size: 0.875rem;
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .card-body {
+                    padding: 25px 20px;
+                }
+
+                .trust-badges {
+                    justify-content: center;
+                    gap: 10px;
+                }
+
+                .trust-badge {
+                    padding: 8px 12px;
+                    font-size: 0.8rem;
+                }
+
+                .payment-btn {
+                    font-size: 1.1rem;
+                    padding: 18px 30px;
+                }
+
+                .countdown {
+                    font-size: 1.4rem;
+                }
+
+                .progress-steps {
+                    margin: 20px 0;
+                }
+
+                .step {
+                    padding: 15px 10px;
+                    font-size: 0.9rem;
+                }
+
+                .urgency-banner {
+                    padding: 15px;
+                    font-size: 0.9rem;
+                }
+
+                .h4 {
+                    font-size: 1.5rem;
+                }
+
+                #product-price {
+                    font-size: 2rem;
+                }
+            }
+
+            /* Enhanced Visual Effects */
+            .pulse-glow {
+                animation: pulseGlow 2s infinite;
+            }
+
+            @keyframes pulseGlow {
+                0%,
+                100% {
+                    box-shadow: 0 15px 40px rgba(255, 153, 0, 0.4);
+                }
+                50% {
+                    box-shadow: 0 20px 50px rgba(255, 153, 0, 0.6);
+                }
+            }
+
+            /* Floating Animation */
+            .float-animation {
+                animation: float 6s ease-in-out infinite;
+            }
+
+            @keyframes float {
+                0%,
+                100% {
+                    transform: translateY(0px);
+                }
+                50% {
+                    transform: translateY(-10px);
+                }
+            }
+
+            /* Security Badge */
+            .security-badge {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: var(--success-gradient);
+                color: white;
+                padding: 10px 15px;
+                border-radius: 25px;
+                font-size: 0.9rem;
+                font-weight: 600;
+                box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .security-badge i {
+                animation: securityPulse 2s infinite;
+            }
+
+            @keyframes securityPulse {
+                0%,
+                100% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.2);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Security Badge -->
+        <div class="security-badge">
+            <i class="fas fa-shield-alt"></i>
+            SSL 보안결제
         </div>
 
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <!-- 긴급성 배너 -->
-                <div class="urgency-banner">
-                    🚨 <strong id="discount-timer">24:00:00</strong> 후 할인 종료! 선착순 <span id="stock-left">47</span>명 한정
+        <div class="container py-4">
+            <!-- 진행률 표시 -->
+            <div class="progress-steps">
+                <div class="step completed">
+                    <div>수강신청</div>
                 </div>
+                <div class="step active">
+                    <div>결제</div>
+                </div>
+                <div class="step">
+                    <div>바로시청하기</div>
+                </div>
+            </div>
 
-                <div class="card shadow">
-                    <div class="card-body">
-                        <!-- 상품 정보 -->
-                        <div id="product-info" class="mb-4">
-                            <h4 id="product-title">로딩중...</h4>
-                            <p class="text-muted">강사: MCSELLER 대표 (前 온라인 마케팅 전문가)</p>
-                            <div class="h4 text-primary" id="product-price">₩0</div>
-                        </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <!-- 긴급성 배너 -->
+                    <div class="urgency-banner float-animation">
+                        <i class="fas fa-fire me-2"></i>
+                        <strong
+                            >🚨 특가 마감까지
+                            <span class="countdown" id="discount-timer">
+                                <span class="time-unit">24</span>:
+                                <span class="time-unit">00</span>:
+                                <span class="time-unit">00</span>
+                            </span></strong
+                        >
+                        <br />
+                        <small
+                            >선착순
+                            <span id="stock-left" class="fw-bold">47</span>명
+                            한정 할인!</small
+                        >
+                    </div>
 
-                        <!-- 신뢰 요소 -->
-                        <div class="trust-badges">
-                            <div class="trust-badge"><i class="fas fa-shield-alt text-success"></i> 7일 내 100% 환불</div>
-                            <div class="trust-badge"><i class="fas fa-users text-info"></i> 1,200+ 수강생</div>
-                            <div class="trust-badge"><i class="fas fa-star text-warning"></i> 평점 4.9/5</div>
-                        </div>
-
-                        <!-- 실시간 재고 -->
-                        <div class="stock-counter">
-                            <i class="fas fa-fire text-danger"></i> <strong>실시간 수강생:</strong> <span id="current-students">1,247명</span> | 
-                            <strong>남은 자리:</strong> <span id="stock-left-detail" class="text-danger">13석</span>
-                        </div>
-
-                        <!-- 장바구니 상품들 -->
-                        <div id="cart-section" class="mb-4">
-                            <h5><i class="fas fa-shopping-cart"></i> 수강 과정</h5>
-                            <div id="cart-items"></div>
-                        </div>
-
-                        <!-- 추천 상품 -->
-                        <div id="recommendations" class="recommendation">
-                            <h6><i class="fas fa-star"></i> 함께 수강하면 좋은 과정</h6>
-                            <div id="recommended-items"></div>
-                        </div>
-
-                        <!-- 할인코드 -->
-                        <div class="mb-3">
-                            <label class="form-label">할인코드</label>
-                            <div class="input-group">
-                                <input type="text" id="discount-code" class="form-control" placeholder="할인코드 입력">
-                                <button class="btn btn-outline-secondary" onclick="applyDiscount()">적용</button>
+                    <div class="card">
+                        <div class="card-body">
+                            <!-- 상품 정보 -->
+                            <div id="product-info" class="mb-4 text-center">
+                                <h4 id="product-title">로딩중...</h4>
+                                <p class="text-muted mb-3">
+                                    <i class="fas fa-graduation-cap me-2"></i>
+                                    강사: MCSELLER 대표 (前 온라인 마케팅
+                                    전문가)
+                                </p>
+                                <div class="h4" id="product-price">₩0</div>
                             </div>
-                            <div id="discount-msg" class="mt-1"></div>
-                        </div>
 
-                        <!-- 적립금 -->
-                        <div class="mb-3">
-                            <label class="form-label">적립금 사용</label>
-                            <div class="input-group">
-                                <input type="number" id="points" class="form-control" placeholder="0" min="0">
-                                <span class="input-group-text">원</span>
-                                <button class="btn btn-outline-secondary" onclick="useAllPoints()">전액사용</button>
-                            </div>
-                            <small class="text-muted">보유: <span id="user-points">0</span>원</small>
-                            <div id="points-msg" class="mt-1"></div>
-                        </div>
-
-                        <!-- 결제 금액 -->
-                        <div class="mb-4 p-3 bg-light rounded">
-                            <div class="d-flex justify-content-between">
-                                <span>원가:</span>
-                                <span id="original-price">₩0</span>
-                            </div>
-                            <div class="d-flex justify-content-between text-danger">
-                                <span>할인:</span>
-                                <span id="discount-amount">-₩0</span>
-                            </div>
-                            <div class="d-flex justify-content-between text-danger">
-                                <span>적립금:</span>
-                                <span id="points-amount">-₩0</span>
-                            </div>
-                            <hr>
-                            <div class="d-flex justify-content-between h4">
-                                <span>최종 결제금액:</span>
-                                <span id="final-amount" class="text-primary">₩0</span>
-                            </div>
-                        </div>
-
-                        <!-- 결제 방법 -->
-                        <div class="mb-4">
-                            <label class="form-label">결제 방법</label>
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <input type="radio" class="btn-check" name="payment-method" id="card" value="card" checked>
-                                    <label class="btn btn-outline-primary w-100" for="card"><i class="fas fa-credit-card"></i> 카드</label>
+                            <!-- 신뢰 요소 -->
+                            <div class="trust-badges">
+                                <div class="trust-badge">
+                                    <i
+                                        class="fas fa-shield-alt text-success"
+                                    ></i>
+                                    <span>7일 내 100% 환불</span>
                                 </div>
-                                <div class="col-6">
-                                    <input type="radio" class="btn-check" name="payment-method" id="kakaopay" value="kakaopay">
-                                    <label class="btn btn-outline-warning w-100" for="kakaopay"><i class="fas fa-comment"></i> 카카오페이</label>
+                                <div class="trust-badge">
+                                    <i class="fas fa-users text-info"></i>
+                                    <span>1,200+ 수강생</span>
                                 </div>
-                                <div class="col-6">
-                                    <input type="radio" class="btn-check" name="payment-method" id="bank" value="bank">
-                                    <label class="btn btn-outline-success w-100" for="bank"><i class="fas fa-university"></i> 계좌이체</label>
-                                </div>
-                                <div class="col-6">
-                                    <input type="radio" class="btn-check" name="payment-method" id="phone" value="phone">
-                                    <label class="btn btn-outline-info w-100" for="phone"><i class="fas fa-mobile-alt"></i> 휴대폰</label>
+                                <div class="trust-badge">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <span>평점 4.9/5</span>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- 결제 버튼 -->
-                        <button id="pay-btn" class="btn payment-btn w-100" onclick="processPay()">
-                            <i class="fas fa-lock"></i> 안전하게 수강 신청하기
-                        </button>
-                        
-                        <!-- 오류 메시지 -->
-                        <div id="error-message" class="alert alert-danger mt-3" style="display: none;"></div>
+                            <!-- 실시간 재고 -->
+                            <div class="stock-counter">
+                                <div
+                                    class="d-flex justify-content-center align-items-center gap-4 flex-wrap"
+                                >
+                                    <div>
+                                        <i
+                                            class="fas fa-users text-warning me-2"
+                                        ></i>
+                                        <strong>실시간 수강생:</strong>
+                                        <span
+                                            id="current-students"
+                                            class="text-warning fw-bold"
+                                            >1,247명</span
+                                        >
+                                    </div>
+                                    <div>
+                                        <i
+                                            class="fas fa-fire text-danger me-2"
+                                        ></i>
+                                        <strong>남은 자리:</strong>
+                                        <span
+                                            id="stock-left-detail"
+                                            class="text-danger fw-bold"
+                                            >13석</span
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 장바구니 상품들 -->
+                            <div id="cart-section" class="mb-4">
+                                <h5 class="mb-3">
+                                    <i
+                                        class="fas fa-shopping-cart me-2 text-warning"
+                                    ></i>
+                                    수강 과정
+                                </h5>
+                                <div id="cart-items"></div>
+                            </div>
+
+                            <!-- 추천 상품 -->
+                            <div id="recommendations" class="recommendation">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-star me-2 text-info"></i>
+                                    함께 수강하면 좋은 과정
+                                </h6>
+                                <div id="recommended-items"></div>
+                            </div>
+
+                            <!-- 할인코드 -->
+                            <div class="mb-4">
+                                <label class="form-label">
+                                    <i class="fas fa-tags me-2"></i>할인코드
+                                </label>
+                                <div class="input-group">
+                                    <input
+                                        type="text"
+                                        id="discount-code"
+                                        class="form-control"
+                                        placeholder="할인코드를 입력하세요"
+                                    />
+                                    <button
+                                        class="btn btn-outline-secondary"
+                                        onclick="applyDiscount()"
+                                    >
+                                        <i class="fas fa-check me-1"></i>적용
+                                    </button>
+                                </div>
+                                <div id="discount-msg" class="mt-2"></div>
+                            </div>
+
+                            <!-- 적립금 -->
+                            <div class="mb-4">
+                                <label class="form-label">
+                                    <i class="fas fa-coins me-2"></i>적립금 사용
+                                </label>
+                                <div class="input-group">
+                                    <input
+                                        type="number"
+                                        id="points"
+                                        class="form-control"
+                                        placeholder="0"
+                                        min="0"
+                                    />
+                                    <span class="input-group-text">원</span>
+                                    <button
+                                        class="btn btn-outline-secondary"
+                                        onclick="useAllPoints()"
+                                    >
+                                        전액사용
+                                    </button>
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-wallet me-1"></i>
+                                    보유:
+                                    <span
+                                        id="user-points"
+                                        class="text-warning fw-bold"
+                                        >0</span
+                                    >원
+                                </small>
+                                <div id="points-msg" class="mt-2"></div>
+                            </div>
+
+                            <!-- 결제 금액 -->
+                            <div class="payment-summary">
+                                <div
+                                    class="d-flex justify-content-between mb-2"
+                                >
+                                    <span>원가:</span>
+                                    <span id="original-price">₩0</span>
+                                </div>
+                                <div
+                                    class="d-flex justify-content-between mb-2 text-success"
+                                >
+                                    <span
+                                        ><i class="fas fa-minus-circle me-1"></i
+                                        >할인:</span
+                                    >
+                                    <span id="discount-amount">-₩0</span>
+                                </div>
+                                <div
+                                    class="d-flex justify-content-between mb-3 text-success"
+                                >
+                                    <span
+                                        ><i class="fas fa-coins me-1"></i
+                                        >적립금:</span
+                                    >
+                                    <span id="points-amount">-₩0</span>
+                                </div>
+                                <hr style="border-color: var(--border-color)" />
+                                <div
+                                    class="d-flex justify-content-between h4 mb-0"
+                                >
+                                    <span class="fw-bold">최종 결제금액:</span>
+                                    <span id="final-amount" class="text-primary"
+                                        >₩0</span
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- 결제 방법 -->
+                            <div class="payment-methods">
+                                <label class="form-label mb-3">
+                                    <i class="fas fa-credit-card me-2"></i>결제
+                                    방법 선택
+                                </label>
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <input
+                                            type="radio"
+                                            class="btn-check"
+                                            name="payment-method"
+                                            id="card"
+                                            value="card"
+                                            checked
+                                        />
+                                        <label
+                                            class="btn btn-outline-primary w-100"
+                                            for="card"
+                                        >
+                                            <i
+                                                class="fas fa-credit-card me-2"
+                                            ></i
+                                            >카드결제
+                                        </label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input
+                                            type="radio"
+                                            class="btn-check"
+                                            name="payment-method"
+                                            id="kakaopay"
+                                            value="kakaopay"
+                                        />
+                                        <label
+                                            class="btn btn-outline-warning w-100"
+                                            for="kakaopay"
+                                        >
+                                            <i class="fas fa-comment me-2"></i
+                                            >카카오페이
+                                        </label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input
+                                            type="radio"
+                                            class="btn-check"
+                                            name="payment-method"
+                                            id="bank"
+                                            value="bank"
+                                        />
+                                        <label
+                                            class="btn btn-outline-success w-100"
+                                            for="bank"
+                                        >
+                                            <i
+                                                class="fas fa-university me-2"
+                                            ></i
+                                            >계좌이체
+                                        </label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input
+                                            type="radio"
+                                            class="btn-check"
+                                            name="payment-method"
+                                            id="phone"
+                                            value="phone"
+                                        />
+                                        <label
+                                            class="btn btn-outline-info w-100"
+                                            for="phone"
+                                        >
+                                            <i
+                                                class="fas fa-mobile-alt me-2"
+                                            ></i
+                                            >휴대폰결제
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 결제 버튼 -->
+                            <button
+                                id="pay-btn"
+                                class="btn payment-btn w-100 pulse-glow"
+                                onclick="processPay()"
+                            >
+                                <i class="fas fa-lock me-2"></i>
+                                <span>안전하게 수강 신청하기</span>
+                            </button>
+
+                            <!-- 추가 보안 정보 -->
+                            <div class="text-center mt-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-shield-alt me-1"></i>
+                                    PCI DSS 인증 · SSL 암호화 · 개인정보보호
+                                </small>
+                            </div>
+
+                            <!-- 오류 메시지 -->
+                            <div
+                                id="error-message"
+                                class="alert alert-danger mt-3"
+                                style="display: none"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <!-- 추가 혜택 알림 -->
+                    <div class="text-center mt-4">
+                        <div
+                            class="d-inline-flex align-items-center gap-3 p-3 rounded-pill"
+                            style="
+                                background: rgba(40, 167, 69, 0.1);
+                                border: 1px solid rgba(40, 167, 69, 0.3);
+                            "
+                        >
+                            <i class="fas fa-gift text-success"></i>
+                            <small class="text-success fw-bold">
+                                수강 완료 시 31,500원 적립금 지급!
+                            </small>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <script src="js/config.js"></script>
-    <script src="js/supabase-client.js"></script>
-    <script src="js/payment-simple.js"></script>
-</body>
+        <script src="js/config.js"></script>
+        <script src="js/supabase-client.js"></script>
+        <script src="js/payment-simple.js"></script>
+
+        <script>
+            // Enhanced payment page functionality
+            document.addEventListener("DOMContentLoaded", function () {
+                // Initialize countdown timer
+                const initializeCountdown = () => {
+                    const timer = document.getElementById("discount-timer");
+                    if (!timer) return;
+
+                    const endTime = new Date().getTime() + 24 * 60 * 60 * 1000; // 24 hours from now
+
+                    const updateCountdown = () => {
+                        const now = new Date().getTime();
+                        const timeLeft = endTime - now;
+
+                        if (timeLeft > 0) {
+                            const hours = Math.floor(
+                                timeLeft / (1000 * 60 * 60),
+                            );
+                            const minutes = Math.floor(
+                                (timeLeft % (1000 * 60 * 60)) / (1000 * 60),
+                            );
+                            const seconds = Math.floor(
+                                (timeLeft % (1000 * 60)) / 1000,
+                            );
+
+                            timer.innerHTML = `
+                            <span class="time-unit">${hours.toString().padStart(2, "0")}</span>:
+                            <span class="time-unit">${minutes.toString().padStart(2, "0")}</span>:
+                            <span class="time-unit">${seconds.toString().padStart(2, "0")}</span>
+                        `;
+                        } else {
+                            timer.innerHTML =
+                                '<span class="time-unit">00</span>:<span class="time-unit">00</span>:<span class="time-unit">00</span>';
+                        }
+                    };
+
+                    updateCountdown();
+                    setInterval(updateCountdown, 1000);
+                };
+
+                // Simulate dynamic stock counter
+                const initializeStockCounter = () => {
+                    const stockElements = document.querySelectorAll(
+                        "#stock-left, #stock-left-detail",
+                    );
+                    const currentStudents =
+                        document.getElementById("current-students");
+
+                    let stock = 47;
+                    let students = 1247;
+
+                    const updateStock = () => {
+                        // Randomly decrease stock (simulate real-time purchases)
+                        if (Math.random() < 0.3 && stock > 5) {
+                            stock -= Math.floor(Math.random() * 2) + 1;
+                            students += Math.floor(Math.random() * 3) + 1;
+
+                            stockElements.forEach((el) => {
+                                el.textContent = stock;
+                                if (stock <= 10) {
+                                    el.style.color = "#ff4757";
+                                    el.parentElement.style.animation =
+                                        "urgentPulse 1s infinite";
+                                }
+                            });
+
+                            if (currentStudents) {
+                                currentStudents.textContent = `${students.toLocaleString()}명`;
+                            }
+                        }
+                    };
+
+                    // Update stock every 30-90 seconds
+                    setInterval(updateStock, Math.random() * 60000 + 30000);
+                };
+
+                // Enhanced form interactions
+                const enhanceFormInteractions = () => {
+                    // Discount code input
+                    const discountInput =
+                        document.getElementById("discount-code");
+                    const pointsInput = document.getElementById("points");
+
+                    if (discountInput) {
+                        discountInput.addEventListener("input", function () {
+                            this.value = this.value.toUpperCase();
+
+                            // Real-time validation styling
+                            if (this.value.length >= 3) {
+                                this.style.borderColor = "#28a745";
+                                this.style.boxShadow =
+                                    "0 0 0 0.2rem rgba(40, 167, 69, 0.25)";
+                            } else {
+                                this.style.borderColor =
+                                    "rgba(255, 153, 0, 0.2)";
+                                this.style.boxShadow =
+                                    "inset 0 2px 10px rgba(0, 0, 0, 0.1)";
+                            }
+                        });
+
+                        // Auto-apply on Enter
+                        discountInput.addEventListener(
+                            "keypress",
+                            function (e) {
+                                if (e.key === "Enter") {
+                                    applyDiscount();
+                                }
+                            },
+                        );
+                    }
+
+                    if (pointsInput) {
+                        pointsInput.addEventListener("input", function () {
+                            const value = parseInt(this.value) || 0;
+                            const maxPoints =
+                                parseInt(
+                                    document.getElementById("user-points")
+                                        .textContent,
+                                ) || 0;
+
+                            if (value > maxPoints) {
+                                this.value = maxPoints;
+                            }
+
+                            // Visual feedback
+                            if (value > 0 && value <= maxPoints) {
+                                this.style.borderColor = "#28a745";
+                                this.style.boxShadow =
+                                    "0 0 0 0.2rem rgba(40, 167, 69, 0.25)";
+                            }
+                        });
+                    }
+                };
+
+                // Payment method selection enhancements
+                const enhancePaymentMethods = () => {
+                    const paymentMethods = document.querySelectorAll(
+                        'input[name="payment-method"]',
+                    );
+
+                    paymentMethods.forEach((method) => {
+                        method.addEventListener("change", function () {
+                            // Update payment button text based on method
+                            const payBtn = document.getElementById("pay-btn");
+                            const methodName =
+                                this.nextElementSibling.textContent.trim();
+
+                            payBtn.innerHTML = `<i class="fas fa-lock me-2"></i>${methodName}로 안전하게 결제하기`;
+
+                            // Add visual feedback
+                            payBtn.style.animation = "none";
+                            payBtn.offsetHeight; // Trigger reflow
+                            payBtn.style.animation = "pulseGlow 2s infinite";
+                        });
+                    });
+                };
+
+                // Enhanced loading states
+                const showLoadingState = (element, originalText) => {
+                    element.innerHTML = `<div class="loading-spinner"></div>${originalText}`;
+                    element.disabled = true;
+                    element.style.opacity = "0.8";
+                };
+
+                const hideLoadingState = (element, originalText) => {
+                    element.innerHTML = originalText;
+                    element.disabled = false;
+                    element.style.opacity = "1";
+                };
+
+                // Enhanced notification system
+                const showNotification = (
+                    message,
+                    type = "success",
+                    duration = 5000,
+                ) => {
+                    // Remove existing notifications
+                    const existingNotifications = document.querySelectorAll(
+                        ".notification-toast",
+                    );
+                    existingNotifications.forEach((notification) =>
+                        notification.remove(),
+                    );
+
+                    const notification = document.createElement("div");
+                    notification.className = `notification-toast position-fixed`;
+                    notification.style.cssText = `
+                    top: 20px;
+                    right: 20px;
+                    z-index: 9999;
+                    max-width: 400px;
+                    padding: 15px 20px;
+                    border-radius: 12px;
+                    font-weight: 600;
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                    backdrop-filter: blur(10px);
+                    animation: slideInRight 0.5s ease-out;
+                `;
+
+                    const typeStyles = {
+                        success:
+                            "background: linear-gradient(135deg, rgba(40, 167, 69, 0.9), rgba(52, 208, 88, 0.8)); color: white; border: 1px solid rgba(40, 167, 69, 0.5);",
+                        error: "background: linear-gradient(135deg, rgba(220, 53, 69, 0.9), rgba(245, 101, 101, 0.8)); color: white; border: 1px solid rgba(220, 53, 69, 0.5);",
+                        warning:
+                            "background: linear-gradient(135deg, rgba(255, 193, 7, 0.9), rgba(255, 213, 79, 0.8)); color: #111; border: 1px solid rgba(255, 193, 7, 0.5);",
+                        info: "background: linear-gradient(135deg, rgba(23, 162, 184, 0.9), rgba(56, 178, 172, 0.8)); color: white; border: 1px solid rgba(23, 162, 184, 0.5);",
+                    };
+
+                    notification.style.cssText +=
+                        typeStyles[type] || typeStyles.info;
+                    notification.innerHTML = `
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-${type === "success" ? "check-circle" : type === "error" ? "exclamation-circle" : type === "warning" ? "exclamation-triangle" : "info-circle"} me-2"></i>
+                            <span>${message}</span>
+                        </div>
+                        <button class="btn-close btn-close-white ms-2" onclick="this.parentElement.parentElement.remove()"></button>
+                    </div>
+                `;
+
+                    document.body.appendChild(notification);
+
+                    // Auto remove after duration
+                    setTimeout(() => {
+                        if (notification.parentElement) {
+                            notification.style.animation =
+                                "slideOutRight 0.5s ease-in";
+                            setTimeout(() => notification.remove(), 500);
+                        }
+                    }, duration);
+                };
+
+                // Add animation styles
+                const style = document.createElement("style");
+                style.textContent = `
+                @keyframes slideInRight {
+                    from {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+                @keyframes slideOutRight {
+                    from {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                    to {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                }
+            `;
+                document.head.appendChild(style);
+
+                // Enhanced payment processing
+                window.processPay = function () {
+                    const payBtn = document.getElementById("pay-btn");
+                    const originalText = payBtn.innerHTML;
+
+                    showLoadingState(payBtn, "결제 처리 중...");
+
+                    // Simulate payment processing
+                    setTimeout(() => {
+                        hideLoadingState(payBtn, originalText);
+                        showNotification(
+                            "결제가 성공적으로 완료되었습니다!",
+                            "success",
+                        );
+
+                        // Simulate redirect after successful payment
+                        setTimeout(() => {
+                            // window.location.href = 'success.html';
+                            console.log("Redirect to success page");
+                        }, 2000);
+                    }, 3000);
+                };
+
+                // Enhanced discount application
+                window.applyDiscount = function () {
+                    const discountInput =
+                        document.getElementById("discount-code");
+                    const discountMsg = document.getElementById("discount-msg");
+                    const code = discountInput.value.trim();
+
+                    if (!code) {
+                        showNotification("할인코드를 입력해주세요.", "warning");
+                        return;
+                    }
+
+                    const applyBtn = discountInput.nextElementSibling;
+                    const originalText = applyBtn.innerHTML;
+                    showLoadingState(applyBtn, "확인 중...");
+
+                    // Simulate API call
+                    setTimeout(() => {
+                        hideLoadingState(applyBtn, originalText);
+
+                        // Mock discount codes
+                        const validCodes = {
+                            SUPER15: { discount: 15, type: "percent" },
+                            NEW2024: { discount: 10000, type: "amount" },
+                            WELCOME: { discount: 20, type: "percent" },
+                        };
+
+                        if (validCodes[code]) {
+                            const discount = validCodes[code];
+                            discountMsg.innerHTML = `<small class="text-success"><i class="fas fa-check-circle me-1"></i>할인이 적용되었습니다!</small>`;
+                            showNotification(
+                                `${code} 할인코드가 적용되었습니다!`,
+                                "success",
+                            );
+                            discountInput.style.borderColor = "#28a745";
+                        } else {
+                            discountMsg.innerHTML = `<small class="text-danger"><i class="fas fa-times-circle me-1"></i>유효하지 않은 할인코드입니다.</small>`;
+                            showNotification(
+                                "유효하지 않은 할인코드입니다.",
+                                "error",
+                            );
+                            discountInput.style.borderColor = "#dc3545";
+                        }
+                    }, 1500);
+                };
+
+                // Enhanced points usage
+                window.useAllPoints = function () {
+                    const pointsInput = document.getElementById("points");
+                    const userPoints =
+                        document.getElementById("user-points").textContent;
+                    const availablePoints = parseInt(userPoints) || 0;
+
+                    if (availablePoints > 0) {
+                        pointsInput.value = availablePoints;
+                        pointsInput.style.borderColor = "#28a745";
+                        pointsInput.style.boxShadow =
+                            "0 0 0 0.2rem rgba(40, 167, 69, 0.25)";
+                        showNotification(
+                            `${availablePoints.toLocaleString()}원 적립금이 적용되었습니다!`,
+                            "success",
+                        );
+                    } else {
+                        showNotification(
+                            "사용 가능한 적립금이 없습니다.",
+                            "warning",
+                        );
+                    }
+                };
+
+                // Initialize all enhancements
+                initializeCountdown();
+                initializeStockCounter();
+                enhanceFormInteractions();
+                enhancePaymentMethods();
+
+                // Mock data setup (remove in production)
+                document.getElementById("product-title").textContent =
+                    "MCSELLER AI 마스터 과정";
+                document.getElementById("product-price").textContent =
+                    "₩490,000";
+                document.getElementById("original-price").textContent =
+                    "₩1,500,000";
+                document.getElementById("final-amount").textContent =
+                    "₩490,000";
+                document.getElementById("user-points").textContent = "31,500";
+
+                console.log("MCSELLER 결제 페이지가 로드되었습니다.");
+            });
+        </script>
+    </body>
 </html>
