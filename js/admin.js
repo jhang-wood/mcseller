@@ -126,6 +126,9 @@ async function loadSectionData(sectionName) {
         case 'analytics':
             await loadAnalyticsData();
             break;
+        case 'promotions':
+            await loadPromotionsData();
+            break;
     }
 }
 
@@ -1004,5 +1007,231 @@ async function importProductsCSV() {
     } catch (error) {
         console.error('CSV 가져오기 오류:', error);
         showToast('CSV 가져오기 중 오류가 발생했습니다.', 'error');
+    }
+}
+
+// 프로모션 관리 기능 추가
+async function loadPromotionsData() {
+    try {
+        // 신규 회원 적립금 설정 로드
+        await loadNewUserPointsSetting();
+        
+        // 할인 코드 목록 로드
+        await loadDiscountCodes();
+        
+        // 프로모션 현황 테이블 로드
+        await loadPromotionsTable();
+        
+        // 이벤트 리스너 설정
+        setupPromotionEvents();
+        
+    } catch (error) {
+        console.error('프로모션 데이터 로드 오류:', error);
+        showToast('프로모션 데이터를 불러오는 중 오류가 발생했습니다.', 'error');
+    }
+}
+
+// 신규 회원 적립금 설정 로드
+async function loadNewUserPointsSetting() {
+    try {
+        // localStorage에서 설정 불러오기 (실제로는 DB에서)
+        const savedPoints = localStorage.getItem('newUserPoints') || '31500';
+        document.getElementById('newUserPoints').value = savedPoints;
+    } catch (error) {
+        console.error('적립금 설정 로드 오류:', error);
+    }
+}
+
+// 할인 코드 목록 로드
+async function loadDiscountCodes() {
+    try {
+        // localStorage에서 할인 코드 불러오기 (실제로는 DB에서)
+        const discountCodes = JSON.parse(localStorage.getItem('discountCodes') || '[]');
+        
+        const container = document.getElementById('discountCodesContainer');
+        if (discountCodes.length === 0) {
+            container.innerHTML = '<p class="text-muted">등록된 할인 코드가 없습니다.</p>';
+            return;
+        }
+        
+        let html = '';
+        discountCodes.forEach((code, index) => {
+            const typeText = code.type === 'percent' ? `${code.value}% 할인` : `${code.value.toLocaleString()}원 할인`;
+            const statusBadge = code.isActive ? 
+                '<span class="badge bg-success">활성</span>' : 
+                '<span class="badge bg-secondary">비활성</span>';
+            
+            html += `
+                <div class="d-flex justify-content-between align-items-center p-2 border rounded mb-2">
+                    <div>
+                        <strong>${code.code}</strong> - ${typeText}
+                        <br><small class="text-muted">사용: ${code.usedCount || 0}/${code.maxUses}회</small>
+                    </div>
+                    <div>
+                        ${statusBadge}
+                        <button class="btn btn-sm btn-outline-danger ms-2" onclick="deleteDiscountCode(${index})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+    } catch (error) {
+        console.error('할인 코드 로드 오류:', error);
+    }
+}
+
+// 프로모션 현황 테이블 로드
+async function loadPromotionsTable() {
+    try {
+        const newUserPoints = localStorage.getItem('newUserPoints') || '31500';
+        const discountCodes = JSON.parse(localStorage.getItem('discountCodes') || '[]');
+        
+        const tbody = document.getElementById('promotionsTableBody');
+        let html = '';
+        
+        // 신규 회원 적립금 행 추가
+        html += `
+            <tr>
+                <td>신규 회원 적립금</td>
+                <td>자동 지급</td>
+                <td>${parseInt(newUserPoints).toLocaleString()}원</td>
+                <td>-</td>
+                <td><span class="badge bg-success">활성</span></td>
+                <td>-</td>
+            </tr>
+        `;
+        
+        // 할인 코드 행들 추가
+        discountCodes.forEach((code, index) => {
+            const typeText = code.type === 'percent' ? `${code.value}%` : `${code.value.toLocaleString()}원`;
+            const statusBadge = code.isActive ? 
+                '<span class="badge bg-success">활성</span>' : 
+                '<span class="badge bg-secondary">비활성</span>';
+            
+            html += `
+                <tr>
+                    <td>할인 코드</td>
+                    <td>${code.code}</td>
+                    <td>${typeText}</td>
+                    <td>${code.usedCount || 0}/${code.maxUses}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteDiscountCode(${index})">
+                            삭제
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        tbody.innerHTML = html;
+    } catch (error) {
+        console.error('프로모션 테이블 로드 오류:', error);
+    }
+}
+
+// 프로모션 이벤트 설정
+function setupPromotionEvents() {
+    // 신규 회원 적립금 저장
+    document.getElementById('saveNewUserPoints').addEventListener('click', async function() {
+        const points = document.getElementById('newUserPoints').value;
+        if (points && parseInt(points) >= 0) {
+            localStorage.setItem('newUserPoints', points);
+            showToast('신규 회원 적립금이 저장되었습니다.', 'success');
+            await loadPromotionsTable();
+        } else {
+            showToast('올바른 적립금을 입력해주세요.', 'error');
+        }
+    });
+    
+    // 할인 코드 저장
+    document.getElementById('saveDiscountCode').addEventListener('click', async function() {
+        const form = document.getElementById('addDiscountCodeForm');
+        const formData = new FormData(form);
+        
+        const discountData = {
+            code: document.getElementById('discountCode').value.toUpperCase(),
+            type: document.getElementById('discountType').value,
+            value: parseInt(document.getElementById('discountValue').value),
+            maxUses: parseInt(document.getElementById('maxUses').value),
+            expiryDate: document.getElementById('expiryDate').value,
+            isActive: document.getElementById('isActive').checked,
+            usedCount: 0,
+            createdAt: new Date().toISOString()
+        };
+        
+        // 유효성 검사
+        if (!discountData.code || !discountData.type || !discountData.value || !discountData.maxUses) {
+            showToast('모든 필수 항목을 입력해주세요.', 'error');
+            return;
+        }
+        
+        if (discountData.type === 'percent' && (discountData.value < 1 || discountData.value > 99)) {
+            showToast('할인율은 1-99% 사이여야 합니다.', 'error');
+            return;
+        }
+        
+        if (discountData.type === 'amount' && discountData.value < 1000) {
+            showToast('할인금액은 최소 1000원 이상이어야 합니다.', 'error');
+            return;
+        }
+        
+        // 기존 할인 코드와 중복 확인
+        const existingCodes = JSON.parse(localStorage.getItem('discountCodes') || '[]');
+        if (existingCodes.some(code => code.code === discountData.code)) {
+            showToast('이미 존재하는 할인 코드입니다.', 'error');
+            return;
+        }
+        
+        // 할인 코드 저장
+        existingCodes.push(discountData);
+        localStorage.setItem('discountCodes', JSON.stringify(existingCodes));
+        
+        // 모달 닫기 및 새로고침
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addDiscountCodeModal'));
+        modal.hide();
+        form.reset();
+        
+        showToast('할인 코드가 추가되었습니다.', 'success');
+        await loadDiscountCodes();
+        await loadPromotionsTable();
+    });
+    
+    // 할인 유형 변경시 도움말 업데이트
+    document.getElementById('discountType').addEventListener('change', function() {
+        const type = this.value;
+        const helpText = document.getElementById('discountValueHelp');
+        const valueInput = document.getElementById('discountValue');
+        
+        if (type === 'percent') {
+            helpText.textContent = '1-99 사이의 할인율을 입력하세요';
+            valueInput.setAttribute('max', '99');
+            valueInput.setAttribute('min', '1');
+        } else if (type === 'amount') {
+            helpText.textContent = '최소 1000원 이상의 할인금액을 입력하세요';
+            valueInput.setAttribute('min', '1000');
+            valueInput.removeAttribute('max');
+        }
+    });
+}
+
+// 할인 코드 삭제
+async function deleteDiscountCode(index) {
+    if (confirm('정말로 이 할인 코드를 삭제하시겠습니까?')) {
+        try {
+            const discountCodes = JSON.parse(localStorage.getItem('discountCodes') || '[]');
+            discountCodes.splice(index, 1);
+            localStorage.setItem('discountCodes', JSON.stringify(discountCodes));
+            
+            showToast('할인 코드가 삭제되었습니다.', 'success');
+            await loadDiscountCodes();
+            await loadPromotionsTable();
+        } catch (error) {
+            console.error('할인 코드 삭제 오류:', error);
+            showToast('할인 코드 삭제 중 오류가 발생했습니다.', 'error');
+        }
     }
 }

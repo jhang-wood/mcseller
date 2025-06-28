@@ -433,6 +433,22 @@ function setupProductEvents() {
     
     // 결제 확인
     document.getElementById('confirm-payment')?.addEventListener('click', handlePaymentConfirm);
+    
+    // 할인코드 적용
+    document.getElementById('apply-discount')?.addEventListener('click', handleDiscountCodeApply);
+    
+    // 적립금 전액 사용
+    document.getElementById('use-all-points')?.addEventListener('click', handleUseAllPoints);
+    
+    // 적립금 입력시 실시간 계산
+    document.getElementById('points-to-use')?.addEventListener('input', updatePaymentCalculation);
+    
+    // 할인코드 입력 엔터키 처리
+    document.getElementById('discount-code')?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            handleDiscountCodeApply();
+        }
+    });
 }
 
 // 구매 버튼 클릭 처리
@@ -485,12 +501,28 @@ function extractYouTubeVideoId(url) {
 }
 
 // 결제 모달 표시
-function showPaymentModal() {
+async function showPaymentModal() {
     if (!currentProduct) return;
     
+    // 기본 상품 정보 설정
     document.getElementById('payment-product-title').textContent = currentProduct.title;
-    document.getElementById('payment-product-price').textContent = `₩${currentProduct.price.toLocaleString()}`;
-    document.getElementById('payment-total').textContent = `₩${currentProduct.price.toLocaleString()}`;
+    document.getElementById('payment-product-price').textContent = currentProduct.price.toLocaleString() + '원';
+    document.getElementById('payment-total').textContent = currentProduct.price.toLocaleString() + '원';
+    
+    // 할인코드와 적립금 입력 초기화
+    document.getElementById('discount-code').value = '';
+    document.getElementById('discount-code').disabled = false;
+    document.getElementById('points-to-use').value = '';
+    document.getElementById('apply-discount').textContent = '적용';
+    document.getElementById('discount-message').innerHTML = '';
+    document.getElementById('points-message').innerHTML = '';
+    appliedDiscount = null;
+    
+    // 사용자 적립금 로드
+    await loadUserPointsInModal();
+    
+    // 초기 결제 계산
+    updatePaymentCalculation();
     
     const modal = new bootstrap.Modal(document.getElementById('paymentModal'));
     modal.show();
@@ -512,8 +544,18 @@ async function handlePaymentConfirm() {
     }
     
     try {
+        // 적립금과 할인코드 정보 수집
+        const pointsToUse = parseInt(document.getElementById('points-to-use').value) || 0;
+        const discountCode = appliedDiscount ? appliedDiscount.code : null;
+        
+        const paymentOptions = {
+            paymentMethod: selectedMethod.dataset.method,
+            pointsToUse: pointsToUse,
+            discountCode: discountCode
+        };
+        
         // 결제 처리 (TossPay 연동)
-        await processPayment(selectedMethod.dataset.method);
+        await processPayment(currentProduct, user, paymentOptions);
         
     } catch (error) {
         console.error('결제 처리 오류:', error);
@@ -686,6 +728,130 @@ function showProductError() {
             </a>
         </div>
     `;
+}
+
+// 할인코드 적용 처리
+let appliedDiscount = null;
+
+async function handleDiscountCodeApply() {
+    const discountCode = document.getElementById('discount-code').value.trim();
+    const messageEl = document.getElementById('discount-message');
+    
+    if (!discountCode) {
+        messageEl.innerHTML = '<span class="text-danger">할인코드를 입력해주세요.</span>';
+        return;
+    }
+    
+    const validation = validateDiscountCode(discountCode);
+    
+    if (validation.valid) {
+        appliedDiscount = validation.code;
+        messageEl.innerHTML = `<span class="text-success">할인코드가 적용되었습니다! (${appliedDiscount.type === 'percent' ? appliedDiscount.value + '%' : appliedDiscount.value.toLocaleString() + '원'} 할인)</span>`;
+        document.getElementById('apply-discount').textContent = '취소';
+        document.getElementById('discount-code').disabled = true;
+        updatePaymentCalculation();
+    } else {
+        appliedDiscount = null;
+        messageEl.innerHTML = `<span class="text-danger">${validation.message}</span>`;
+        document.getElementById('apply-discount').textContent = '적용';
+        document.getElementById('discount-code').disabled = false;
+        updatePaymentCalculation();
+    }
+}
+
+// 적립금 전액 사용
+async function handleUseAllPoints() {
+    const user = await getCurrentUser();
+    if (!user) return;
+    
+    const userPoints = getUserPoints(user.id);
+    document.getElementById('points-to-use').value = userPoints;
+    updatePaymentCalculation();
+}
+
+// 결제 금액 계산 업데이트
+function updatePaymentCalculation() {
+    if (!currentProduct) return;
+    
+    const pointsInput = document.getElementById('points-to-use');
+    const pointsToUse = parseInt(pointsInput.value) || 0;
+    const discountCode = appliedDiscount ? appliedDiscount.code : null;
+    
+    // 최종 금액 계산
+    const calculation = calculateFinalAmount(currentProduct.price, pointsToUse, discountCode);
+    
+    // UI 업데이트
+    updatePaymentUI(calculation);
+    
+    // 적립금 사용 유효성 검사
+    validatePointsUsage(pointsToUse, calculation.finalAmount);
+}
+
+// 결제 UI 업데이트
+function updatePaymentUI(calculation) {
+    // 원래 금액 표시
+    document.getElementById('original-amount').textContent = calculation.originalPrice.toLocaleString() + '원';
+    
+    // 할인 내역 표시/숨김
+    const discountBreakdown = document.getElementById('discount-breakdown');
+    const discountRow = document.getElementById('discount-amount-row');
+    const pointsRow = document.getElementById('points-amount-row');
+    
+    if (calculation.discountAmount > 0 || calculation.pointsUsed > 0) {
+        discountBreakdown.style.display = 'block';
+        
+        // 할인 혜택 표시
+        if (calculation.discountAmount > 0) {
+            discountRow.style.display = 'flex';
+            document.getElementById('discount-amount').textContent = '-' + calculation.discountAmount.toLocaleString() + '원';
+        } else {
+            discountRow.style.display = 'none';
+        }
+        
+        // 적립금 사용 표시
+        if (calculation.pointsUsed > 0) {
+            pointsRow.style.display = 'flex';
+            document.getElementById('points-amount').textContent = '-' + calculation.pointsUsed.toLocaleString() + '원';
+        } else {
+            pointsRow.style.display = 'none';
+        }
+    } else {
+        discountBreakdown.style.display = 'none';
+    }
+    
+    // 최종 결제 금액 표시
+    document.getElementById('payment-total').textContent = calculation.finalAmount.toLocaleString() + '원';
+}
+
+// 적립금 사용 유효성 검사
+async function validatePointsUsage(pointsToUse, finalAmount) {
+    const user = await getCurrentUser();
+    if (!user) return;
+    
+    const userPoints = getUserPoints(user.id);
+    const messageEl = document.getElementById('points-message');
+    
+    if (pointsToUse > userPoints) {
+        messageEl.innerHTML = '<span class="text-danger">보유 적립금을 초과했습니다.</span>';
+        document.getElementById('points-to-use').value = userPoints;
+        updatePaymentCalculation();
+    } else if (pointsToUse > 0) {
+        messageEl.innerHTML = `<span class="text-success">${pointsToUse.toLocaleString()}원 적립금을 사용합니다.</span>`;
+    } else {
+        messageEl.innerHTML = '';
+    }
+}
+
+// 결제 모달 표시 시 사용자 적립금 로드
+async function loadUserPointsInModal() {
+    const user = await getCurrentUser();
+    if (!user) return;
+    
+    const userPoints = getUserPoints(user.id);
+    document.getElementById('user-points').textContent = userPoints.toLocaleString() + '원';
+    
+    // 적립금 입력 최대값 설정
+    document.getElementById('points-to-use').setAttribute('max', userPoints);
 }
 
 // 도움됨 버튼 이벤트

@@ -244,9 +244,49 @@
                             <span id="payment-product-title"></span>
                             <span id="payment-product-price"></span>
                         </div>
+                        
+                        <!-- 할인코드 적용 섹션 -->
+                        <div class="discount-section mb-3">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" id="discount-code" placeholder="할인코드 입력">
+                                <button class="btn btn-outline-secondary" type="button" id="apply-discount">적용</button>
+                            </div>
+                            <div id="discount-message" class="small mt-1"></div>
+                        </div>
+                        
+                        <!-- 적립금 사용 섹션 -->
+                        <div class="points-section mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small">보유 적립금</span>
+                                <span class="small fw-bold" id="user-points">0원</span>
+                            </div>
+                            <div class="input-group input-group-sm">
+                                <input type="number" class="form-control" id="points-to-use" placeholder="사용할 적립금" min="0">
+                                <span class="input-group-text">원</span>
+                                <button class="btn btn-outline-secondary" type="button" id="use-all-points">전액</button>
+                            </div>
+                            <div id="points-message" class="small mt-1"></div>
+                        </div>
+                        
+                        <!-- 할인 내역 표시 -->
+                        <div id="discount-breakdown" class="mb-2" style="display: none;">
+                            <div class="d-flex justify-content-between small text-muted">
+                                <span>상품 금액</span>
+                                <span id="original-amount"></span>
+                            </div>
+                            <div class="d-flex justify-content-between small text-success" id="discount-amount-row" style="display: none;">
+                                <span>할인 혜택</span>
+                                <span id="discount-amount">-0원</span>
+                            </div>
+                            <div class="d-flex justify-content-between small text-warning" id="points-amount-row" style="display: none;">
+                                <span>적립금 사용</span>
+                                <span id="points-amount">-0원</span>
+                            </div>
+                        </div>
+                        
                         <hr>
                         <div class="d-flex justify-content-between fw-bold">
-                            <span>총 결제금액</span>
+                            <span>최종 결제금액</span>
                             <span class="text-primary" id="payment-total"></span>
                         </div>
                     </div>

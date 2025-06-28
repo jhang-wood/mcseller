@@ -79,6 +79,11 @@
                                 <i class="fas fa-chart-bar me-2"></i>통계 분석
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#promotions" data-section="promotions">
+                                <i class="fas fa-tags me-2"></i>프로모션 관리
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </nav>
@@ -279,6 +284,79 @@
                         </div>
                     </div>
                 </section>
+
+                <!-- Promotions Section -->
+                <section id="promotions-section" class="content-section d-none">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">프로모션 관리</h1>
+                    </div>
+
+                    <div class="row">
+                        <!-- 신규 회원 적립금 설정 -->
+                        <div class="col-md-6">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">신규 회원 적립금 설정</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="newUserPoints" class="form-label">적립금 (원)</label>
+                                        <input type="number" class="form-control" id="newUserPoints" value="31500" min="0">
+                                        <small class="form-text text-muted">신규 회원가입 시 지급할 적립금을 설정하세요.</small>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" id="saveNewUserPoints">적립금 설정 저장</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 할인 코드 관리 -->
+                        <div class="col-md-6">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                    <h6 class="m-0 font-weight-bold text-primary">할인 코드 관리</h6>
+                                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addDiscountCodeModal">
+                                        <i class="fas fa-plus"></i> 코드 추가
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div id="discountCodesContainer">
+                                        <!-- 할인 코드 목록이 여기에 표시됩니다 -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 활성 프로모션 현황 -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">활성 프로모션 현황</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered" id="promotionsTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>프로모션 유형</th>
+                                                    <th>코드/설정값</th>
+                                                    <th>할인율/금액</th>
+                                                    <th>사용 횟수</th>
+                                                    <th>상태</th>
+                                                    <th>작업</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="promotionsTableBody">
+                                                <!-- 프로모션 데이터가 여기에 표시됩니다 -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </main>
         </div>
     </div>
@@ -380,6 +458,58 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
                     <button type="button" class="btn btn-primary" id="importCsv">가져오기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Discount Code Modal -->
+    <div class="modal fade" id="addDiscountCodeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">할인 코드 추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addDiscountCodeForm">
+                        <div class="mb-3">
+                            <label for="discountCode" class="form-label">할인 코드</label>
+                            <input type="text" class="form-control" id="discountCode" placeholder="예: SUPER15" required>
+                            <small class="form-text text-muted">영문, 숫자만 사용 가능합니다.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="discountType" class="form-label">할인 유형</label>
+                            <select class="form-select" id="discountType" required>
+                                <option value="">선택하세요</option>
+                                <option value="percent">할인율 (%)</option>
+                                <option value="amount">할인금액 (원)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="discountValue" class="form-label">할인값</label>
+                            <input type="number" class="form-control" id="discountValue" min="1" required>
+                            <small class="form-text text-muted" id="discountValueHelp">할인율의 경우 1-99, 할인금액의 경우 최소 1000원</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="maxUses" class="form-label">최대 사용 횟수</label>
+                            <input type="number" class="form-control" id="maxUses" value="100" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="expiryDate" class="form-label">만료일 (선택사항)</label>
+                            <input type="date" class="form-control" id="expiryDate">
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="isActive" checked>
+                            <label class="form-check-label" for="isActive">
+                                활성화
+                            </label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="saveDiscountCode">저장</button>
                 </div>
             </div>
         </div>
