@@ -1553,10 +1553,41 @@
                             <a class="nav-link" href="#faq">FAQ</a>
                         </li>
                     </ul>
-                    <div class="d-flex gap-2">
-                        <a href="#courses" class="btn btn-premium">
-                            <i class="fas fa-rocket me-2"></i>지금 시작하기
-                        </a>
+                    <div class="d-flex gap-2" id="nav-buttons">
+                        <!-- 로그아웃 상태 버튼들 -->
+                        <div id="logged-out-buttons" class="d-flex gap-2">
+                            <a href="auth.html" class="btn btn-outline-light">
+                                <i class="fas fa-sign-in-alt me-2"></i>로그인
+                            </a>
+                            <a href="#courses" class="btn btn-premium">
+                                <i class="fas fa-rocket me-2"></i>지금 시작하기
+                            </a>
+                        </div>
+                        
+                        <!-- 로그인 상태 버튼들 -->
+                        <div id="logged-in-buttons" class="d-flex gap-2" style="display: none;">
+                            <!-- 일반 사용자 버튼들 -->
+                            <div id="user-buttons" class="d-flex gap-2">
+                                <a href="mypage.html" class="btn btn-outline-light">
+                                    <i class="fas fa-user me-2"></i>마이페이지
+                                </a>
+                            </div>
+                            
+                            <!-- 관리자 버튼들 -->
+                            <div id="admin-buttons" class="d-flex gap-2" style="display: none;">
+                                <a href="admin.html" class="btn btn-outline-warning">
+                                    <i class="fas fa-cog me-2"></i>관리자페이지
+                                </a>
+                            </div>
+                            
+                            <!-- 공통 버튼들 -->
+                            <a href="#courses" class="btn btn-premium">
+                                <i class="fas fa-rocket me-2"></i>지금 시작하기
+                            </a>
+                            <button id="logout-btn" class="btn btn-outline-danger">
+                                <i class="fas fa-sign-out-alt me-2"></i>로그아웃
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2885,6 +2916,33 @@
                 offset: 100,
             });
 
+            // 네비게이션 UI 업데이트 함수
+            function updateNavigationUI(user) {
+                const loggedOutButtons = document.getElementById('logged-out-buttons');
+                const loggedInButtons = document.getElementById('logged-in-buttons');
+                const userButtons = document.getElementById('user-buttons');
+                const adminButtons = document.getElementById('admin-buttons');
+                
+                if (user) {
+                    // 로그인된 상태
+                    loggedOutButtons.style.display = 'none';
+                    loggedInButtons.style.display = 'flex';
+                    
+                    // 관리자인지 확인
+                    if (user.isAdmin) {
+                        userButtons.style.display = 'none';
+                        adminButtons.style.display = 'flex';
+                    } else {
+                        userButtons.style.display = 'flex';
+                        adminButtons.style.display = 'none';
+                    }
+                } else {
+                    // 로그아웃된 상태
+                    loggedOutButtons.style.display = 'flex';
+                    loggedInButtons.style.display = 'none';
+                }
+            }
+
             // 부드러운 스크롤 기능 및 로그인 체크
             document.addEventListener('DOMContentLoaded', function() {
                 // 로그인 상태 확인 함수
@@ -2943,7 +3001,82 @@
                         }
                     });
                 });
+                
+                // 초기 로그인 상태 확인 및 UI 업데이트
+                checkAndUpdateUI();
+                
+                // 로그아웃 버튼 이벤트
+                document.getElementById('logout-btn').addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    
+                    // 테스트 사용자 로그아웃
+                    if (localStorage.getItem('testUser')) {
+                        localStorage.removeItem('testUser');
+                        updateNavigationUI(null);
+                        showToast('로그아웃되었습니다.', 'success');
+                        return;
+                    }
+                    
+                    // Supabase 로그아웃
+                    if (window.signOut) {
+                        const success = await window.signOut();
+                        if (success) {
+                            updateNavigationUI(null);
+                        }
+                    }
+                });
+                
+                // 로그인 상태 확인 및 UI 업데이트 함수
+                async function checkAndUpdateUI() {
+                    try {
+                        const isLoggedIn = await checkLoginStatus();
+                        if (isLoggedIn) {
+                            // 사용자 정보 가져오기
+                            const testUser = localStorage.getItem('testUser');
+                            if (testUser) {
+                                const user = JSON.parse(testUser);
+                                updateNavigationUI(user);
+                            } else if (window.getCurrentUser) {
+                                const user = await window.getCurrentUser();
+                                if (user) {
+                                    // Supabase 사용자는 기본적으로 일반 사용자
+                                    updateNavigationUI({ ...user, isAdmin: false });
+                                }
+                            }
+                        } else {
+                            updateNavigationUI(null);
+                        }
+                    } catch (error) {
+                        console.error('UI 업데이트 오류:', error);
+                        updateNavigationUI(null);
+                    }
+                }
             });
+            
+            // Toast 메시지 표시 함수 (간단한 버전)
+            function showToast(message, type = 'info') {
+                // 간단한 알림 표시
+                const alertClass = type === 'success' ? 'alert-success' : 
+                                 type === 'error' ? 'alert-danger' : 'alert-info';
+                
+                const toastHtml = `
+                    <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+                         style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', toastHtml);
+                
+                // 3초 후 자동 제거
+                setTimeout(() => {
+                    const alert = document.querySelector('.alert:last-of-type');
+                    if (alert) {
+                        alert.remove();
+                    }
+                }, 3000);
+            }
 
             // Course landing data
             const courseLandings = {
