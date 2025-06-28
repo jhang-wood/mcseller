@@ -20,9 +20,14 @@ async function initializeAdminPage() {
     }
     
     // 사용자 정보 표시
-    const user = await getCurrentUser();
-    if (user) {
-        document.getElementById('admin-name').textContent = user.email;
+    const adminEmail = localStorage.getItem('adminEmail');
+    if (adminEmail) {
+        document.getElementById('admin-name').textContent = 'MCSELLER 관리자';
+    } else {
+        const user = await getCurrentUser();
+        if (user) {
+            document.getElementById('admin-name').textContent = user.email;
+        }
     }
     
     // 초기 섹션 로드
@@ -32,6 +37,14 @@ async function initializeAdminPage() {
 // 관리자 권한 확인
 async function checkAdminAccess() {
     try {
+        // 임시 관리자 계정 확인
+        const isAdminUser = localStorage.getItem('adminUser') === 'true';
+        const adminEmail = localStorage.getItem('adminEmail');
+        
+        if (isAdminUser && adminEmail === 'mcseller.admin@gmail.com') {
+            return true;
+        }
+        
         const user = await getCurrentUser();
         if (!user) {
             return false;

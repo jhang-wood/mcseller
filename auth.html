@@ -3,49 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로그인 / 회원가입 - 교육플랫폼</title>
+    <title>로그인 / 회원가입 - MCSELLER</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Custom CSS -->
-    <link href="css/style.css" rel="stylesheet">
+    <link href="css/modern-style.css" rel="stylesheet">
     
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="auth-page">
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand fw-bold" href="index.html">
-                <i class="fas fa-graduation-cap me-2"></i>교육플랫폼
+                <img
+                    src="attached_assets/제목 추가_upscayl_4x_upscayl-standard-4x_1751101180619.png"
+                    alt="MCSELLER"
+                    height="40"
+                />
             </a>
         </div>
     </nav>
 
-    <div class="container-fluid">
-        <div class="row min-vh-100">
-            <!-- Left Side - Image -->
-            <div class="col-lg-6 d-none d-lg-block p-0">
-                <div class="auth-image-section">
-                    <img src="https://pixabay.com/get/g6bb9746dfecf2914ab0cf48dd8bded4344b307079528ba10348763fbeef12214b77b9b90a3a17495dbb701469f1169f5f1a9bb4e76ba93462a6edaa3e7c1aaca_1280.jpg" 
-                         alt="온라인 교육" class="img-fluid h-100 w-100 object-fit-cover">
-                    <div class="auth-overlay">
-                        <div class="overlay-content">
-                            <h2 class="text-white fw-bold mb-3">지금 시작하세요!</h2>
-                            <p class="text-white-50 lead">
-                                수많은 전문가들의 지식과<br>
-                                노하우를 경험해보세요
-                            </p>
+    <!-- Hero Section with Auth -->
+    <section class="hero-section py-5">
+        <div class="container">
+            <div class="row min-vh-100 align-items-center">
+                <!-- Left Side - Hero Content -->
+                <div class="col-lg-6 d-none d-lg-block">
+                    <div class="pe-5">
+                        <h1 class="hero-title mb-4">
+                            MCSELLER와 함께<br>
+                            <span class="text-gradient">성공적인 수익화</span>를<br>
+                            시작하세요
+                        </h1>
+                        <p class="hero-subtitle mb-4">
+                            실제 <span class="text-warning fw-bold">2달내 첫 수익 90% 달성</span><br>
+                            검증된 수익화 전략으로 경제적 자유를 실현하세요
+                        </p>
+                        <div class="d-flex align-items-center mb-4">
+                            <img 
+                                src="attached_assets/c55eb7e7b16af_upscayl_4x_upscayl-standard-4x_1751101180619.png" 
+                                alt="전문가" 
+                                class="rounded-circle me-3" 
+                                style="width: 60px; height: 60px; object-fit: cover;"
+                            />
+                            <div>
+                                <h6 class="mb-1">전문가와 함께</h6>
+                                <p class="text-muted mb-0">1:1 맞춤 컨설팅 제공</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Right Side - Auth Form -->
-            <div class="col-lg-6 d-flex align-items-center">
+                <!-- Right Side - Auth Form -->
+                <div class="col-lg-6 d-flex align-items-center">
                 <div class="container py-5">
                     <div class="row justify-content-center">
                         <div class="col-md-8 col-lg-6">
@@ -76,7 +92,7 @@
                                         </label>
                                     </div>
                                     
-                                    <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                                    <button type="submit" class="btn btn-premium btn-lg w-100 mb-3">
                                         <i class="fas fa-sign-in-alt me-2"></i>로그인
                                     </button>
                                 </form>
@@ -90,7 +106,7 @@
                                     <button class="btn btn-outline-warning btn-lg" id="kakao-login">
                                         <i class="fas fa-comment me-2"></i>카카오로 로그인
                                     </button>
-                                    <button class="btn btn-outline-danger btn-lg" id="google-login">
+                                    <button class="btn btn-outline-secondary btn-lg" id="google-login">
                                         <i class="fab fa-google me-2"></i>구글로 로그인
                                     </button>
                                 </div>

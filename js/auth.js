@@ -158,6 +158,19 @@ async function handleLogin(e) {
     submitBtn.disabled = true;
     
     try {
+        // 관리자 계정 체크 (임시 설정)
+        if (email === 'mcseller.admin@gmail.com' && password === 'MCsellerAdmin2025!') {
+            // 관리자 로그인 성공 시 관리자 페이지로 리다이렉트
+            localStorage.setItem('adminUser', 'true');
+            localStorage.setItem('adminEmail', email);
+            showToast('관리자로 로그인되었습니다!', 'success');
+            
+            setTimeout(() => {
+                window.location.href = 'admin.html';
+            }, 1000);
+            return;
+        }
+        
         if (!window.supabaseClient) {
             throw new Error('서비스 연결 오류');
         }
