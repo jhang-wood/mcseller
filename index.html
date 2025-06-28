@@ -64,6 +64,18 @@
                     #23272f 100%
                 );
                 --accent-gradient: linear-gradient(90deg, #ff9900, #ffe259);
+                --purple-gradient: linear-gradient(
+                    135deg,
+                    #667eea 0%,
+                    #764ba2 100%
+                );
+                --ai-gradient: linear-gradient(
+                    135deg,
+                    #ff9900 0%,
+                    #ffe259 25%,
+                    #667eea 75%,
+                    #764ba2 100%
+                );
                 --border-gradient: linear-gradient(
                     90deg,
                     #ff9900,
@@ -205,7 +217,7 @@
             }
 
             .hero-title {
-                font-size: 3.5rem;
+                font-size: 3rem;
                 font-weight: 900;
                 line-height: 1.2;
                 margin-bottom: 30px;
@@ -296,6 +308,101 @@
                 color: var(--text-muted);
                 margin-bottom: 40px;
                 line-height: 1.6;
+            }
+
+            /* Success Strategy Cards with Hover Effects */
+            .strategy-section {
+                background: rgba(20, 20, 20, 0.8);
+                backdrop-filter: blur(10px);
+                padding: 80px 0;
+            }
+
+            .strategy-card {
+                background: rgba(255, 255, 255, 0.05);
+                border: 2px solid rgba(255, 153, 0, 0.2);
+                border-radius: 20px;
+                padding: 40px 30px;
+                text-align: center;
+                height: 100%;
+                transition: all 0.4s ease;
+                position: relative;
+                overflow: hidden;
+                cursor: pointer;
+            }
+
+            .strategy-card::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: var(--accent-gradient);
+                opacity: 0;
+                transition: all 0.4s ease;
+                z-index: -1;
+                border-radius: 20px;
+            }
+
+            .strategy-card:hover {
+                transform: translateY(-15px) scale(1.02);
+                border-color: #ff9900;
+                box-shadow: 0 25px 50px rgba(255, 153, 0, 0.3);
+            }
+
+            .strategy-card:hover::before {
+                opacity: 0.1;
+            }
+
+            .strategy-card:hover .strategy-icon {
+                transform: scale(1.2) rotate(10deg);
+                background: var(--white);
+                color: #ff9900;
+            }
+
+            .strategy-card:hover .strategy-title {
+                color: #ff9900;
+            }
+
+            .strategy-icon {
+                background: var(--accent-gradient);
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 20px;
+                font-size: 2rem;
+                color: var(--dark);
+                transition: all 0.4s ease;
+            }
+
+            .strategy-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                margin-bottom: 20px;
+                color: var(--white);
+                transition: color 0.4s ease;
+            }
+
+            .strategy-features {
+                list-style: none;
+                text-align: left;
+                margin-top: 20px;
+            }
+
+            .strategy-features li {
+                padding: 8px 0;
+                color: var(--text-light);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .strategy-features i {
+                color: #28a745;
+                min-width: 16px;
             }
 
             /* Problem Section */
@@ -534,6 +641,351 @@
             .course-features i {
                 color: #28a745;
                 margin-right: 8px;
+            }
+
+            /* AI Master Course Special Section */
+            .ai-master-section {
+                background: linear-gradient(135deg, #111111 0%, #23272f 100%);
+                padding: 80px 0;
+                margin: 80px 0;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .ai-master-section::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: var(--ai-gradient);
+                opacity: 0.05;
+                z-index: 1;
+            }
+
+            .ai-master-container {
+                position: relative;
+                z-index: 2;
+            }
+
+            .ai-master-hero {
+                text-align: center;
+                margin-bottom: 60px;
+            }
+
+            .ai-urgent-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                background: linear-gradient(90deg, #dc3545, #ff6b6b);
+                color: white;
+                padding: 12px 25px;
+                border-radius: 30px;
+                font-weight: 700;
+                font-size: 16px;
+                margin-bottom: 20px;
+                animation: urgentPulse 2s infinite;
+                box-shadow: 0 5px 20px rgba(220, 53, 69, 0.4);
+            }
+
+            @keyframes urgentPulse {
+                0%,
+                100% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.05);
+                }
+            }
+
+            .ai-master-title {
+                font-size: 3.5rem;
+                font-weight: 900;
+                margin-bottom: 20px;
+                background: var(--ai-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                line-height: 1.2;
+            }
+
+            .ai-master-subtitle {
+                font-size: 1.4rem;
+                color: var(--text-light);
+                margin-bottom: 40px;
+                line-height: 1.6;
+            }
+
+            .ai-master-card {
+                background: rgba(255, 255, 255, 0.08);
+                border: 3px solid transparent;
+                border-radius: 30px;
+                padding: 50px;
+                max-width: 800px;
+                margin: 0 auto;
+                position: relative;
+                overflow: hidden;
+                backdrop-filter: blur(10px);
+            }
+
+            .ai-master-card::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                border-radius: 30px;
+                padding: 3px;
+                background: var(--ai-gradient);
+                mask:
+                    linear-gradient(#fff 0 0) content-box,
+                    linear-gradient(#fff 0 0);
+                mask-composite: exclude;
+                animation: borderGlow 3s linear infinite;
+            }
+
+            @keyframes borderGlow {
+                0%,
+                100% {
+                    opacity: 0.8;
+                }
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            .ai-pricing-header {
+                text-align: center;
+                margin-bottom: 40px;
+            }
+
+            .ai-best-choice {
+                display: inline-block;
+                background: var(--accent-gradient);
+                color: var(--dark);
+                padding: 8px 20px;
+                border-radius: 25px;
+                font-weight: 800;
+                font-size: 14px;
+                margin-bottom: 20px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .ai-course-title {
+                font-size: 2.2rem;
+                font-weight: 800;
+                color: var(--white);
+                margin-bottom: 10px;
+            }
+
+            .ai-course-subtitle {
+                color: var(--text-muted);
+                margin-bottom: 30px;
+                font-size: 1.1rem;
+            }
+
+            .ai-pricing-section {
+                text-align: center;
+                margin: 40px 0;
+            }
+
+            .ai-price-comparison {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 20px;
+                margin-bottom: 20px;
+                flex-wrap: wrap;
+            }
+
+            .ai-original-price {
+                font-size: 1.5rem;
+                color: var(--text-muted);
+                text-decoration: line-through;
+            }
+
+            .ai-discounted-price {
+                font-size: 3.5rem;
+                font-weight: 900;
+                background: var(--ai-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .ai-discount-badge {
+                background: #dc3545;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 25px;
+                font-size: 1rem;
+                font-weight: 700;
+            }
+
+            .ai-timer-section {
+                background: rgba(220, 53, 69, 0.15);
+                border: 2px solid #dc3545;
+                border-radius: 20px;
+                padding: 25px;
+                text-align: center;
+                margin: 30px 0;
+            }
+
+            .ai-timer-title {
+                color: #dc3545;
+                font-weight: 700;
+                margin-bottom: 15px;
+                font-size: 1.2rem;
+            }
+
+            .ai-timer {
+                font-family: "Courier New", monospace;
+                font-size: 2.5rem;
+                font-weight: 900;
+                color: #dc3545;
+                text-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+            }
+
+            .ai-features-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 30px;
+                margin: 40px 0;
+            }
+
+            .ai-feature-group {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 15px;
+                padding: 25px;
+                border: 1px solid rgba(255, 153, 0, 0.2);
+            }
+
+            .ai-feature-group h5 {
+                color: #ff9900;
+                font-weight: 700;
+                margin-bottom: 15px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 1.2rem;
+            }
+
+            .ai-feature-group ul {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            .ai-feature-group li {
+                padding: 8px 0;
+                color: var(--text-light);
+                position: relative;
+                padding-left: 25px;
+                font-size: 0.95rem;
+            }
+
+            .ai-feature-group li::before {
+                content: "✓";
+                position: absolute;
+                left: 0;
+                color: #28a745;
+                font-weight: 700;
+                font-size: 1.1rem;
+            }
+
+            .ai-special-notice {
+                background: rgba(102, 126, 234, 0.1);
+                border: 2px solid #667eea;
+                border-radius: 15px;
+                padding: 25px;
+                margin: 30px 0;
+                text-align: center;
+            }
+
+            .ai-special-notice h6 {
+                color: #667eea;
+                font-weight: 700;
+                margin-bottom: 10px;
+                font-size: 1.1rem;
+            }
+
+            .ai-special-notice p {
+                color: var(--text-light);
+                margin: 0;
+                line-height: 1.6;
+            }
+
+            .ai-cta-button {
+                background: var(--ai-gradient);
+                border: none;
+                color: var(--white);
+                font-weight: 800;
+                font-size: 1.3rem;
+                padding: 20px 50px;
+                border-radius: 50px;
+                transition: all 0.3s ease;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                box-shadow: 0 10px 30px rgba(255, 153, 0, 0.3);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .ai-cta-button::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.2),
+                    transparent
+                );
+                transition: left 0.5s;
+            }
+
+            .ai-cta-button:hover::before {
+                left: 100%;
+            }
+
+            .ai-cta-button:hover {
+                transform: translateY(-3px) scale(1.05);
+                box-shadow: 0 15px 40px rgba(255, 153, 0, 0.4);
+                color: var(--white);
+            }
+
+            .ai-guarantee {
+                background: rgba(40, 167, 69, 0.1);
+                border: 2px solid #28a745;
+                border-radius: 15px;
+                padding: 20px;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                margin: 30px 0;
+            }
+
+            .ai-guarantee i {
+                font-size: 2rem;
+                color: #28a745;
+            }
+
+            .ai-guarantee h6 {
+                margin: 0;
+                color: var(--white);
+                font-weight: 700;
+            }
+
+            .ai-guarantee p {
+                margin: 0;
+                color: var(--text-muted);
+                font-size: 0.9rem;
             }
 
             /* Success Stories */
@@ -972,7 +1424,7 @@
             /* Responsive Design */
             @media (max-width: 768px) {
                 .hero-title {
-                    font-size: 2.5rem;
+                    font-size: 2.2rem;
                 }
 
                 .section-title {
@@ -981,6 +1433,14 @@
 
                 .problem-title {
                     font-size: 2rem;
+                }
+
+                .ai-master-title {
+                    font-size: 2.5rem;
+                }
+
+                .ai-discounted-price {
+                    font-size: 2.5rem;
                 }
 
                 .btn-premium,
@@ -993,9 +1453,19 @@
                     grid-template-columns: 1fr;
                 }
 
-                .price-comparison {
+                .price-comparison,
+                .ai-price-comparison {
                     flex-direction: column;
                     gap: 10px;
+                }
+
+                .ai-features-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .ai-cta-button {
+                    font-size: 1.1rem;
+                    padding: 15px 30px;
                 }
             }
 
@@ -1013,6 +1483,27 @@
 
             .slide-in-up {
                 animation: slideInUp 0.6s ease-out;
+            }
+
+            /* Enhanced visual effects */
+            @keyframes shimmer {
+                0% {
+                    background-position: -1000px 0;
+                }
+                100% {
+                    background-position: 1000px 0;
+                }
+            }
+
+            .shimmer-effect {
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.1),
+                    transparent
+                );
+                background-size: 1000px 100%;
+                animation: shimmer 2s infinite;
             }
         </style>
     </head>
@@ -1056,6 +1547,9 @@
                             >
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="#ai-master">AI 마스터</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="#faq">FAQ</a>
                         </li>
                     </ul>
@@ -1090,7 +1584,7 @@
                                 <span class="text-gradient"
                                     >진짜 수익화 가능한</span
                                 ><br />
-                                온라인 부업을 찾고 계신가요?
+                                온라인 부업을 찾고 있나요?
                             </h1>
 
                             <p class="hero-subtitle mb-4">
@@ -1124,9 +1618,7 @@
                                     </div>
                                     <div class="col-4">
                                         <div class="stat-item">
-                                            <div class="stat-number">
-                                                90%
-                                            </div>
+                                            <div class="stat-number">90%</div>
                                             <div class="stat-label">
                                                 2달내 첫 수익 달성
                                             </div>
@@ -1140,7 +1632,8 @@
                                     href="register.html"
                                     class="btn btn-premium btn-lg"
                                 >
-                                    <i class="fas fa-rocket me-2"></i>지금 바로 시작하기
+                                    <i class="fas fa-rocket me-2"></i>지금 바로
+                                    시작하기
                                 </a>
                                 <a
                                     href="#achievements"
@@ -1172,7 +1665,12 @@
                                 src="attached_assets/제목 추가_upscayl_4x_upscayl-standard-4x_1751101180619.png"
                                 alt="MCSELLER 검증된 수익화 전문가"
                                 class="character-image"
-                                style="max-width: 400px; height: auto; border-radius: 20px; box-shadow: 0 8px 40px rgba(0,0,0,0.16);"
+                                style="
+                                    max-width: 400px;
+                                    height: auto;
+                                    border-radius: 20px;
+                                    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.16);
+                                "
                             />
                         </div>
                     </div>
@@ -1252,6 +1750,122 @@
                                 검증된 수익화 전략으로 확실하게
                                 시작하세요.</strong
                             >
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Success Strategy Section -->
+        <section id="success-strategy" class="strategy-section">
+            <div class="container">
+                <div class="text-center mb-5" data-aos="fade-up">
+                    <div class="section-badge">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>MCSELLER 솔루션</span>
+                    </div>
+
+                    <h2 class="section-title">
+                        MCSELLER의
+                        <span class="text-gradient">실제 성과</span>로<br />
+                        검증된 수익화 노하우
+                    </h2>
+
+                    <p class="section-subtitle">
+                        중고 플랫폼 활용 모델 등 초보자도 쉽게 따라할 수 있는
+                        확실한 수익화 전략<br />
+                        단계별 난이도로 수익화를 체계화하여, 가장 쉬운 방법부터
+                        고수익 모델까지 명확히 안내
+                    </p>
+                </div>
+
+                <div class="row g-4">
+                    <div
+                        class="col-lg-4"
+                        data-aos="fade-up"
+                        data-aos-delay="100"
+                    >
+                        <div class="strategy-card">
+                            <div class="strategy-icon">
+                                <i class="fas fa-rocket"></i>
+                            </div>
+                            <h3 class="strategy-title">초보자 맞춤 진입</h3>
+                            <p class="strategy-description">
+                                중고 플랫폼 활용부터 시작하는 현실적인 수익화
+                                모델로 누구나 쉽게 따라할 수 있는다.
+                            </p>
+                            <ul class="strategy-features">
+                                <li>
+                                    <i class="fas fa-check"></i> 진입장벽 최소화
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 초기 투자 거의
+                                    불필요
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 즉시 실행 가능
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div
+                        class="col-lg-4"
+                        data-aos="fade-up"
+                        data-aos-delay="200"
+                    >
+                        <div class="strategy-card">
+                            <div class="strategy-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h3 class="strategy-title">단계별 수익화 체계</h3>
+                            <p class="strategy-description">
+                                가장 쉬운 방법부터 고수익 모델까지 명확한
+                                로드맵으로 단계적으로 성장할 수 있다.
+                            </p>
+                            <ul class="strategy-features">
+                                <li>
+                                    <i class="fas fa-check"></i> 1단계: 월
+                                    30만원
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 2단계: 월
+                                    100만원
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 3단계: 월
+                                    300만원+
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div
+                        class="col-lg-4"
+                        data-aos="fade-up"
+                        data-aos-delay="300"
+                    >
+                        <div class="strategy-card">
+                            <div class="strategy-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h3 class="strategy-title">실패 확률 최소화</h3>
+                            <p class="strategy-description">
+                                검증된 노하우와 1:1 멘토링으로 시행착오 없이
+                                안전하게 수익을 달성합니다.
+                            </p>
+                            <ul class="strategy-features">
+                                <li>
+                                    <i class="fas fa-check"></i> 개별 맞춤
+                                    피드백
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 실시간 피드백
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 100% 환불 보장
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -1360,7 +1974,7 @@
                     </h2>
 
                     <p class="section-subtitle">
-                        K4 플랫폼과 프리랜서 마켓에서 검증된 실제 후기들입니다
+                        K사 프리랜서 마켓에서 검증된 실제 후기들입니다
                     </p>
                 </div>
 
@@ -1563,8 +2177,13 @@
                                 </li>
                             </ul>
 
-                            <a href="https://kmong.com/self-marketing/504217/EnSc73Jiex" target="_blank" class="btn btn-premium w-100">
-                                <i class="fas fa-shopping-cart me-2"></i>수강 신청하기
+                            <a
+                                href="https://kmong.com/self-marketing/504217/EnSc73Jiex"
+                                target="_blank"
+                                class="btn btn-premium w-100"
+                            >
+                                <i class="fas fa-shopping-cart me-2"></i>수강
+                                신청하기
                             </a>
                         </div>
                     </div>
@@ -1621,8 +2240,13 @@
                                 </li>
                             </ul>
 
-                            <a href="https://kmong.com/self-marketing/431248/V8o7vCYANq" target="_blank" class="btn btn-premium w-100">
-                                <i class="fas fa-shopping-cart me-2"></i>수강 신청하기
+                            <a
+                                href="https://kmong.com/self-marketing/431248/V8o7vCYANq"
+                                target="_blank"
+                                class="btn btn-premium w-100"
+                            >
+                                <i class="fas fa-shopping-cart me-2"></i>수강
+                                신청하기
                             </a>
                         </div>
                     </div>
@@ -1677,8 +2301,12 @@
                                 </li>
                             </ul>
 
-                            <a href="ebook1-landing.html" class="btn btn-premium w-100">
-                                <i class="fas fa-shopping-cart me-2"></i>수강 신청하기
+                            <a
+                                href="ebook1-landing.html"
+                                class="btn btn-premium w-100"
+                            >
+                                <i class="fas fa-shopping-cart me-2"></i>수강
+                                신청하기
                             </a>
                         </div>
                     </div>
@@ -1734,65 +2362,173 @@
                                 </li>
                             </ul>
 
-                            <a href="ebook2-landing.html" class="btn btn-premium w-100">
-                                <i class="fas fa-shopping-cart me-2"></i>수강 신청하기
+                            <a
+                                href="ebook2-landing.html"
+                                class="btn btn-premium w-100"
+                            >
+                                <i class="fas fa-shopping-cart me-2"></i>수강
+                                신청하기
                             </a>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
 
-                    <!-- AI 마스터 과정 -->
-                    <div
-                        class="col-lg-6"
-                        data-aos="fade-up"
-                        data-aos-delay="400"
-                    >
-                        <div class="course-card">
-                            <div class="course-level">★★★★★ 최상급</div>
-                            <h3 class="course-title">
-                                AI 마스터 과정
-                            </h3>
-                            <p class="course-description">
-                                AI 활용 동영상 강의 + 실전 코스
-                            </p>
+        <!-- AI Master Course Special Section -->
+        <section id="ai-master" class="ai-master-section">
+            <div class="ai-master-container">
+                <div class="container">
+                    <div class="ai-master-hero" data-aos="fade-up">
+                        <div class="ai-urgent-badge">
+                            <i class="fas fa-clock"></i>
+                            <span>기회는 지금뿐입니다!</span>
+                        </div>
 
-                            <div class="course-investment">
-                                <h6>
-                                    <i class="fas fa-coins me-2"></i>초기 투자비
-                                </h6>
-                                <p>
-                                    AI 도구 활용으로 최소한의 투자
-                                </p>
+                        <h2 class="ai-master-title">
+                            최초 100명 한정<br />
+                            50% 특별 할인 제공
+                        </h2>
+
+                        <p class="ai-master-subtitle">
+                            더 이상 시간과 돈 낭비하지 마시고, 빠르게 경제적
+                            여유를 확보하세요<br />
+                            <small class="text-warning"
+                                >※ 지금 보고 계신 페이지도 하루만에
+                                제작되었습니다!</small
+                            >
+                        </p>
+                    </div>
+
+                    <div class="row justify-content-center">
+                        <div class="col-lg-10">
+                            <div
+                                class="ai-master-card"
+                                data-aos="zoom-in"
+                                data-aos-delay="200"
+                            >
+                                <div class="ai-pricing-header">
+                                    <div class="ai-best-choice">
+                                        ✨ BEST CHOICE
+                                    </div>
+                                    <h3 class="ai-course-title">
+                                        토큰 1원도 낭비하지 않는<br />
+                                        초가성비 AI 마스터 과정
+                                    </h3>
+                                    <p class="ai-course-subtitle">
+                                        모든 도구, 매출, 그리고 자료 및 방법론을
+                                        하나도 남기지 않고 담았습니다.
+                                    </p>
+                                </div>
+
+                                <div class="ai-pricing-section">
+                                    <div class="ai-price-comparison">
+                                        <span class="ai-original-price"
+                                            >₩1,500,000원</span
+                                        >
+                                        <span class="ai-discounted-price"
+                                            >490,000원</span
+                                        >
+                                        <span class="ai-discount-badge"
+                                            >얼리버드 특가 -67% (₩1,010,000원
+                                            할인)</span
+                                        >
+                                    </div>
+
+                                    <div class="text-center mb-4">
+                                        <div
+                                            class="badge bg-warning text-dark fs-6 fw-bold"
+                                        >
+                                            <i class="fas fa-fire me-2"></i>7월
+                                            정식 런칭 시 ₩1,500,000원으로 정상
+                                            복귀!
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="ai-timer-section">
+                                    <div class="ai-timer-title">
+                                        <i
+                                            class="fas fa-hourglass-half me-2"
+                                        ></i
+                                        >특가 종료까지
+                                    </div>
+                                    <div class="ai-timer" id="ai-countdown">
+                                        00:00:00
+                                    </div>
+                                </div>
+
+                                <div class="ai-special-notice">
+                                    <h6>
+                                        <i class="fas fa-info-circle me-2"></i
+                                        >특별 혜택
+                                    </h6>
+                                    <p>
+                                        <strong
+                                            >극초창기 자동화 기능구현 SaaS 개발
+                                            + 구독제 시스템</strong
+                                        >으로 자동수익 창출!<br />
+                                        8월 정식 런칭 예정 / 7월 사전예약 한정
+                                        특가<br />
+                                        이렇게까지 자세하고 쉽게 알려주는 강의는
+                                        처음일 거라고 확신합니다.
+                                    </p>
+                                </div>
+
+                                <div class="ai-features-grid">
+                                    <div class="ai-feature-group">
+                                        <h5>
+                                            <i
+                                                class="fas fa-robot text-primary me-2"
+                                            ></i
+                                            >AI 자동화 모듈
+                                        </h5>
+                                        <ul>
+                                            <li>3개월 무료 크레딧 제공 도구</li>
+                                            <li>실전 SaaS 구독 자동 공정</li>
+                                            <li>1:1 멘토링 기간</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="ai-feature-group">
+                                        <h5>
+                                            <i
+                                                class="fas fa-chart-line text-success me-2"
+                                            ></i
+                                            >특별 혜택
+                                        </h5>
+                                        <ul>
+                                            <li>월상 업데이트</li>
+                                            <li>60일 환불 보장</li>
+                                            <li>문의 공개 지원</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="text-center mt-5">
+                                    <button
+                                        class="ai-cta-button"
+                                        onclick="handleAiMasterSignup()"
+                                    >
+                                        <i class="fas fa-rocket me-2"></i>지금
+                                        사전예약 신청하기
+                                    </button>
+                                    <p class="text-muted mt-3">
+                                        <small>27자리</small>
+                                    </p>
+                                </div>
+
+                                <div class="ai-guarantee">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <div>
+                                        <h6>100% 환불 보장</h6>
+                                        <p>
+                                            60일 내 만족하지 않으시면 전액
+                                            환불해드립니다
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
-
-                            <div class="course-price">299,000원</div>
-
-                            <ul class="course-features">
-                                <li>
-                                    <i class="fas fa-check"></i> 월 500만원+ 수료
-                                </li>
-                                <li>
-                                    <i class="fas fa-check"></i> AI 자동화 완전 활용
-                                </li>
-                                <li>
-                                    <i class="fas fa-check"></i> 동영상 강의 20시간+
-                                </li>
-                                <li>
-                                    <i class="fas fa-check"></i> 1:1 개인 멘토링 포함
-                                </li>
-                                <li>
-                                    <i class="fas fa-check"></i> 실전 프로젝트 진행
-                                </li>
-                                <li>
-                                    <i class="fas fa-check"></i> 커뮤니티 평생 이용
-                                </li>
-                                <li>
-                                    <i class="fas fa-check"></i> 성공할 때까지 무제한 지원
-                                </li>
-                            </ul>
-
-                            <a href="ai-master-landing.html" class="btn btn-premium w-100">
-                                <i class="fas fa-shopping-cart me-2"></i>수강 신청하기
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -1816,7 +2552,7 @@
                         </h2>
 
                         <p class="mb-5" style="color: #333; font-size: 1.1rem">
-                            K4 플랫폼 1위, 와디즈 펀딩 5,283% 달성한 검증된
+                            K사 플랫폼 1위, 와디즈 펀딩 5,283% 달성한 검증된
                             노하우<br />
                             60일 내 <strong>100% 환불 보장</strong>으로 부담
                             없이 시작하세요
@@ -1937,10 +2673,13 @@
                                     data-bs-parent="#faqAccordion"
                                 >
                                     <div class="accordion-body">
-                                        네, 60일 내 만족하지 않으시면 조건 없이
-                                        100% 전액 환불해드립니다. K4 플랫폼의
-                                        환불 정책을 따르며, 실제로 환불 요청하신
-                                        분들께 모두 처리해드렸습니다.
+                                        네, 기본적으로 평생교육법 시행령 제23조
+                                        학습비 반환 규정에 따라 아래 기준으로
+                                        환불이 가능합니다. 추가 환불 보증제도로
+                                        60일 내에 강의 내용을 100% 동일하게
+                                        따라했음에도 효과가 나타나지 않는다면
+                                        강의 또는 전자책별 조건에 따라서 환불을
+                                        진행해드리고 있습니다.
                                     </div>
                                 </div>
                             </div>
@@ -1962,12 +2701,11 @@
                                     data-bs-parent="#faqAccordion"
                                 >
                                     <div class="accordion-body">
-                                        2달내 첫 수익 90%는 실제 수강생들의 
-                                        성과 통계입니다. 개인차는 있지만,
-                                        체계적으로 따라하신 분들은 대부분 첫
-                                        달부터 수익을 얻고 계십니다. 단, 개인의
-                                        노력과 상황에 따라 차이가 있을 수
-                                        있습니다.
+                                        2달내 첫 수익 90%는 실제 수강생들의 성과
+                                        통계입니다. 개인차는 있지만, 체계적으로
+                                        따라하신 분들은 대부분 첫 달부터 수익을
+                                        얻고 계십니다. 단, 개인의 노력과 상황에
+                                        따라 차이가 있을 수 있습니다.
                                     </div>
                                 </div>
                             </div>
@@ -1995,6 +2733,34 @@
                                         있다면 명품리셀로 바로 시작해도 됩니다.
                                         전자책 자동화는 리셀 경험 후
                                         추천드립니다.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#faq6"
+                                    >
+                                        AI 마스터 과정은 언제 시작되나요?
+                                    </button>
+                                </h2>
+                                <div
+                                    id="faq6"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#faqAccordion"
+                                >
+                                    <div class="accordion-body">
+                                        AI 마스터 과정은 8월 정식 런칭 예정이며,
+                                        현재 7월 사전예약을 진행 중입니다.
+                                        사전예약자에게는 특별 할인가를 제공하며,
+                                        정식 런칭 후에는 정가로 판매됩니다.
+                                        극초창기 자동화 SaaS 구축부터 구독제
+                                        시스템까지 완전한 자동수익 시스템을
+                                        구축할 수 있습니다.
                                     </div>
                                 </div>
                             </div>
@@ -2043,6 +2809,9 @@
                                 <a href="javascript:openCourseLanding('ebook2')"
                                     >전자책자동화 2탄</a
                                 >
+                            </li>
+                            <li>
+                                <a href="#ai-master">AI 마스터 (사전예약)</a>
                             </li>
                         </ul>
                     </div>
@@ -2140,7 +2909,7 @@
                         "이렇게까지 자세한 방법을 제시해주셔서 너무 감사해요",
                         "컨설팅 시작하고 3분만에 3만원 수익 발생했습니다!",
                     ],
-                    link: "https://kmong.com/gig/480461", // 실제 크몽 링크로 교체
+                    link: "https://kmong.com/self-marketing/504217/EnSc73Jiex",
                 },
                 luxury: {
                     title: "1일만에 돌파하는 중고명품 창업사업",
@@ -2164,7 +2933,7 @@
                         "이런 강의는 처음 봤습니다. 실행만 하면 실패할 확률이 1%도 안 된다고 생각해요",
                         "3시간 정도의 긴 컨설팅임에도 하나도 지치지 않으시고 계속 도움이 되는 이야기를 해주셔서 감사합니다",
                     ],
-                    link: "https://kmong.com/gig/480462", // 실제 크몽 링크로 교체
+                    link: "https://kmong.com/self-marketing/431248/V8o7vCYANq",
                 },
                 ebook1: {
                     title: "시 캐릭터로 월 1200만원 전자책 자동화 1탄",
@@ -2189,7 +2958,7 @@
                         "세세한 방법까지 무료강의에서도 알려주셔서 넘 감사합니다!",
                     ],
                     note: "2탄 진행을 위해서는 1탄 수강이 필수입니다",
-                    link: "https://kmong.com/gig/480463", // 실제 크몽 링크로 교체
+                    link: "ebook1-landing.html",
                 },
                 ebook2: {
                     title: "전자책 자동화 마스터 2탄",
@@ -2214,7 +2983,7 @@
                         "7월 15일-20일 사이 자료 발송되는데 정말 기대됩니다",
                     ],
                     note: "1탄을 보시지 않으신 분은 2탄 내용을 절대 이해하실 수 없습니다. 반드시 1탄부터 시작해주세요.",
-                    link: "https://kmong.com/gig/480464", // 실제 크몽 링크로 교체
+                    link: "ebook2-landing.html",
                 },
             };
 
@@ -2362,6 +3131,14 @@
                 document.body.style.overflow = "auto";
             }
 
+            // AI Master signup handler
+            function handleAiMasterSignup() {
+                // 실제 사전예약 링크로 연결하거나 모달 표시
+                alert(
+                    "AI 마스터 과정 사전예약을 위해 연락처로 문의해주세요!\n\n📞 010-720-8322\n📧 mcseller369@gmail.com\n\n8월 정식 런칭 전 특별가로 제공됩니다!",
+                );
+            }
+
             // Smooth scrolling for navigation links
             document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
                 anchor.addEventListener("click", function (e) {
@@ -2378,8 +3155,8 @@
                 });
             });
 
-            // 24-hour repeating countdown timer
-            function updateCountdown() {
+            // AI Timer countdown
+            function updateAiCountdown() {
                 const now = new Date();
                 const endOfDay = new Date(now);
                 endOfDay.setHours(23, 59, 59, 999);
@@ -2392,7 +3169,13 @@
                 );
                 const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
 
-                // Update timer displays if they exist
+                // Update AI timer
+                const aiTimer = document.getElementById("ai-countdown");
+                if (aiTimer) {
+                    aiTimer.innerHTML = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+                }
+
+                // Update other timer displays if they exist
                 const timerElements = document.querySelectorAll(".timer");
                 timerElements.forEach((timer) => {
                     timer.innerHTML = `
@@ -2404,18 +3187,32 @@
             }
 
             // Update countdown every second
-            setInterval(updateCountdown, 1000);
-            updateCountdown(); // Initial call
+            setInterval(updateAiCountdown, 1000);
+            updateAiCountdown(); // Initial call
 
             // Initialize page
             document.addEventListener("DOMContentLoaded", function () {
-                console.log("MCSELLER 페이지가 로드되었습니다.");
+                console.log("MCSELLER 리팩토링된 페이지가 로드되었습니다.");
 
                 // Close landing on Escape key
                 document.addEventListener("keydown", function (e) {
                     if (e.key === "Escape") {
                         closeLanding();
                     }
+                });
+
+                // Enhanced visual effects
+                const cards = document.querySelectorAll(
+                    ".strategy-card, .course-card, .success-card",
+                );
+                cards.forEach((card) => {
+                    card.addEventListener("mouseenter", function () {
+                        this.style.transform = "translateY(-10px) scale(1.02)";
+                    });
+
+                    card.addEventListener("mouseleave", function () {
+                        this.style.transform = "translateY(0) scale(1)";
+                    });
                 });
             });
         </script>

@@ -131,10 +131,16 @@ Changelog:
   * Updated marketing copy from "156만원" to "2달내 첫 수익 90%" across all pages
   * Added AI 마스터 과정 as new course offering
   * Updated course routing: Lego/Luxury courses redirect to external Kmong links
-  * Created internal landing pages for Ebook 1탄, Ebook 2탄, and AI Master course
+  * Created internal landing pages for Ebook 1탁, Ebook 2탄, and AI Master course
   * Redesigned auth.html to match main site aesthetic with MCSELLER branding
   * Implemented temporary admin account system (mcseller.admin@gmail.com)
   * Updated admin page branding to MCSELLER
+- June 28, 2025. Payment system automation:
+  * Created payment.html with automatic product detection from URL parameters
+  * Implemented automatic payment page generation for any new landing page
+  * Added discount code and reward point usage in payment flow
+  * Simplified payment process - no user registration required, direct to payment
+  * System automatically scales for new products when landing pages are added
 ```
 
 ## User Preferences

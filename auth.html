@@ -1,242 +1,1439 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로그인 / 회원가입 - MCSELLER</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="css/modern-style.css" rel="stylesheet">
-    
-    <!-- Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body class="auth-page">
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-white shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="index.html">
-                <img
-                    src="attached_assets/제목 추가_upscayl_4x_upscayl-standard-4x_1751101180619.png"
-                    alt="MCSELLER"
-                    height="40"
-                />
-            </a>
-        </div>
-    </nav>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>로그인 / 회원가입 - MCSELLER</title>
 
-    <!-- Hero Section with Auth -->
-    <section class="hero-section py-5">
-        <div class="container">
-            <div class="row min-vh-100 align-items-center">
-                <!-- Left Side - Hero Content -->
-                <div class="col-lg-6 d-none d-lg-block">
-                    <div class="pe-5">
-                        <h1 class="hero-title mb-4">
-                            MCSELLER와 함께<br>
-                            <span class="text-gradient">성공적인 수익화</span>를<br>
-                            시작하세요
-                        </h1>
-                        <p class="hero-subtitle mb-4">
-                            실제 <span class="text-warning fw-bold">2달내 첫 수익 90% 달성</span><br>
-                            검증된 수익화 전략으로 경제적 자유를 실현하세요
-                        </p>
-                        <div class="d-flex align-items-center mb-4">
-                            <img 
-                                src="attached_assets/c55eb7e7b16af_upscayl_4x_upscayl-standard-4x_1751101180619.png" 
-                                alt="전문가" 
-                                class="rounded-circle me-3" 
-                                style="width: 60px; height: 60px; object-fit: cover;"
-                            />
-                            <div>
-                                <h6 class="mb-1">전문가와 함께</h6>
-                                <p class="text-muted mb-0">1:1 맞춤 컨설팅 제공</p>
+        <!-- Bootstrap CSS -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+        <!-- Font Awesome -->
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+            rel="stylesheet"
+        />
+        <!-- Google Fonts -->
+        <link
+            href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap"
+            rel="stylesheet"
+        />
+
+        <!-- Supabase -->
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+        <style>
+            /* MCSELLER Auth Theme */
+            :root {
+                --primary-gradient: linear-gradient(
+                    135deg,
+                    #111111 0%,
+                    #23272f 100%
+                );
+                --accent-gradient: linear-gradient(90deg, #ff9900, #ffe259);
+                --glass-gradient: linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.1) 0%,
+                    rgba(255, 255, 255, 0.05) 100%
+                );
+                --text-light: #e0e0e0;
+                --text-muted: #b5b5b5;
+                --white: #ffffff;
+                --dark: #111111;
+                --border-color: rgba(255, 153, 0, 0.2);
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: "Noto Sans KR", sans-serif;
+                background: var(--primary-gradient);
+                color: var(--text-light);
+                line-height: 1.6;
+                min-height: 100vh;
+                overflow-x: hidden;
+            }
+
+            /* Animated Background */
+            body::before {
+                content: "";
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(
+                        circle at 20% 50%,
+                        rgba(255, 153, 0, 0.1) 0%,
+                        transparent 50%
+                    ),
+                    radial-gradient(
+                        circle at 80% 20%,
+                        rgba(255, 226, 89, 0.1) 0%,
+                        transparent 50%
+                    ),
+                    radial-gradient(
+                        circle at 40% 80%,
+                        rgba(255, 153, 0, 0.05) 0%,
+                        transparent 50%
+                    );
+                animation: backgroundMove 20s ease-in-out infinite;
+                z-index: -1;
+            }
+
+            @keyframes backgroundMove {
+                0%,
+                100% {
+                    transform: translate(0, 0) rotate(0deg);
+                }
+                33% {
+                    transform: translate(30px, -50px) rotate(120deg);
+                }
+                66% {
+                    transform: translate(-20px, 20px) rotate(240deg);
+                }
+            }
+
+            /* Navigation */
+            .navbar {
+                background: rgba(17, 17, 17, 0.95) !important;
+                backdrop-filter: blur(10px);
+                border-bottom: 1px solid var(--border-color);
+                box-shadow: 0 2px 20px rgba(255, 153, 0, 0.2);
+            }
+
+            .navbar-brand img {
+                filter: drop-shadow(0 2px 8px rgba(255, 153, 0, 0.3));
+                transition: all 0.3s ease;
+            }
+
+            .navbar-brand:hover img {
+                transform: scale(1.05);
+                filter: drop-shadow(0 4px 12px rgba(255, 153, 0, 0.5));
+            }
+
+            /* Hero Section */
+            .hero-section {
+                min-height: 100vh;
+                padding-top: 100px;
+                position: relative;
+            }
+
+            .hero-title {
+                font-size: 3.5rem;
+                font-weight: 900;
+                line-height: 1.2;
+                margin-bottom: 30px;
+            }
+
+            .text-gradient {
+                background: var(--accent-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .hero-subtitle {
+                font-size: 1.3rem;
+                color: var(--text-light);
+                margin-bottom: 40px;
+                line-height: 1.6;
+            }
+
+            /* Auth Forms */
+            .auth-form {
+                background: var(--glass-gradient);
+                border: 1px solid var(--border-color);
+                border-radius: 25px;
+                padding: 40px;
+                backdrop-filter: blur(20px);
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                position: relative;
+                overflow: hidden;
+                animation: slideInUp 0.8s ease-out;
+            }
+
+            .auth-form::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: var(--accent-gradient);
+                border-radius: 25px 25px 0 0;
+            }
+
+            @keyframes slideInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(50px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .auth-form h3 {
+                color: var(--white);
+                font-weight: 800;
+                margin-bottom: 10px;
+                background: var(--accent-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            /* Form Controls */
+            .form-label {
+                color: var(--text-light);
+                font-weight: 600;
+                margin-bottom: 8px;
+                font-size: 0.95rem;
+            }
+
+            .form-control {
+                background: rgba(255, 255, 255, 0.08);
+                border: 2px solid rgba(255, 153, 0, 0.2);
+                border-radius: 12px;
+                color: var(--white);
+                padding: 15px 20px;
+                font-size: 1rem;
+                transition: all 0.3s ease;
+                box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .form-control:focus {
+                background: rgba(255, 255, 255, 0.12);
+                border-color: #ff9900;
+                box-shadow:
+                    inset 0 2px 10px rgba(0, 0, 0, 0.1),
+                    0 0 0 0.2rem rgba(255, 153, 0, 0.25),
+                    0 0 20px rgba(255, 153, 0, 0.3);
+                color: var(--white);
+                transform: translateY(-2px);
+            }
+
+            .form-control::placeholder {
+                color: var(--text-muted);
+            }
+
+            .form-control-lg {
+                padding: 18px 24px;
+                font-size: 1.1rem;
+            }
+
+            .form-text {
+                color: var(--text-muted);
+                font-size: 0.875rem;
+            }
+
+            /* Form Check */
+            .form-check-input {
+                background-color: rgba(255, 255, 255, 0.1);
+                border: 2px solid var(--border-color);
+                border-radius: 6px;
+                margin-top: 0.25rem;
+            }
+
+            .form-check-input:checked {
+                background-color: #ff9900;
+                border-color: #ff9900;
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
+            }
+
+            .form-check-input:focus {
+                box-shadow: 0 0 0 0.2rem rgba(255, 153, 0, 0.25);
+            }
+
+            .form-check-label {
+                color: var(--text-light);
+                font-size: 0.95rem;
+            }
+
+            /* Buttons */
+            .btn-premium {
+                background: var(--accent-gradient);
+                border: none;
+                color: var(--dark);
+                font-weight: 700;
+                padding: 15px 30px;
+                border-radius: 12px;
+                transition: all 0.3s ease;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                position: relative;
+                overflow: hidden;
+                box-shadow: 0 8px 25px rgba(255, 153, 0, 0.3);
+            }
+
+            .btn-premium:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 15px 35px rgba(255, 153, 0, 0.4);
+                color: var(--dark);
+            }
+
+            .btn-premium::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.2),
+                    transparent
+                );
+                transition: left 0.5s;
+            }
+
+            .btn-premium:hover::before {
+                left: 100%;
+            }
+
+            .btn-primary {
+                background: var(--accent-gradient);
+                border: none;
+                color: var(--dark);
+                font-weight: 700;
+                padding: 15px 30px;
+                border-radius: 12px;
+                transition: all 0.3s ease;
+                box-shadow: 0 8px 25px rgba(255, 153, 0, 0.3);
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 15px 35px rgba(255, 153, 0, 0.4);
+                color: var(--dark);
+            }
+
+            .btn-outline-warning {
+                border: 2px solid #ffc107;
+                color: #ffc107;
+                background: transparent;
+                font-weight: 600;
+                padding: 12px 24px;
+                border-radius: 12px;
+                transition: all 0.3s ease;
+            }
+
+            .btn-outline-warning:hover {
+                background: #ffc107;
+                color: var(--dark);
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(255, 193, 7, 0.3);
+            }
+
+            .btn-outline-secondary {
+                border: 2px solid var(--text-muted);
+                color: var(--text-light);
+                background: transparent;
+                font-weight: 600;
+                padding: 12px 24px;
+                border-radius: 12px;
+                transition: all 0.3s ease;
+            }
+
+            .btn-outline-secondary:hover {
+                background: var(--text-light);
+                color: var(--dark);
+                border-color: var(--text-light);
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(255, 255, 255, 0.2);
+            }
+
+            .btn-outline-danger {
+                border: 2px solid #dc3545;
+                color: #dc3545;
+                background: transparent;
+                font-weight: 600;
+                padding: 12px 24px;
+                border-radius: 12px;
+                transition: all 0.3s ease;
+            }
+
+            .btn-outline-danger:hover {
+                background: #dc3545;
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(220, 53, 69, 0.3);
+            }
+
+            .btn-lg {
+                padding: 18px 30px;
+                font-size: 1.1rem;
+            }
+
+            /* Divider */
+            .divider {
+                position: relative;
+                text-align: center;
+                margin: 30px 0;
+            }
+
+            .divider::before {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    var(--border-color),
+                    transparent
+                );
+            }
+
+            .divider span {
+                background: var(--primary-gradient);
+                color: var(--text-muted);
+                padding: 0 20px;
+                font-size: 0.9rem;
+                font-weight: 500;
+            }
+
+            /* Links */
+            a {
+                color: #ff9900;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            a:hover {
+                color: #ffe259;
+                transform: translateY(-1px);
+            }
+
+            a::after {
+                content: "";
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background: var(--accent-gradient);
+                transition: width 0.3s ease;
+            }
+
+            a:hover::after {
+                width: 100%;
+            }
+
+            .text-primary {
+                color: #ff9900 !important;
+            }
+
+            .text-muted {
+                color: var(--text-muted) !important;
+            }
+
+            /* Toast */
+            .toast {
+                background: var(--glass-gradient);
+                border: 1px solid var(--border-color);
+                backdrop-filter: blur(10px);
+                color: var(--text-light);
+            }
+
+            .toast-header {
+                background: rgba(255, 153, 0, 0.1);
+                border-bottom: 1px solid var(--border-color);
+                color: var(--white);
+            }
+
+            .btn-close {
+                filter: invert(1);
+            }
+
+            /* Form Animation */
+            .auth-form.switching {
+                animation: formSwitch 0.6s ease-in-out;
+            }
+
+            @keyframes formSwitch {
+                0% {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+                50% {
+                    opacity: 0;
+                    transform: translateX(-20px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            /* Hero Image Animation */
+            .hero-image {
+                border-radius: 20px;
+                box-shadow: 0 20px 60px rgba(255, 153, 0, 0.2);
+                transition: all 0.3s ease;
+                animation: float 6s ease-in-out infinite;
+            }
+
+            @keyframes float {
+                0%,
+                100% {
+                    transform: translateY(0px);
+                }
+                50% {
+                    transform: translateY(-20px);
+                }
+            }
+
+            .hero-image:hover {
+                transform: scale(1.05) translateY(-10px);
+                box-shadow: 0 30px 80px rgba(255, 153, 0, 0.3);
+            }
+
+            /* Expert Info */
+            .expert-info {
+                background: rgba(255, 153, 0, 0.1);
+                border: 1px solid var(--border-color);
+                border-radius: 15px;
+                padding: 20px;
+                backdrop-filter: blur(10px);
+                transition: all 0.3s ease;
+            }
+
+            .expert-info:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(255, 153, 0, 0.2);
+            }
+
+            .expert-avatar {
+                border: 3px solid #ff9900;
+                box-shadow: 0 5px 15px rgba(255, 153, 0, 0.3);
+            }
+
+            /* Responsive Design */
+            @media (max-width: 992px) {
+                .hero-title {
+                    font-size: 2.5rem;
+                    text-align: center;
+                }
+
+                .hero-subtitle {
+                    text-align: center;
+                    font-size: 1.1rem;
+                }
+
+                .auth-form {
+                    margin: 20px;
+                    padding: 30px 25px;
+                }
+
+                .hero-section {
+                    padding-top: 80px;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .hero-title {
+                    font-size: 2rem;
+                }
+
+                .auth-form {
+                    margin: 10px;
+                    padding: 25px 20px;
+                    border-radius: 20px;
+                }
+
+                .form-control-lg {
+                    padding: 15px 20px;
+                    font-size: 1rem;
+                }
+
+                .btn-lg {
+                    padding: 15px 25px;
+                    font-size: 1rem;
+                }
+            }
+
+            /* Loading Spinner */
+            .spinner-border-sm {
+                width: 1rem;
+                height: 1rem;
+                border-width: 0.15em;
+            }
+
+            /* Enhanced Visual Effects */
+            .glow-effect {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .glow-effect::before {
+                content: "";
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: conic-gradient(
+                    transparent,
+                    rgba(255, 153, 0, 0.3),
+                    transparent
+                );
+                animation: rotate 4s linear infinite;
+                z-index: -1;
+            }
+
+            @keyframes rotate {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            /* Particle Effect */
+            .particles {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: -1;
+            }
+
+            .particle {
+                position: absolute;
+                background: #ff9900;
+                border-radius: 50%;
+                opacity: 0.1;
+                animation: particleFloat 15s infinite linear;
+            }
+
+            @keyframes particleFloat {
+                0% {
+                    transform: translateY(100vh) translateX(0px);
+                    opacity: 0;
+                }
+                10% {
+                    opacity: 0.1;
+                }
+                90% {
+                    opacity: 0.1;
+                }
+                100% {
+                    transform: translateY(-100vh) translateX(100px);
+                    opacity: 0;
+                }
+            }
+
+            /* Success Animation */
+            .success-checkmark {
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                background: var(--accent-gradient);
+                margin: 0 auto 20px;
+                position: relative;
+                animation: successPulse 2s ease-in-out infinite;
+            }
+
+            .success-checkmark::after {
+                content: "✓";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: var(--dark);
+                font-size: 2rem;
+                font-weight: bold;
+            }
+
+            @keyframes successPulse {
+                0%,
+                100% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.1);
+                }
+            }
+        </style>
+    </head>
+    <body class="auth-page">
+        <!-- Particles Background -->
+        <div class="particles" id="particles"></div>
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg fixed-top">
+            <div class="container">
+                <a class="navbar-brand fw-bold" href="index.html">
+                    <img
+                        src="attached_assets/제목 추가_upscayl_4x_upscayl-standard-4x_1751101180619.png"
+                        alt="MCSELLER"
+                        height="40"
+                    />
+                </a>
+            </div>
+        </nav>
+
+        <!-- Hero Section with Auth -->
+        <section class="hero-section py-5">
+            <div class="container">
+                <div class="row min-vh-100 align-items-center">
+                    <!-- Left Side - Hero Content -->
+                    <div class="col-lg-6 d-none d-lg-block">
+                        <div class="pe-5">
+                            <h1 class="hero-title mb-4">
+                                MCSELLER와 함께<br />
+                                <span class="text-gradient"
+                                    >성공적인 수익화</span
+                                >를<br />
+                                시작하세요
+                            </h1>
+                            <p class="hero-subtitle mb-4">
+                                실제
+                                <span class="text-warning fw-bold"
+                                    >2달내 첫 수익 90% 달성</span
+                                ><br />
+                                검증된 수익화 전략으로 경제적 자유를 실현하세요
+                            </p>
+                            <div class="expert-info">
+                                <div class="d-flex align-items-center">
+                                    <img
+                                        src="attached_assets/c55eb7e7b16af_upscayl_4x_upscayl-standard-4x_1751101180619.png"
+                                        alt="전문가"
+                                        class="rounded-circle me-3 expert-avatar"
+                                        style="
+                                            width: 60px;
+                                            height: 60px;
+                                            object-fit: cover;
+                                        "
+                                    />
+                                    <div>
+                                        <h6 class="mb-1 text-white fw-bold">
+                                            전문가와 함께
+                                        </h6>
+                                        <p class="text-muted mb-0">
+                                            1:1 맞춤 컨설팅 제공
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Side - Auth Form -->
+                    <div class="col-lg-6 d-flex align-items-center">
+                        <div class="container py-5">
+                            <div class="row justify-content-center">
+                                <div class="col-md-10 col-lg-8">
+                                    <!-- 로그인 폼 -->
+                                    <div
+                                        id="login-form"
+                                        class="auth-form glow-effect"
+                                    >
+                                        <div class="text-center mb-4">
+                                            <h3 class="fw-bold">로그인</h3>
+                                            <p class="text-muted">
+                                                계정에 로그인하여 학습을
+                                                계속하세요
+                                            </p>
+                                        </div>
+
+                                        <form id="loginForm">
+                                            <div class="mb-3">
+                                                <label
+                                                    for="loginEmail"
+                                                    class="form-label"
+                                                    >이메일</label
+                                                >
+                                                <input
+                                                    type="email"
+                                                    class="form-control form-control-lg"
+                                                    id="loginEmail"
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label
+                                                    for="loginPassword"
+                                                    class="form-label"
+                                                    >비밀번호</label
+                                                >
+                                                <input
+                                                    type="password"
+                                                    class="form-control form-control-lg"
+                                                    id="loginPassword"
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div class="mb-3 form-check">
+                                                <input
+                                                    type="checkbox"
+                                                    class="form-check-input"
+                                                    id="rememberMe"
+                                                />
+                                                <label
+                                                    class="form-check-label"
+                                                    for="rememberMe"
+                                                >
+                                                    로그인 상태 유지
+                                                </label>
+                                            </div>
+
+                                            <button
+                                                type="submit"
+                                                class="btn btn-premium btn-lg w-100 mb-3"
+                                            >
+                                                <i
+                                                    class="fas fa-sign-in-alt me-2"
+                                                ></i
+                                                >로그인
+                                            </button>
+                                        </form>
+
+                                        <div class="divider mb-3">
+                                            <span>또는</span>
+                                        </div>
+
+                                        <!-- 소셜 로그인 -->
+                                        <div class="d-grid gap-2 mb-4">
+                                            <button
+                                                class="btn btn-outline-warning btn-lg"
+                                                id="kakao-login"
+                                            >
+                                                <i
+                                                    class="fas fa-comment me-2"
+                                                ></i
+                                                >카카오로 로그인
+                                            </button>
+                                            <button
+                                                class="btn btn-outline-secondary btn-lg"
+                                                id="google-login"
+                                            >
+                                                <i
+                                                    class="fab fa-google me-2"
+                                                ></i
+                                                >구글로 로그인
+                                            </button>
+                                        </div>
+
+                                        <div class="text-center">
+                                            <p class="mb-0">
+                                                계정이 없으신가요?
+                                                <a
+                                                    href="#"
+                                                    class="text-primary"
+                                                    id="show-signup"
+                                                    >회원가입</a
+                                                >
+                                            </p>
+                                            <a
+                                                href="#"
+                                                class="text-muted small"
+                                                id="forgot-password"
+                                                >비밀번호를 잊으셨나요?</a
+                                            >
+                                        </div>
+                                    </div>
+
+                                    <!-- 회원가입 폼 -->
+                                    <div
+                                        id="signup-form"
+                                        class="auth-form glow-effect d-none"
+                                    >
+                                        <div class="text-center mb-4">
+                                            <h3 class="fw-bold">회원가입</h3>
+                                            <p class="text-muted">
+                                                새 계정을 만들어 학습을
+                                                시작하세요
+                                            </p>
+                                        </div>
+
+                                        <form id="signupForm">
+                                            <div class="mb-3">
+                                                <label
+                                                    for="signupName"
+                                                    class="form-label"
+                                                    >이름</label
+                                                >
+                                                <input
+                                                    type="text"
+                                                    class="form-control form-control-lg"
+                                                    id="signupName"
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label
+                                                    for="signupEmail"
+                                                    class="form-label"
+                                                    >이메일</label
+                                                >
+                                                <input
+                                                    type="email"
+                                                    class="form-control form-control-lg"
+                                                    id="signupEmail"
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label
+                                                    for="signupPassword"
+                                                    class="form-label"
+                                                    >비밀번호</label
+                                                >
+                                                <input
+                                                    type="password"
+                                                    class="form-control form-control-lg"
+                                                    id="signupPassword"
+                                                    required
+                                                    minlength="6"
+                                                />
+                                                <div class="form-text">
+                                                    최소 6자 이상 입력해주세요
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label
+                                                    for="confirmPassword"
+                                                    class="form-label"
+                                                    >비밀번호 확인</label
+                                                >
+                                                <input
+                                                    type="password"
+                                                    class="form-control form-control-lg"
+                                                    id="confirmPassword"
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div class="mb-3 form-check">
+                                                <input
+                                                    type="checkbox"
+                                                    class="form-check-input"
+                                                    id="agreeTerms"
+                                                    required
+                                                />
+                                                <label
+                                                    class="form-check-label"
+                                                    for="agreeTerms"
+                                                >
+                                                    <a
+                                                        href="#"
+                                                        class="text-primary"
+                                                        >이용약관</a
+                                                    >
+                                                    및
+                                                    <a
+                                                        href="#"
+                                                        class="text-primary"
+                                                        >개인정보처리방침</a
+                                                    >에 동의합니다
+                                                </label>
+                                            </div>
+
+                                            <button
+                                                type="submit"
+                                                class="btn btn-primary btn-lg w-100 mb-3"
+                                            >
+                                                <i
+                                                    class="fas fa-user-plus me-2"
+                                                ></i
+                                                >회원가입
+                                            </button>
+                                        </form>
+
+                                        <div class="divider mb-3">
+                                            <span>또는</span>
+                                        </div>
+
+                                        <!-- 소셜 회원가입 -->
+                                        <div class="d-grid gap-2 mb-4">
+                                            <button
+                                                class="btn btn-outline-warning btn-lg"
+                                                id="kakao-signup"
+                                            >
+                                                <i
+                                                    class="fas fa-comment me-2"
+                                                ></i
+                                                >카카오로 가입
+                                            </button>
+                                            <button
+                                                class="btn btn-outline-danger btn-lg"
+                                                id="google-signup"
+                                            >
+                                                <i
+                                                    class="fab fa-google me-2"
+                                                ></i
+                                                >구글로 가입
+                                            </button>
+                                        </div>
+
+                                        <div class="text-center">
+                                            <p class="mb-0">
+                                                이미 계정이 있으신가요?
+                                                <a
+                                                    href="#"
+                                                    class="text-primary"
+                                                    id="show-login"
+                                                    >로그인</a
+                                                >
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- 비밀번호 재설정 폼 -->
+                                    <div
+                                        id="reset-form"
+                                        class="auth-form glow-effect d-none"
+                                    >
+                                        <div class="text-center mb-4">
+                                            <h3 class="fw-bold">
+                                                비밀번호 재설정
+                                            </h3>
+                                            <p class="text-muted">
+                                                이메일을 입력하시면 재설정
+                                                링크를 보내드립니다
+                                            </p>
+                                        </div>
+
+                                        <form id="resetForm">
+                                            <div class="mb-3">
+                                                <label
+                                                    for="resetEmail"
+                                                    class="form-label"
+                                                    >이메일</label
+                                                >
+                                                <input
+                                                    type="email"
+                                                    class="form-control form-control-lg"
+                                                    id="resetEmail"
+                                                    required
+                                                />
+                                            </div>
+
+                                            <button
+                                                type="submit"
+                                                class="btn btn-primary btn-lg w-100 mb-3"
+                                            >
+                                                <i
+                                                    class="fas fa-paper-plane me-2"
+                                                ></i
+                                                >재설정 링크 전송
+                                            </button>
+                                        </form>
+
+                                        <div class="text-center">
+                                            <a
+                                                href="#"
+                                                class="text-primary"
+                                                id="back-to-login"
+                                                >로그인으로 돌아가기</a
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
 
-                <!-- Right Side - Auth Form -->
-                <div class="col-lg-6 d-flex align-items-center">
-                <div class="container py-5">
-                    <div class="row justify-content-center">
-                        <div class="col-md-8 col-lg-6">
-                            <!-- 로그인 폼 -->
-                            <div id="login-form" class="auth-form">
-                                <div class="text-center mb-4">
-                                    <h3 class="fw-bold">로그인</h3>
-                                    <p class="text-muted">계정에 로그인하여 학습을 계속하세요</p>
-                                </div>
-
-                                <form id="loginForm">
-                                    <div class="mb-3">
-                                        <label for="loginEmail" class="form-label">이메일</label>
-                                        <input type="email" class="form-control form-control-lg" 
-                                               id="loginEmail" required>
-                                    </div>
-                                    
-                                    <div class="mb-3">
-                                        <label for="loginPassword" class="form-label">비밀번호</label>
-                                        <input type="password" class="form-control form-control-lg" 
-                                               id="loginPassword" required>
-                                    </div>
-                                    
-                                    <div class="mb-3 form-check">
-                                        <input type="checkbox" class="form-check-input" id="rememberMe">
-                                        <label class="form-check-label" for="rememberMe">
-                                            로그인 상태 유지
-                                        </label>
-                                    </div>
-                                    
-                                    <button type="submit" class="btn btn-premium btn-lg w-100 mb-3">
-                                        <i class="fas fa-sign-in-alt me-2"></i>로그인
-                                    </button>
-                                </form>
-
-                                <div class="divider mb-3">
-                                    <span>또는</span>
-                                </div>
-
-                                <!-- 소셜 로그인 -->
-                                <div class="d-grid gap-2 mb-4">
-                                    <button class="btn btn-outline-warning btn-lg" id="kakao-login">
-                                        <i class="fas fa-comment me-2"></i>카카오로 로그인
-                                    </button>
-                                    <button class="btn btn-outline-secondary btn-lg" id="google-login">
-                                        <i class="fab fa-google me-2"></i>구글로 로그인
-                                    </button>
-                                </div>
-
-                                <div class="text-center">
-                                    <p class="mb-0">
-                                        계정이 없으신가요? 
-                                        <a href="#" class="text-primary" id="show-signup">회원가입</a>
-                                    </p>
-                                    <a href="#" class="text-muted small" id="forgot-password">비밀번호를 잊으셨나요?</a>
-                                </div>
-                            </div>
-
-                            <!-- 회원가입 폼 -->
-                            <div id="signup-form" class="auth-form d-none">
-                                <div class="text-center mb-4">
-                                    <h3 class="fw-bold">회원가입</h3>
-                                    <p class="text-muted">새 계정을 만들어 학습을 시작하세요</p>
-                                </div>
-
-                                <form id="signupForm">
-                                    <div class="mb-3">
-                                        <label for="signupName" class="form-label">이름</label>
-                                        <input type="text" class="form-control form-control-lg" 
-                                               id="signupName" required>
-                                    </div>
-                                    
-                                    <div class="mb-3">
-                                        <label for="signupEmail" class="form-label">이메일</label>
-                                        <input type="email" class="form-control form-control-lg" 
-                                               id="signupEmail" required>
-                                    </div>
-                                    
-                                    <div class="mb-3">
-                                        <label for="signupPassword" class="form-label">비밀번호</label>
-                                        <input type="password" class="form-control form-control-lg" 
-                                               id="signupPassword" required minlength="6">
-                                        <div class="form-text">최소 6자 이상 입력해주세요</div>
-                                    </div>
-                                    
-                                    <div class="mb-3">
-                                        <label for="confirmPassword" class="form-label">비밀번호 확인</label>
-                                        <input type="password" class="form-control form-control-lg" 
-                                               id="confirmPassword" required>
-                                    </div>
-                                    
-                                    <div class="mb-3 form-check">
-                                        <input type="checkbox" class="form-check-input" id="agreeTerms" required>
-                                        <label class="form-check-label" for="agreeTerms">
-                                            <a href="#" class="text-primary">이용약관</a> 및 
-                                            <a href="#" class="text-primary">개인정보처리방침</a>에 동의합니다
-                                        </label>
-                                    </div>
-                                    
-                                    <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
-                                        <i class="fas fa-user-plus me-2"></i>회원가입
-                                    </button>
-                                </form>
-
-                                <div class="divider mb-3">
-                                    <span>또는</span>
-                                </div>
-
-                                <!-- 소셜 회원가입 -->
-                                <div class="d-grid gap-2 mb-4">
-                                    <button class="btn btn-outline-warning btn-lg" id="kakao-signup">
-                                        <i class="fas fa-comment me-2"></i>카카오로 가입
-                                    </button>
-                                    <button class="btn btn-outline-danger btn-lg" id="google-signup">
-                                        <i class="fab fa-google me-2"></i>구글로 가입
-                                    </button>
-                                </div>
-
-                                <div class="text-center">
-                                    <p class="mb-0">
-                                        이미 계정이 있으신가요? 
-                                        <a href="#" class="text-primary" id="show-login">로그인</a>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <!-- 비밀번호 재설정 폼 -->
-                            <div id="reset-form" class="auth-form d-none">
-                                <div class="text-center mb-4">
-                                    <h3 class="fw-bold">비밀번호 재설정</h3>
-                                    <p class="text-muted">이메일을 입력하시면 재설정 링크를 보내드립니다</p>
-                                </div>
-
-                                <form id="resetForm">
-                                    <div class="mb-3">
-                                        <label for="resetEmail" class="form-label">이메일</label>
-                                        <input type="email" class="form-control form-control-lg" 
-                                               id="resetEmail" required>
-                                    </div>
-                                    
-                                    <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
-                                        <i class="fas fa-paper-plane me-2"></i>재설정 링크 전송
-                                    </button>
-                                </form>
-
-                                <div class="text-center">
-                                    <a href="#" class="text-primary" id="back-to-login">로그인으로 돌아가기</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <!-- Toast Container -->
+        <div class="toast-container position-fixed top-0 end-0 p-3">
+            <div id="authToast" class="toast" role="alert">
+                <div class="toast-header">
+                    <strong class="me-auto">알림</strong>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="toast"
+                    ></button>
+                </div>
+                <div class="toast-body" id="toast-message">
+                    <!-- 메시지가 여기에 표시됩니다 -->
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Toast Container -->
-    <div class="toast-container position-fixed top-0 end-0 p-3">
-        <div id="authToast" class="toast" role="alert">
-            <div class="toast-header">
-                <strong class="me-auto">알림</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
-            </div>
-            <div class="toast-body" id="toast-message">
-                <!-- 메시지가 여기에 표시됩니다 -->
-            </div>
-        </div>
-    </div>
+        <!-- Scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    
-    <!-- Custom Scripts -->
-    <script src="js/supabase-client.js"></script>
-    <script src="js/auth.js"></script>
-</body>
+        <!-- Custom Scripts -->
+        <script src="js/supabase-client.js"></script>
+        <script src="js/auth.js"></script>
+
+        <script>
+            // Enhanced authentication page functionality
+            document.addEventListener("DOMContentLoaded", function () {
+                // Create floating particles
+                const createParticles = () => {
+                    const particlesContainer =
+                        document.getElementById("particles");
+                    const numberOfParticles = 20;
+
+                    for (let i = 0; i < numberOfParticles; i++) {
+                        const particle = document.createElement("div");
+                        particle.className = "particle";
+
+                        // Random size and position
+                        const size = Math.random() * 4 + 2;
+                        particle.style.width = `${size}px`;
+                        particle.style.height = `${size}px`;
+                        particle.style.left = `${Math.random() * 100}vw`;
+                        particle.style.animationDelay = `${Math.random() * 15}s`;
+                        particle.style.animationDuration = `${15 + Math.random() * 10}s`;
+
+                        particlesContainer.appendChild(particle);
+                    }
+                };
+
+                createParticles();
+
+                // Form switching animations
+                const switchForm = (hideForm, showForm) => {
+                    const hideElement = document.getElementById(hideForm);
+                    const showElement = document.getElementById(showForm);
+
+                    hideElement.classList.add("switching");
+
+                    setTimeout(() => {
+                        hideElement.classList.add("d-none");
+                        hideElement.classList.remove("switching");
+                        showElement.classList.remove("d-none");
+                        showElement.style.animation = "slideInUp 0.8s ease-out";
+                    }, 300);
+                };
+
+                // Form navigation
+                document
+                    .getElementById("show-signup")
+                    ?.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        switchForm("login-form", "signup-form");
+                    });
+
+                document
+                    .getElementById("show-login")
+                    ?.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        switchForm("signup-form", "login-form");
+                    });
+
+                document
+                    .getElementById("forgot-password")
+                    ?.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        switchForm("login-form", "reset-form");
+                    });
+
+                document
+                    .getElementById("back-to-login")
+                    ?.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        switchForm("reset-form", "login-form");
+                    });
+
+                // Enhanced form validation with visual feedback
+                const forms = document.querySelectorAll("form");
+                forms.forEach((form) => {
+                    const inputs = form.querySelectorAll("input");
+
+                    inputs.forEach((input) => {
+                        // Real-time validation feedback
+                        input.addEventListener("input", function () {
+                            const isValid = this.checkValidity();
+
+                            if (this.value.length > 0) {
+                                if (isValid) {
+                                    this.style.borderColor = "#28a745";
+                                    this.style.boxShadow =
+                                        "inset 0 2px 10px rgba(0, 0, 0, 0.1), 0 0 0 0.2rem rgba(40, 167, 69, 0.25)";
+                                } else {
+                                    this.style.borderColor = "#dc3545";
+                                    this.style.boxShadow =
+                                        "inset 0 2px 10px rgba(0, 0, 0, 0.1), 0 0 0 0.2rem rgba(220, 53, 69, 0.25)";
+                                }
+                            } else {
+                                this.style.borderColor =
+                                    "rgba(255, 153, 0, 0.2)";
+                                this.style.boxShadow =
+                                    "inset 0 2px 10px rgba(0, 0, 0, 0.1)";
+                            }
+                        });
+
+                        // Focus effects
+                        input.addEventListener("focus", function () {
+                            this.parentElement.style.transform =
+                                "translateY(-2px)";
+                            this.parentElement.style.transition =
+                                "transform 0.3s ease";
+                        });
+
+                        input.addEventListener("blur", function () {
+                            this.parentElement.style.transform =
+                                "translateY(0)";
+                        });
+                    });
+                });
+
+                // Password confirmation validation
+                const signupPassword =
+                    document.getElementById("signupPassword");
+                const confirmPassword =
+                    document.getElementById("confirmPassword");
+
+                if (signupPassword && confirmPassword) {
+                    const validatePasswordMatch = () => {
+                        if (confirmPassword.value.length > 0) {
+                            if (
+                                signupPassword.value === confirmPassword.value
+                            ) {
+                                confirmPassword.style.borderColor = "#28a745";
+                                confirmPassword.style.boxShadow =
+                                    "inset 0 2px 10px rgba(0, 0, 0, 0.1), 0 0 0 0.2rem rgba(40, 167, 69, 0.25)";
+                            } else {
+                                confirmPassword.style.borderColor = "#dc3545";
+                                confirmPassword.style.boxShadow =
+                                    "inset 0 2px 10px rgba(0, 0, 0, 0.1), 0 0 0 0.2rem rgba(220, 53, 69, 0.25)";
+                            }
+                        }
+                    };
+
+                    signupPassword.addEventListener(
+                        "input",
+                        validatePasswordMatch,
+                    );
+                    confirmPassword.addEventListener(
+                        "input",
+                        validatePasswordMatch,
+                    );
+                }
+
+                // Button ripple effect
+                const buttons = document.querySelectorAll(".btn");
+                buttons.forEach((btn) => {
+                    btn.addEventListener("click", function (e) {
+                        // Create ripple element
+                        const ripple = document.createElement("span");
+                        const rect = this.getBoundingClientRect();
+                        const size = Math.max(rect.width, rect.height);
+                        const x = e.clientX - rect.left - size / 2;
+                        const y = e.clientY - rect.top - size / 2;
+
+                        ripple.style.cssText = `
+                        position: absolute;
+                        width: ${size}px;
+                        height: ${size}px;
+                        left: ${x}px;
+                        top: ${y}px;
+                        background: rgba(255, 255, 255, 0.4);
+                        border-radius: 50%;
+                        transform: scale(0);
+                        animation: ripple 0.6s linear;
+                        pointer-events: none;
+                    `;
+
+                        this.style.position = "relative";
+                        this.style.overflow = "hidden";
+                        this.appendChild(ripple);
+
+                        setTimeout(() => {
+                            ripple.remove();
+                        }, 600);
+                    });
+                });
+
+                // Add ripple animation CSS
+                const style = document.createElement("style");
+                style.textContent = `
+                @keyframes ripple {
+                    to {
+                        transform: scale(2);
+                        opacity: 0;
+                    }
+                }
+            `;
+                document.head.appendChild(style);
+
+                // Enhanced loading states for form submissions
+                const addLoadingState = (button, form) => {
+                    const originalText = button.innerHTML;
+                    button.innerHTML =
+                        '<i class="spinner-border spinner-border-sm me-2"></i>처리 중...';
+                    button.disabled = true;
+                    form.style.pointerEvents = "none";
+                    form.style.opacity = "0.7";
+
+                    // Simulate processing time (remove in production)
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                        form.style.pointerEvents = "auto";
+                        form.style.opacity = "1";
+                    }, 2000);
+                };
+
+                // Form submission handlers (enhanced)
+                document
+                    .getElementById("loginForm")
+                    ?.addEventListener("submit", function (e) {
+                        e.preventDefault();
+                        const submitBtn = this.querySelector(
+                            'button[type="submit"]',
+                        );
+                        addLoadingState(submitBtn, this);
+
+                        // Your login logic here
+                        console.log("로그인 처리");
+                    });
+
+                document
+                    .getElementById("signupForm")
+                    ?.addEventListener("submit", function (e) {
+                        e.preventDefault();
+                        const submitBtn = this.querySelector(
+                            'button[type="submit"]',
+                        );
+                        addLoadingState(submitBtn, this);
+
+                        // Your signup logic here
+                        console.log("회원가입 처리");
+                    });
+
+                document
+                    .getElementById("resetForm")
+                    ?.addEventListener("submit", function (e) {
+                        e.preventDefault();
+                        const submitBtn = this.querySelector(
+                            'button[type="submit"]',
+                        );
+                        addLoadingState(submitBtn, this);
+
+                        // Your password reset logic here
+                        console.log("비밀번호 재설정 처리");
+                    });
+
+                // Social login handlers with enhanced feedback
+                const socialButtons = [
+                    "kakao-login",
+                    "google-login",
+                    "kakao-signup",
+                    "google-signup",
+                ];
+                socialButtons.forEach((buttonId) => {
+                    document
+                        .getElementById(buttonId)
+                        ?.addEventListener("click", function () {
+                            this.style.transform = "scale(0.95)";
+                            setTimeout(() => {
+                                this.style.transform = "scale(1)";
+                            }, 150);
+
+                            // Your social login logic here
+                            console.log(`${buttonId} 클릭됨`);
+                        });
+                });
+
+                // Enhanced toast notifications
+                const showToast = (message, type = "info") => {
+                    const toast = document.getElementById("authToast");
+                    const toastBody = document.getElementById("toast-message");
+
+                    toastBody.textContent = message;
+
+                    // Add color coding based on type
+                    toast.className = `toast show border-${type === "success" ? "success" : type === "error" ? "danger" : "info"}`;
+
+                    const bsToast = new bootstrap.Toast(toast);
+                    bsToast.show();
+                };
+
+                // Keyboard navigation enhancement
+                document.addEventListener("keydown", function (e) {
+                    // Enter key handling for better UX
+                    if (e.key === "Enter" && e.target.matches("input")) {
+                        const form = e.target.closest("form");
+                        const inputs = Array.from(
+                            form.querySelectorAll("input"),
+                        );
+                        const currentIndex = inputs.indexOf(e.target);
+
+                        if (currentIndex < inputs.length - 1) {
+                            e.preventDefault();
+                            inputs[currentIndex + 1].focus();
+                        }
+                    }
+
+                    // Escape key to close modals/forms
+                    if (e.key === "Escape") {
+                        const activeForm = document.querySelector(
+                            ".auth-form:not(.d-none)",
+                        );
+                        if (activeForm && activeForm.id !== "login-form") {
+                            document.getElementById("back-to-login")?.click() ||
+                                document.getElementById("show-login")?.click();
+                        }
+                    }
+                });
+
+                // Auto-focus first input when forms switch
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (
+                            mutation.type === "attributes" &&
+                            mutation.attributeName === "class"
+                        ) {
+                            const target = mutation.target;
+                            if (
+                                !target.classList.contains("d-none") &&
+                                target.classList.contains("auth-form")
+                            ) {
+                                const firstInput =
+                                    target.querySelector("input");
+                                if (firstInput) {
+                                    setTimeout(() => firstInput.focus(), 100);
+                                }
+                            }
+                        }
+                    });
+                });
+
+                // Observe all auth forms
+                document.querySelectorAll(".auth-form").forEach((form) => {
+                    observer.observe(form, { attributes: true });
+                });
+
+                // Initial focus
+                const initialInput =
+                    document.querySelector("#login-form input");
+                if (initialInput) {
+                    setTimeout(() => initialInput.focus(), 500);
+                }
+
+                console.log("MCSELLER 인증 페이지가 로드되었습니다.");
+            });
+        </script>
+    </body>
 </html>

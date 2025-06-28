@@ -1,66 +1,1051 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>전자책 자동화 2탄 - MCSELLER</title>
+        <title>
+            AI캐릭터로 월 1200만원, 전자책 자동화 마스터 강의 2탄 - MCSELLER
+        </title>
 
         <!-- Meta Tags for SEO -->
         <meta
             name="description"
-            content="전자책 자동화 2탄 - MCSELLER에서 제공하는 고급 수익화 전략 강의"
+            content="AI캐릭터로 월 1200만원 수익을 달성한 노하우 2탄 공개! 총 380만원 상당의 자료와 마케팅 자동화 프로그램까지, 기간 한정 특가로 만나보세요."
+        />
+        <meta
+            name="keywords"
+            content="전자책, 자동화, AI수익화, 부업, 패시브인컴, N잡, MCSELLER, 전자책 2탄"
         />
 
-        <!-- Bootstrap CSS -->
+        <!-- Open Graph -->
+        <meta
+            property="og:title"
+            content="[사전예약2차 -85%] 전자책 자동화 마스터 2탄"
+        />
+        <meta
+            property="og:description"
+            content="AI를 활용한 전자책 기획, 제작, 자동 판매 시스템 구축까지. 월 1200만원 수익 노하우 2탄을 지금 확인하세요."
+        />
+        <meta property="og:image" content="https://i.imgur.com/7gYfW3z.png" />
+        <meta property="og:type" content="website" />
+
+        <!-- Favicon -->
         <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="icon"
+            type="image/svg+xml"
+            href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>"
+        />
+
+        <!-- External CSS -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
             rel="stylesheet"
         />
-        
-        <!-- Font Awesome -->
         <link
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
             rel="stylesheet"
         />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://unpkg.com/aos@2.3.1/dist/aos.css"
+            rel="stylesheet"
+        />
 
-        <!-- Custom CSS -->
-        <link rel="stylesheet" href="css/modern-style.css" />
+        <style>
+            /* Custom CSS inspired by the reference design */
+            :root {
+                --primary-gradient: linear-gradient(
+                    135deg,
+                    #111111 0%,
+                    #23272f 100%
+                );
+                /* 퍼플 계열 그라데이션으로 변경 */
+                --accent-gradient: linear-gradient(
+                    90deg,
+                    #8a2be2,
+                    #9370db
+                ); /* 보라색 계열 */
+                --highlight-gradient: linear-gradient(
+                    90deg,
+                    #8a2be2,
+                    #da70d6
+                ); /* 강조용 보라색 계열 */
+                --text-light: #e0e0e0;
+                --text-muted: #d1d5db;
+                --white: #ffffff;
+                --dark: #111111;
+                --success: #28a745;
+                --danger: #dc3545;
+                --primary-purple: #8a2be2; /* 주요 보라색 */
+                --light-purple: #9370db; /* 밝은 보라색 */
+                --star-color: #ffd700;
+            }
 
-        <!-- AOS CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+            body {
+                font-family: "Noto Sans KR", sans-serif;
+                background: var(--dark);
+                color: var(--text-light);
+                line-height: 1.8;
+            }
+
+            /* Common Styles */
+            .text-gradient-purple {
+                /* 클래스명 변경 */
+                background: var(--accent-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+            .text-gradient-gold {
+                background: var(--highlight-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            /* Navigation */
+            .modern-navbar {
+                background: rgba(17, 17, 17, 0.85);
+                backdrop-filter: blur(10px);
+                border-bottom: 1px solid rgba(138, 43, 226, 0.3); /* 보라색 계열 */
+            }
+            .navbar-brand img {
+                height: 35px;
+            }
+
+            /* Buttons */
+            .btn-premium {
+                background: var(--accent-gradient);
+                border: none;
+                color: var(--white);
+                font-weight: 700;
+                padding: 16px 40px;
+                border-radius: 50px;
+                transition: all 0.3s ease;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                box-shadow: 0 5px 20px rgba(138, 43, 226, 0.3); /* 보라색 계열 */
+                font-size: 1.1rem;
+                white-space: nowrap;
+            }
+
+            .btn-premium:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 30px rgba(138, 43, 226, 0.5); /* 보라색 계열 */
+                color: var(--white);
+            }
+
+            .btn-outline-premium {
+                border: 2px solid var(--primary-purple); /* 보라색 계열 */
+                color: var(--light-purple); /* 보라색 계열 */
+                font-weight: 600;
+                padding: 10px 25px;
+                border-radius: 50px;
+                transition: all 0.3s ease;
+            }
+
+            .btn-outline-premium:hover {
+                background-color: var(--primary-purple); /* 보라색 계열 */
+                color: var(--white);
+            }
+
+            /* Intro Section */
+            .intro-section {
+                padding: 120px 0 60px;
+                background: var(--primary-gradient);
+            }
+            .intro-badge {
+                display: inline-block;
+                background: var(--highlight-gradient);
+                color: var(--dark);
+                padding: 8px 15px;
+                border-radius: 20px;
+                font-weight: 700;
+                font-size: 0.9rem;
+            }
+            .intro-title {
+                font-size: 2.8rem;
+                font-weight: 900;
+            }
+            .value-card {
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(138, 43, 226, 0.3); /* 보라색 계열 */
+                padding: 20px;
+                border-radius: 15px;
+                margin-top: 30px;
+            }
+            .value-card h3 {
+                font-weight: 700;
+                color: var(--light-purple); /* 보라색 계열 */
+            }
+            .value-list li {
+                padding: 10px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                color: var(--text-light);
+            }
+            .value-list li:last-child {
+                border-bottom: none;
+            }
+            .value-list .price {
+                color: var(--light-purple); /* 보라색 계열 */
+                font-size: 0.9em;
+            }
+            .pricing-box {
+                background: rgba(0, 0, 0, 0.3);
+                border: 2px solid var(--primary-purple); /* 보라색 계열 */
+                padding: 25px;
+                border-radius: 15px;
+                text-align: center;
+            }
+            .final-price {
+                font-size: 2.5rem;
+                font-weight: 900;
+                color: var(--light-purple); /* 보라색 계열 */
+            }
+            .maker-card {
+                background: rgba(255, 255, 255, 0.05);
+                padding: 20px;
+                border-radius: 15px;
+            }
+            .maker-card h5 {
+                color: var(--white);
+                font-weight: 700;
+            }
+            .maker-card .stat {
+                font-size: 1.1rem;
+                font-weight: 500;
+            }
+
+            /* 글자 크기 줄이기 */
+            .small-text {
+                font-size: 0.85rem;
+            }
+            .smaller-badge {
+                font-size: 0.9rem;
+                padding: 6px 12px;
+            }
+
+            /* Hero Section */
+            .hero-section {
+                padding: 60px 0;
+                display: flex;
+                align-items: center;
+                background: var(--dark);
+            }
+            .hero-title {
+                font-size: 3.2rem;
+                font-weight: 900;
+                line-height: 1.3;
+            }
+            .hero-subtitle {
+                font-size: 1.25rem;
+                color: var(--text-light);
+                margin-bottom: 40px;
+            }
+
+            /* General Section Styling */
+            .section-badge {
+                display: inline-block;
+                background: rgba(138, 43, 226, 0.1); /* 보라색 계열 */
+                border: 1px solid var(--primary-purple); /* 보라색 계열 */
+                border-radius: 25px;
+                padding: 8px 20px;
+                color: var(--light-purple); /* 보라색 계열 */
+                font-weight: 600;
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+            .section-title {
+                font-size: 2.5rem;
+                font-weight: 800;
+                margin-bottom: 20px;
+                color: var(--white);
+            }
+            .section-subtitle {
+                font-size: 1.1rem;
+                color: var(--text-muted);
+                margin-bottom: 50px;
+                max-width: 700px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            /* Feature Card */
+            .feature-card {
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(138, 43, 226, 0.2); /* 보라색 계열 */
+                padding: 25px;
+                border-radius: 15px;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                transition: all 0.3s ease;
+            }
+
+            .feature-card:hover {
+                transform: translateY(-5px);
+                background: rgba(255, 255, 255, 0.1);
+                border-color: rgba(138, 43, 226, 0.5); /* 보라색 계열 */
+            }
+
+            .feature-icon {
+                font-size: 1.8rem;
+                color: var(--light-purple); /* 보라색 계열 */
+                background: rgba(138, 43, 226, 0.15); /* 보라색 계열 */
+                min-width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .feature-text {
+                color: var(--text-light);
+                font-weight: 500;
+            }
+
+            /* Enhanced Testimonial Section */
+            .testimonial-container {
+                background: rgba(255, 255, 255, 0.02);
+                border-radius: 20px;
+                padding: 30px;
+                margin-bottom: 30px;
+                border: 1px solid rgba(138, 43, 226, 0.1); /* 보라색 계열 */
+                transition: all 0.3s ease;
+            }
+
+            .testimonial-container:hover {
+                transform: translateY(-5px);
+                border-color: rgba(138, 43, 226, 0.3); /* 보라색 계열 */
+                box-shadow: 0 10px 30px rgba(138, 43, 226, 0.1); /* 보라색 계열 */
+            }
+
+            .testimonial-header {
+                display: flex;
+                align-items: center;
+                margin-bottom: 20px;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .testimonial-avatar {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                background: var(--accent-gradient);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: 700;
+                font-size: 1.2rem;
+            }
+
+            .testimonial-info {
+                flex: 1;
+            }
+
+            .testimonial-name {
+                font-weight: 700;
+                color: var(--white);
+                margin-bottom: 5px;
+                font-size: 1.1rem;
+            }
+
+            .testimonial-stars {
+                color: var(--star-color);
+                font-size: 1.1rem;
+                margin-bottom: 10px;
+            }
+
+            .testimonial-badge {
+                background: linear-gradient(
+                    45deg,
+                    #a052e0,
+                    #da70d6
+                ); /* 보라색 계열 */
+                color: white;
+                padding: 5px 12px;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .testimonial-content {
+                color: var(--text-light);
+                line-height: 1.8;
+                font-size: 1rem;
+                background: rgba(255, 255, 255, 0.02);
+                padding: 20px;
+                border-radius: 12px;
+                border-left: 4px solid var(--primary-purple); /* 보라색 계열 */
+                position: relative;
+            }
+
+            .testimonial-content::before {
+                content: '"';
+                position: absolute;
+                top: -10px;
+                left: 15px;
+                font-size: 3rem;
+                color: var(--primary-purple); /* 보라색 계열 */
+                font-family: Georgia, serif;
+            }
+
+            .testimonial-date {
+                color: var(--text-muted);
+                font-size: 0.9rem;
+                margin-top: 15px;
+                text-align: right;
+            }
+
+            /* Masonry style layout for testimonials */
+            .testimonials-masonry {
+                column-count: 1;
+                column-gap: 30px;
+            }
+
+            @media (min-width: 768px) {
+                .testimonials-masonry {
+                    column-count: 2;
+                }
+            }
+
+            @media (min-width: 1200px) {
+                .testimonials-masonry {
+                    column-count: 3;
+                }
+            }
+
+            .testimonial-item {
+                break-inside: avoid;
+                margin-bottom: 30px;
+            }
+
+            /* Process Guide */
+            .process-step {
+                position: relative;
+                padding: 20px 0 20px 80px;
+                margin-bottom: 30px;
+            }
+            .process-step:not(:last-child)::after {
+                content: "";
+                position: absolute;
+                left: 36px;
+                top: 60px;
+                height: calc(100% - 20px);
+                width: 2px;
+                background: rgba(138, 43, 226, 0.3); /* 보라색 계열 */
+            }
+            .process-number {
+                position: absolute;
+                left: 0;
+                top: 0;
+                font-size: 1.5rem;
+                font-weight: 900;
+                color: var(--primary-purple); /* 보라색 계열 */
+                border: 2px solid var(--primary-purple); /* 보라색 계열 */
+                width: 70px;
+                height: 70px;
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: rgba(138, 43, 226, 0.1); /* 보라색 계열 */
+            }
+            .process-title {
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: var(--white);
+            }
+            .process-body p {
+                color: var(--text-muted);
+            }
+
+            /* Curriculum Section */
+            .curriculum-accordion .accordion-item {
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(138, 43, 226, 0.2); /* 보라색 계열 */
+                margin-bottom: 10px;
+                border-radius: 10px !important;
+                overflow: hidden;
+            }
+            .curriculum-accordion .accordion-button {
+                background: transparent;
+                color: var(--white);
+                font-weight: 700;
+            }
+            .curriculum-accordion .accordion-button:not(.collapsed) {
+                background: rgba(138, 43, 226, 0.1); /* 보라색 계열 */
+                color: var(--light-purple); /* 보라색 계열 */
+                box-shadow: none;
+            }
+            .curriculum-accordion .accordion-button:focus {
+                box-shadow: none;
+            }
+            .curriculum-accordion .accordion-body {
+                background: #181c24;
+                color: var(--text-light);
+                border-top: 1px solid rgba(138, 43, 226, 0.2); /* 보라색 계열 */
+            }
+            .chapter-title {
+                color: var(--light-purple); /* 보라색 계열 */
+                font-weight: 700;
+            }
+            .chapter-list {
+                list-style-type: none;
+                padding-left: 0;
+            }
+            .chapter-list li {
+                padding: 8px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .chapter-list li:last-child {
+                border-bottom: none;
+            }
+
+            /* Pricing Card */
+            .pricing-card-final {
+                background: var(--primary-gradient);
+                border: 2px solid var(--primary-purple); /* 보라색 계열 */
+                border-radius: 20px;
+                padding: 40px;
+                text-align: center;
+                box-shadow: 0 10px 40px rgba(138, 43, 226, 0.2); /* 보라색 계열 */
+                color: var(--text-light);
+            }
+            .pricing-card-final .section-title {
+                color: var(--white);
+            }
+            .pricing-card-final .original-price {
+                font-size: 1.5rem;
+                text-decoration: line-through;
+                color: var(--text-muted);
+            }
+            .pricing-card-final .sale-price {
+                font-size: 3.5rem;
+                font-weight: 900;
+                color: var(--light-purple); /* 보라색 계열 */
+                margin: 10px 0;
+            }
+            .pricing-card-final .bonus-offer {
+                background: rgba(138, 43, 226, 0.1); /* 보라색 계열 */
+                color: var(--light-purple); /* 보라색 계열 */
+                padding: 10px;
+                border-radius: 10px;
+                font-weight: 700;
+                margin: 20px 0;
+            }
+
+            /* FAQ Section */
+            #faq .accordion-item,
+            #faq .accordion-button,
+            #faq .accordion-body {
+                background: transparent;
+                border: none;
+                color: var(--text-light);
+            }
+            #faq .accordion-item {
+                border-bottom: 1px solid rgba(138, 43, 226, 0.2); /* 보라색 계열 */
+                border-radius: 0;
+            }
+            #faq .accordion-button {
+                padding: 25px 0;
+                font-weight: 700;
+                font-size: 1.1rem;
+            }
+            #faq .accordion-button:not(.collapsed) {
+                color: var(--light-purple); /* 보라색 계열 */
+            }
+            #faq .accordion-body {
+                padding-bottom: 25px;
+                color: var(--text-muted);
+            }
+
+            /* Footer */
+            .footer {
+                background: #111;
+                padding: 60px 0 20px;
+                border-top: 1px solid rgba(138, 43, 226, 0.2); /* 보라색 계열 */
+                font-size: 0.9rem;
+            }
+            .footer p,
+            .footer li,
+            .footer a {
+                color: var(--text-muted);
+            }
+            .footer a:hover {
+                color: var(--white);
+            }
+
+            /* Enhanced CTA Section */
+            .cta-floating {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 1000;
+                background: var(--accent-gradient);
+                border-radius: 50px;
+                padding: 15px 30px;
+                box-shadow: 0 5px 30px rgba(138, 43, 226, 0.4); /* 보라색 계열 */
+                animation: pulse 2s infinite;
+            }
+
+            @keyframes pulse {
+                0% {
+                    box-shadow: 0 5px 30px rgba(138, 43, 226, 0.4);
+                } /* 보라색 계열 */
+                50% {
+                    box-shadow: 0 5px 30px rgba(138, 43, 226, 0.7);
+                } /* 보라색 계열 */
+                100% {
+                    box-shadow: 0 5px 30px rgba(138, 43, 226, 0.4);
+                } /* 보라색 계열 */
+            }
+
+            @media (max-width: 768px) {
+                .intro-title {
+                    font-size: 2.2rem;
+                }
+                .hero-title {
+                    font-size: 2.5rem;
+                }
+                .section-title {
+                    font-size: 2rem;
+                }
+                .process-step {
+                    padding-left: 0;
+                }
+                .process-number {
+                    position: static;
+                    margin-bottom: 15px;
+                }
+                .process-step:not(:last-child)::after {
+                    display: none;
+                }
+                .testimonials-masonry {
+                    column-count: 1;
+                }
+                .cta-floating {
+                    position: relative;
+                    bottom: auto;
+                    left: auto;
+                    transform: none;
+                    width: 100%;
+                    text-align: center;
+                    margin: 20px 0;
+                }
+            }
+        </style>
     </head>
 
     <body>
         <!-- Navigation -->
-        <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-white shadow-sm">
+        <nav
+            class="navbar navbar-expand-lg navbar-dark fixed-top modern-navbar shadow-sm"
+        >
             <div class="container">
                 <a class="navbar-brand fw-bold" href="index.html">
                     <img
-                        src="attached_assets/제목 추가_upscayl_4x_upscayl-standard-4x_1751101180619.png"
-                        alt="MCSELLER"
-                        height="40"
+                        src="attached_assets/c55eb7e7b16af_upscayl_4x_upscayl-standard-4x_1751101180619.png"
+                        alt="MCSELLER Logo"
                     />
                 </a>
-                
-                <div class="d-flex gap-2">
-                    <a href="index.html" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-2"></i>메인으로
-                    </a>
-                </div>
+                <a
+                    href="index.html"
+                    class="btn btn-outline-premium d-none d-lg-inline-block"
+                >
+                    <i class="fas fa-arrow-left me-2"></i>메인으로
+                </a>
             </div>
         </nav>
+
+        <!-- New Intro Section -->
+        <section class="intro-section">
+            <div class="container">
+                <div class="row align-items-center mb-5">
+                    <div class="col-lg-8" data-aos="fade-right">
+                        <span class="intro-badge mb-3"
+                            >🏆 한정가격 수량임박!</span
+                        >
+                        <h2 class="intro-title">
+                            [고효율 부업 시리즈]<br />
+                            <span class="text-gradient-purple"
+                                >AI캐릭터로 월 1200만원 찍은</span
+                            ><br />
+                            전자책 자동화 2탄
+                        </h2>
+                        <p class="lead mt-4 text-light">
+                            강의사이트부터 광고, 상세페이지까지 전자책 수익
+                            자동화 시스템 완성!
+                        </p>
+                    </div>
+                    <div class="col-lg-4" data-aos="fade-left">
+                        <div class="text-center">
+                            <img
+                                src="https://i.imgur.com/7gYfW3z.png"
+                                alt="맥셀러 AI 캐릭터"
+                                class="img-fluid"
+                                style="
+                                    max-width: 280px;
+                                    filter: drop-shadow(
+                                        0 10px 30px rgba(138, 43, 226, 0.3)
+                                    );
+                                "
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 align-items-center">
+                    <div class="col-lg-7" data-aos="fade-right">
+                        <div class="value-card">
+                            <h3 class="mb-3">
+                                <i class="fas fa-star me-2"></i>현업에서 숨기는
+                                내용과 380만원 상당 자료들
+                            </h3>
+                            <ul class="list-unstyled value-list">
+                                <li>
+                                    <i
+                                        class="fas fa-check-circle text-gradient-purple me-2"
+                                    ></i
+                                    >전자책 자동화 마스터 강의2 (80만원 상당)
+                                </li>
+                                <li>
+                                    <i
+                                        class="fas fa-check-circle text-gradient-purple me-2"
+                                    ></i
+                                    >나만의 마케팅 프로그램 만들기 (100만원
+                                    상당)
+                                </li>
+                                <li>
+                                    <i
+                                        class="fas fa-check-circle text-gradient-purple me-2"
+                                    ></i
+                                    >상페 퀄리티 초고퀄 UP VOD (70만원 상당)
+                                </li>
+                                <li>
+                                    <i
+                                        class="fas fa-check-circle text-gradient-purple me-2"
+                                    ></i
+                                    >픽셀 설치 가이드VOD (50만원 상당)
+                                </li>
+                                <li>
+                                    <i
+                                        class="fas fa-check-circle text-gradient-purple me-2"
+                                    ></i
+                                    >강의&전자책 판매 사이트 생성 VOD (30만원
+                                    상당)
+                                </li>
+                                <li>
+                                    <i
+                                        class="fas fa-check-circle text-gradient-purple me-2"
+                                    ></i
+                                    >1.5배~3배 수익폭등 퍼포먼스광고VOD (50만원
+                                    상당)
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-5" data-aos="fade-left">
+                        <div class="pricing-box">
+                            <h4 class="fw-bold text-white smaller-badge">
+                                [사전예약2차 -85%] 전자책 자동화 마스터 2탄
+                            </h4>
+                            <p class="text-light">
+                                ※ 총 380만원 상당의 자료가 제공됩니다.
+                            </p>
+                            <p class="text-light">
+                                정가 590,000원 ➡ 119,000원
+                            </p>
+                            <p class="h4 fw-bold text-white small-text">
+                                기간 한정 쿠폰 + 신규 적립금 적용가
+                            </p>
+                            <p class="h1 fw-bold text-gradient-purple">
+                                119,000원
+                            </p>
+                            <hr
+                                style="border-color: rgba(255, 255, 255, 0.2)"
+                            />
+                            <p class="text-light small-text mb-2">
+                                1탄 구매자 한정 특별 혜택가 공개
+                            </p>
+                            <p class="text-light small-text mb-4">
+                                1탄 마지막챕터 비밀쿠폰적용하시면
+                                확인가능합니다.
+                            </p>
+                            <a href="#pricing" class="btn btn-premium w-100"
+                                ><i class="fas fa-rocket me-2"></i>119,000원으로
+                                시작하기</a
+                            >
+                            <p class="text-danger mt-2 fw-bold">
+                                ※ 사전예약 곧 마감됩니다. | 남은 수량 14개
+                            </p>
+                            <p class="text-muted mt-2 small-text">
+                                *7월15일~20일 사이 자료 발송됩니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mt-5">
+                    <div class="col-lg-8" data-aos="fade-up">
+                        <div class="maker-card">
+                            <h5>메이커 누적 성과</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="stat mb-2">
+                                        🏆 누적수익
+                                        <span class="text-gradient-gold fw-bold"
+                                            >77,850,000원 +</span
+                                        >
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="stat mb-2">
+                                        🏆 프리랜서 마켓 K사
+                                        <span class="text-warning"
+                                            >5점 후기 200개 이상</span
+                                        >
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="stat mb-2">
+                                        🏆 K사 '리셀' 분야
+                                        <span class="text-gradient-gold fw-bold"
+                                            >판매량 1위</span
+                                        >
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="stat mb-2">
+                                        🏆 W사 펀딩
+                                        <span class="text-warning">5,283%</span>
+                                        달성
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="stat mb-2">
+                                        🏆 누적 수강생
+                                        <span class="text-gradient-gold fw-bold"
+                                            >400명 이상⬆️</span
+                                        >
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="col-lg-4"
+                        data-aos="fade-up"
+                        data-aos-delay="100"
+                    >
+                        <div
+                            class="maker-card h-100 d-flex flex-column justify-content-center"
+                        >
+                            <h5>
+                                리뷰
+                                <span class="text-gradient-gold fw-bold"
+                                    >223건+</span
+                                >
+                                (전체 노하우 플랫폼 리뷰)
+                            </h5>
+                            <div>
+                                <span class="text-warning">⭐⭐⭐⭐⭐</span>
+                                <span class="fw-bold ms-2">4.9 | 5.0</span>
+                            </div>
+                            <a
+                                href="https://kmong.com/@%EC%9D%BC%EB%8B%A4%ED%95%B4"
+                                target="_blank"
+                                class="text-light small mt-1"
+                                >(클릭 시 메이커의 이전 노하우 리뷰 이동합니다.)
+                                <i class="fas fa-external-link-alt"></i
+                            ></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-5" data-aos="fade-up">
+                    <p class="lead">
+                        🎁1탄 구매자분들 반드시
+                        <span class="text-gradient-gold fw-bold"
+                            >마지막 챕터에서 '비밀쿠폰' 적용해서
+                            구입하세요!</span
+                        >
+                    </p>
+                    <p class="text-light fw-bold">
+                        1탄을 보시지 않으신 분은 2탄 내용을 절대 이해하실 수
+                        없습니다.
+                    </p>
+                    <p class="text-light fw-bold mb-4">
+                        반드시 '1탄' 부터 먼저 섭렵하고 와주시길 바랍니다.
+                    </p>
+                    <a
+                        href="https://your-1st-ebook-link.com"
+                        target="_blank"
+                        class="btn btn-outline-premium"
+                    >
+                        자동화 수익 생성기 1탄 바로가기 >
+                    </a>
+                    <p class="text-danger mt-4 small-text">
+                        위 내용을 숙지하시지 않고, 주문시에 단순 변심으로
+                        처리되어 환불이 어렵습니다.
+                    </p>
+                    <p class="text-danger small-text">
+                        반드시 참고해주시길 바라겠습니다!
+                    </p>
+
+                    <p class="lead mt-5">
+                        전자책으로 약
+                        <span class="text-gradient-gold fw-bold"
+                            >8천만원의 자동화 수익</span
+                        >을 만들어내고<br />
+                        처음이자 마지막일 수 있는 가격의 강의를 열어봤습니다.
+                    </p>
+                    <p class="text-light">
+                        이 가격에
+                        <span class="fw-bold">마케팅 자동화 프로그램(영구)</span
+                        >까지 드리는 강의는 "단언컨대 최초 입니다."
+                    </p>
+                    <p class="text-light mt-4">
+                        하루 30분만 투자해도 유지가 가능한 진짜 부업을
+                        소개합니다.<br />
+                        하루 열 몇 시간 투자하며 몇 달 고생 후 몇 만원 나올지..
+                        이젠 걱정 하지 마세요!
+                    </p>
+                </div>
+            </div>
+        </section>
 
         <!-- Hero Section -->
         <section class="hero-section">
             <div class="container">
-                <div class="row align-items-center min-vh-100">
-                    <div class="col-lg-12 text-center">
-                        <div data-aos="fade-up">
-                            <h1 class="hero-title mb-4">
-                                전자책 자동화 2탄
-                            </h1>
-                            <p class="hero-subtitle mb-5">
-                                <!-- 여기에 강의 소개 내용을 추가하세요 -->
+                <div class="row align-items-center">
+                    <div class="col-lg-6" data-aos="fade-right">
+                        <h1 class="hero-title mb-3">
+                            강의사이트부터 광고, 상세페이지까지<br />
+                            <span class="text-gradient-purple"
+                                >전자책 수익 자동화 시스템 완성!</span
+                            >
+                        </h1>
+                        <p class="hero-subtitle">
+                            홈페이지 구축 + 고효율 광고 + 상세페이지 + VOD +
+                            블로그 자동화까지, <br />
+                            진짜 자동수익 실현하는 전자책 자동화 2탄
+                        </p>
+                        <a href="#pricing" class="btn btn-premium btn-lg">
+                            <i class="fas fa-rocket me-2"></i> 119,000원으로
+                            시작하기
+                        </a>
+                    </div>
+                    <div class="col-lg-6 text-center" data-aos="fade-left">
+                        <img
+                            src="https://i.imgur.com/7gYfW3z.png"
+                            class="img-fluid"
+                            alt="맥셀러 AI 캐릭터"
+                            style="max-width: 400px"
+                        />
+                        <!-- 대표 이미지/영상: 전자책 판매용 홈페이지, 픽셀 광고 세팅, 상세페이지 제작 과정, 블로그 운영 캡처 등 (텍스트 설명으로 대체) -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features & Benefits Section -->
+        <section id="features" class="py-5 bg-dark">
+            <div class="container">
+                <div class="text-center" data-aos="fade-up">
+                    <h2 class="section-title">주요 기능 및 혜택</h2>
+                </div>
+                <div class="row g-4">
+                    <div
+                        class="col-lg-4 col-md-6"
+                        data-aos="fade-up"
+                        data-aos-delay="100"
+                    >
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <p class="feature-text">
+                                ✅
+                                <strong
+                                    >실전 홈페이지 자동판매 시스템 구축</strong
+                                >
+                                (영상 기반)
+                            </p>
+                        </div>
+                    </div>
+                    <div
+                        class="col-lg-4 col-md-6"
+                        data-aos="fade-up"
+                        data-aos-delay="200"
+                    >
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <p class="feature-text">
+                                ✅ <strong>픽셀 기반 전환광고</strong>로 초반
+                                매출 견인
+                            </p>
+                        </div>
+                    </div>
+                    <div
+                        class="col-lg-4 col-md-6"
+                        data-aos="fade-up"
+                        data-aos-delay="300"
+                    >
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <p class="feature-text">
+                                ✅
+                                <strong>상세페이지 자동 생성 템플릿</strong>
+                                포함
+                            </p>
+                        </div>
+                    </div>
+                    <div
+                        class="col-lg-6"
+                        data-aos="fade-up"
+                        data-aos-delay="400"
+                    >
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-video"></i>
+                            </div>
+                            <p class="feature-text">
+                                ✅
+                                <strong>강의+전자책 형태의 고급형 콘텐츠</strong
+                                >까지 제작 가능
+                            </p>
+                        </div>
+                    </div>
+                    <div
+                        class="col-lg-6"
+                        data-aos="fade-up"
+                        data-aos-delay="500"
+                    >
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <p class="feature-text">
+                                ✅
+                                <strong
+                                    >광고-판매-자동배송까지 전 과정 통합
+                                    자동화</strong
+                                >
                             </p>
                         </div>
                     </div>
@@ -68,39 +1053,856 @@
             </div>
         </section>
 
-        <!-- Content Sections -->
-        <section class="py-5">
+        <!-- Process Guide Section -->
+        <section id="process" class="py-5">
             <div class="container">
-                <!-- 여기에 랜딩페이지 콘텐츠를 추가하세요 -->
+                <div class="text-center" data-aos="fade-up">
+                    <div class="section-badge">PROCESS GUIDE</div>
+                    <h2 class="section-title">
+                        전자책 수익 자동화 시스템 완성 과정
+                    </h2>
+                    <p class="section-subtitle">
+                        아래 6단계 프로세스를 그대로 따라오시면 완벽한 자동 수익
+                        시스템을 구축할 수 있습니다.
+                    </p>
+                </div>
                 <div class="row">
-                    <div class="col-12">
-                        <div class="text-center p-5 bg-light rounded">
-                            <h3 class="mb-3">콘텐츠 영역</h3>
-                            <p class="text-muted">이 영역에 전자책 2탄 관련 내용을 추가해주세요.</p>
+                    <div class="col-md-12">
+                        <div
+                            class="process-step"
+                            data-aos="fade-up"
+                            data-aos-delay="100"
+                        >
+                            <div class="process-number">1</div>
+                            <h3 class="process-title">
+                                홈페이지 자동판매 시스템 구축
+                            </h3>
+                            <div class="process-body">
+                                <p>
+                                    자신만의 전자책 판매 홈페이지를 구축하여
+                                    자동 판매 시스템을 완성합니다.
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            class="process-step"
+                            data-aos="fade-up"
+                            data-aos-delay="200"
+                        >
+                            <div class="process-number">2</div>
+                            <h3 class="process-title">픽셀 기반 광고 최적화</h3>
+                            <div class="process-body">
+                                <p>
+                                    픽셀을 활용한 전환 광고로 초반 매출을
+                                    견인하고 광고 효율을 극대화합니다.
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            class="process-step"
+                            data-aos="fade-up"
+                            data-aos-delay="300"
+                        >
+                            <div class="process-number">3</div>
+                            <h3 class="process-title">
+                                상세페이지 자동 생성 및 A/B 테스트
+                            </h3>
+                            <div class="process-body">
+                                <p>
+                                    자동 생성 템플릿으로 고퀄리티 상세페이지를
+                                    만들고, A/B 테스트로 최적화합니다.
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            class="process-step"
+                            data-aos="fade-up"
+                            data-aos-delay="400"
+                        >
+                            <div class="process-number">4</div>
+                            <h3 class="process-title">
+                                강의 콘텐츠 및 전자책 동시 판매 구조 완성
+                            </h3>
+                            <div class="process-body">
+                                <p>
+                                    VOD 강의와 전자책을 동시에 판매하는 고급
+                                    수익화 구조를 구축합니다.
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            class="process-step"
+                            data-aos="fade-up"
+                            data-aos-delay="500"
+                        >
+                            <div class="process-number">5</div>
+                            <h3 class="process-title">
+                                블로그+VOD 마케팅 자동화
+                            </h3>
+                            <div class="process-body">
+                                <p>
+                                    블로그와 VOD를 활용한 마케팅 자동화로 꾸준한
+                                    트래픽과 수익을 만듭니다.
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            class="process-step"
+                            data-aos="fade-up"
+                            data-aos-delay="600"
+                        >
+                            <div class="process-number">6</div>
+                            <h3 class="process-title">
+                                구매 후 자동배송 및 CS 시스템 정비
+                            </h3>
+                            <div class="process-body">
+                                <p>
+                                    구매부터 배송, 고객 관리까지 모든 과정을
+                                    자동화하여 최소한의 노력으로 최대의 수익을
+                                    실현합니다.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Footer -->
-        <footer class="footer mt-5">
+        <!-- Enhanced Social Proof Section -->
+        <section id="social-proof" class="py-5 bg-dark">
             <div class="container">
-                <div class="row">
-                    <div class="col-12 text-center">
-                        <p class="mb-0">&copy; 2025 MCSELLER. All rights reserved.</p>
+                <div class="text-center" data-aos="fade-up">
+                    <div class="section-badge">SOCIAL PROOF</div>
+                    <h2 class="section-title">
+                        먼저 경험한 수강생들의 실제 후기
+                    </h2>
+                    <p class="section-subtitle">
+                        이론이 아닌 결과로 증명합니다. 당신도 다음 주인공이 될
+                        수 있습니다.
+                    </p>
+                </div>
+
+                <div class="testimonials-masonry">
+                    <!-- 후기 1 -->
+                    <div class="testimonial-item" data-aos="fade-up">
+                        <div class="testimonial-container">
+                            <div class="testimonial-header">
+                                <div class="testimonial-avatar">박</div>
+                                <div class="testimonial-info">
+                                    <div class="testimonial-name">박**</div>
+                                    <div class="testimonial-stars">
+                                        ⭐⭐⭐⭐⭐
+                                    </div>
+                                </div>
+                                <div class="testimonial-badge">BEST</div>
+                            </div>
+                            <div class="testimonial-content">
+                                안녕하세요 맥셀러님! 저는 17년 직장 생활의
+                                우물안에만 있다가 이대로는 안되겠다 싶어 새로운
+                                저만의 가치를 컨텐츠로 빌드업하여 결국은
+                                수익화를 통해 저만의 비즈니스를 구축하고
+                                싶었습니다. 그 과정속에서 수많은 무료 강의 및
+                                유료강의 및 전자책을 수강하고 구매하면서 정말
+                                불필요한 시간과 낭비를 했던게 아닌가 싶을정도로
+                                이번 전자책과 VOD강의 내용은 가격대비 정말
+                                저에게는 충격적일 정도로 상세하고 모든 과정을
+                                오픈해주신게 아닌가 싶습니다. 실행을 했지만
+                                구체화되거나 그 이상의 성장의 한계에서 무엇을
+                                할지 몰라 어려움이 너무도 컸던 시기에 이렇게
+                                정말 좋은 내용으로 만날 수 있었다는 건 정말
+                                행운이 아닐 수 없겠네요!
+                            </div>
+                            <div class="testimonial-date">2024-07-15</div>
+                        </div>
                     </div>
+
+                    <!-- 후기 2 -->
+                    <div
+                        class="testimonial-item"
+                        data-aos="fade-up"
+                        data-aos-delay="100"
+                    >
+                        <div class="testimonial-container">
+                            <div class="testimonial-header">
+                                <div class="testimonial-avatar">김</div>
+                                <div class="testimonial-info">
+                                    <div class="testimonial-name">김**</div>
+                                    <div class="testimonial-stars">
+                                        ⭐⭐⭐⭐⭐
+                                    </div>
+                                </div>
+                                <div class="testimonial-badge">BEST</div>
+                            </div>
+                            <div class="testimonial-content">
+                                그동안 돈버는 수많은 강의를 들었습니다. 거의
+                                강의료에만 몇천만원은 썼던 것 같습니다. 그렇게
+                                많은 돈을 들였지만 실제적으로 수익을 보기란 쉽지
+                                않았지요. 위탁판매부터 시작하여 쇼핑몰, 구매대행
+                                등등 거의 안해본 거 없이 모든 부업들을
+                                해보았지만 들인 시간에 비해서 수익은 미미하였고
+                                나중에는 경쟁자들로 인해서 가격을 계속 낮추게
+                                되는 치킨게임이 되어갔습니다. 맥셀러님의 강의는
+                                무엇보다 전자책의 생태계에 대해서 본질을
+                                뚫어보는 혜안이 있음을 느꼈고 초보자들이 처음
+                                전자책을 도전할 때의 고충을 충분히
+                                이해해주신다는 느낌을 받았습니다.
+                            </div>
+                            <div class="testimonial-date">2024-07-10</div>
+                        </div>
+                    </div>
+
+                    <!-- 후기 3 -->
+                    <div
+                        class="testimonial-item"
+                        data-aos="fade-up"
+                        data-aos-delay="200"
+                    >
+                        <div class="testimonial-container">
+                            <div class="testimonial-header">
+                                <div class="testimonial-avatar">이</div>
+                                <div class="testimonial-info">
+                                    <div class="testimonial-name">이**</div>
+                                    <div class="testimonial-stars">
+                                        ⭐⭐⭐⭐⭐
+                                    </div>
+                                </div>
+                                <div class="testimonial-badge">BEST</div>
+                            </div>
+                            <div class="testimonial-content">
+                                강의사이트와 그를 활용한 방안에 대해서 공부하고
+                                있는데 교과서 같은 VOD네요! 블로그 트래픽 부분은
+                                가장 궁금해 했던 부분인데 천천히 잘 설명해주셔서
+                                열심히 보고 있습니다. 파트 하나당 정말 섬세하게
+                                해놔서 분량도 장난아닙니다! 가격에 비해 정보량이
+                                어마무시해서 수강하는 사람 역량이 필요없이
+                                A-Z까지 다 알려주십니다. 그냥 천천히 보면서 같이
+                                만들면 충분히 만들 수 있는 수준으로
+                                강의해주시네요!
+                            </div>
+                            <div class="testimonial-date">2024-07-08</div>
+                        </div>
+                    </div>
+
+                    <!-- 후기 4 -->
+                    <div
+                        class="testimonial-item"
+                        data-aos="fade-up"
+                        data-aos-delay="300"
+                    >
+                        <div class="testimonial-container">
+                            <div class="testimonial-header">
+                                <div class="testimonial-avatar">강</div>
+                                <div class="testimonial-info">
+                                    <div class="testimonial-name">강**</div>
+                                    <div class="testimonial-stars">
+                                        ⭐⭐⭐⭐⭐
+                                    </div>
+                                </div>
+                                <div class="testimonial-badge">BEST</div>
+                            </div>
+                            <div class="testimonial-content">
+                                저처럼 제 직업외에는 아무것도 모르는 사람에게도
+                                할 수 있다는 자신감이 생기게 해주는 좋은
+                                강의입니다. 거기에 직접 경험해본 것들로만
+                                알려주시는데 이미 검증된 거라 그냥 믿고 따라만
+                                하면 되는 강의이네요. 드디어 부업유목민에서
+                                탈출할 수 있겠습니다. 아직 다 듣지도 못했고
+                                2탄도 들어야겠지만 앞으로가 더욱 기대됩니다.
+                                설명도 쉽게 잘해주셔서 전혀 어렵지 않습니다.
+                            </div>
+                            <div class="testimonial-date">2024-06-27</div>
+                        </div>
+                    </div>
+
+                    <!-- 후기 5 -->
+                    <div
+                        class="testimonial-item"
+                        data-aos="fade-up"
+                        data-aos-delay="400"
+                    >
+                        <div class="testimonial-container">
+                            <div class="testimonial-header">
+                                <div class="testimonial-avatar">윤</div>
+                                <div class="testimonial-info">
+                                    <div class="testimonial-name">윤**</div>
+                                    <div class="testimonial-stars">
+                                        ⭐⭐⭐⭐⭐
+                                    </div>
+                                </div>
+                                <div class="testimonial-badge">BEST</div>
+                            </div>
+                            <div class="testimonial-content">
+                                같은 코웨이 홈닥터 출신이신것부터 왠지 모를
+                                동질감이 느껴졌는데 진짜 영업 하실때
+                                날라다니셨겠구나 싶더라구요. 저도 영업은 자신
+                                있다 생각하는데 그걸 뛰어넘어서 새로운 분야를
+                                개척하고 사업화 시키신게 너무 대단하다
+                                느껴졌습니다. 특히 블로그 관련 내용에서 진짜
+                                어떤식으로 써내려가야하는지부터 어떻게 팬을
+                                모으고 어떻게해야 수익화가 지속되고 발전할 수
+                                있는가까지 A to Z를 담은 정수라고 할 수
+                                있겠습니다.
+                            </div>
+                            <div class="testimonial-date">2024-06-26</div>
+                        </div>
+                    </div>
+
+                    <!-- 후기 6 -->
+                    <div
+                        class="testimonial-item"
+                        data-aos="fade-up"
+                        data-aos-delay="500"
+                    >
+                        <div class="testimonial-container">
+                            <div class="testimonial-header">
+                                <div class="testimonial-avatar">임</div>
+                                <div class="testimonial-info">
+                                    <div class="testimonial-name">임**</div>
+                                    <div class="testimonial-stars">
+                                        ⭐⭐⭐⭐⭐
+                                    </div>
+                                </div>
+                                <div class="testimonial-badge">BEST</div>
+                            </div>
+                            <div class="testimonial-content">
+                                맥셀러님의 '나만의 AI 캐릭터로 월 1200만원 찍은
+                                전자책 자동화 수익 생성기' 강의를 들었는데, 정말
+                                눈이 번쩍 띄었어요. AI로 캐릭터를 만들어
+                                브랜딩에 활용한다는 접근이 신선했습니다.
+                                전자책을 작성하려 할 때 무슨 주제로 쓸지 항상
+                                고민이었는데 강의에서 블루오션 주제 찾는 법도
+                                실용적이었어요. 경쟁이 덜한 틈새시장을 발견하는
+                                요령을 배워서 좋았습니다. 카카오톡에서
+                                마케팅하는 방법도 굉장히 처음 배워봤던 내용이고
+                                이를 통해 마케팅비를 많이 아낄 수 있을 거
+                                같습니다.
+                            </div>
+                            <div class="testimonial-date">2024-06-25</div>
+                        </div>
+                    </div>
+
+                    <!-- 후기 7 -->
+                    <div
+                        class="testimonial-item"
+                        data-aos="fade-up"
+                        data-aos-delay="600"
+                    >
+                        <div class="testimonial-container">
+                            <div class="testimonial-header">
+                                <div class="testimonial-avatar">정</div>
+                                <div class="testimonial-info">
+                                    <div class="testimonial-name">정**</div>
+                                    <div class="testimonial-stars">
+                                        ⭐⭐⭐⭐⭐
+                                    </div>
+                                </div>
+                                <div class="testimonial-badge">BEST</div>
+                            </div>
+                            <div class="testimonial-content">
+                                저는 부업 강의만 10번 넘게 구매해본 강의계의
+                                흑우라고 할 수 있습니다. 강의는 다 보고
+                                실질적으로 시도해보고, 실제로 수익도 낸 적
+                                있지만, 사람들이 강의 올릴 때 늘 말하는 것처럼
+                                월3천은 무슨 천만원도 못벌어 봤어요. 맥셀러님이
+                                말씀하신 것처럼 쇼핑몰은 진짜 매일 계속해서 시간
+                                써야되고, 돈도 많이 써야 그나마 돈이
+                                들어오더라구요. 이번 강의를 듣고, 이거 해볼까?
+                                저거 해볼까? 하며 너무 재미있더라구요!!
+                            </div>
+                            <div class="testimonial-date">2024-06-20</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Curriculum Section -->
+        <section id="curriculum" class="py-5">
+            <div class="container">
+                <div class="text-center" data-aos="fade-up">
+                    <div class="section-badge">CURRICULUM</div>
+                    <h2 class="section-title">강의 목차 미리보기</h2>
+                    <p class="section-subtitle">
+                        당신의 성공을 위해 모든 노하우를 압축했습니다. 군더더기
+                        없는 핵심만 담았습니다.
+                    </p>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-lg-9">
+                        <div
+                            class="accordion curriculum-accordion"
+                            id="curriculumAccordion"
+                        >
+                            <div class="accordion-item" data-aos="fade-up">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#chapter0"
+                                    >
+                                        OT: 자동수익 매출폭등공식 (40:46)
+                                    </button>
+                                </h2>
+                            </div>
+                            <div class="accordion-item" data-aos="fade-up">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#chapter1"
+                                    >
+                                        Chapter01: 끝판왕 자동 판매시스템,
+                                        홈페이지 구축 (2:17:48)
+                                    </button>
+                                </h2>
+                                <div
+                                    id="chapter1"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#curriculumAccordion"
+                                >
+                                    <div class="accordion-body">
+                                        <ul class="chapter-list">
+                                            <li>
+                                                1-1) 웹사이트의 전체적인 흐름
+                                                설명
+                                            </li>
+                                            <li>
+                                                1-2) 맥셀러버전 웹사이트 초고속
+                                                구축 (1편)
+                                            </li>
+                                            <li>
+                                                1-3) 맥셀러버전 웹사이트 초고속
+                                                구축 (2편)
+                                            </li>
+                                            <li>
+                                                1-4) VOD 유포방지 기능
+                                                강의사이트 만들기
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item" data-aos="fade-up">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#chapter2"
+                                    >
+                                        Chapter02: 자동수익의 꽃, 전환광고
+                                        (1:20:36)
+                                    </button>
+                                </h2>
+                                <div
+                                    id="chapter2"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#curriculumAccordion"
+                                >
+                                    <div class="accordion-body">
+                                        <ul class="chapter-list">
+                                            <li>2-1) 픽셀 설치하기</li>
+                                            <li>
+                                                2-2) 아드리엘 고효율 최적화 세팅
+                                            </li>
+                                            <li>
+                                                2-3) 메타광고비용 돌려받는 세팅
+                                            </li>
+                                            <li>
+                                                2-4) 메타광고 고효율 최적화 세팅
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item" data-aos="fade-up">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#chapter3"
+                                    >
+                                        Chapter03: 상세페이지 초고퀄 첨가
+                                        (24:30)
+                                    </button>
+                                </h2>
+                            </div>
+                            <div class="accordion-item" data-aos="fade-up">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#chapter4"
+                                    >
+                                        Chapter04: 나만의 K사 마케팅프로그램
+                                        만들기 (11:13)
+                                    </button>
+                                </h2>
+                            </div>
+                            <div class="accordion-item" data-aos="fade-up">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#chapter5"
+                                    >
+                                        Chapter05: 맥셀러의 초간단 VOD 강의
+                                        생성법 (46:46)
+                                    </button>
+                                </h2>
+                            </div>
+                            <div class="accordion-item" data-aos="fade-up">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#chapter6"
+                                    >
+                                        Chapter06: 돈버는 글쓰기 VOD버전 (53:04)
+                                    </button>
+                                </h2>
+                            </div>
+                            <div class="accordion-item" data-aos="fade-up">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#chapter7"
+                                    >
+                                        Chapter07: 검색엔진 점령, 브랜딩블로그
+                                        VOD버전 (29:10)
+                                    </button>
+                                </h2>
+                            </div>
+                            <div class="accordion-item" data-aos="fade-up">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#chapter8"
+                                    >
+                                        Chapter08: N사 상위노출 마케팅 복제하기
+                                        (22:20)
+                                    </button>
+                                </h2>
+                            </div>
+                            <div class="accordion-item" data-aos="fade-up">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#chapter9"
+                                    >
+                                        🏆 마무리 및 특급선물 섭렵하기
+                                    </button>
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing & CTA Section -->
+        <section id="pricing" class="py-5 bg-dark">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8" data-aos="zoom-in-up">
+                        <div class="pricing-card-final">
+                            <h2 class="section-title">
+                                지금 시작해서 나만의<br />전자책 + 강의
+                                수익시스템 만들기
+                            </h2>
+                            <p class="text-light mb-4">
+                                모든 노하우, 템플릿, 그리고 성공 방정식을 하나에
+                                담았습니다.
+                            </p>
+                            <div class="price-section my-4">
+                                <p class="original-price">정가 450,000원</p>
+                                <p class="sale-price">2탄 단독특가 69,000원</p>
+                                <p class="bonus-offer">
+                                    🎁 1탄+2탄 동시 수강 시 30% 추가 할인
+                                </p>
+                            </div>
+                            <a
+                                href="payment.html?product=ebook2"
+                                class="btn btn-premium btn-lg mt-3"
+                                style="
+                                    width: 100%;
+                                    max-width: 400px;
+                                    margin: 0 auto;
+                                    display: block;
+                                "
+                                ><i class="fas fa-bolt me-2"></i>지금 시작해서
+                                나만의 전자책 + 강의 수익시스템 만들기</a
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section id="faq" class="py-5">
+            <div class="container">
+                <div class="text-center" data-aos="fade-up">
+                    <div class="section-badge">FAQ — 질문과 답변</div>
+                    <h2 class="section-title">자주 묻는 질문</h2>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="accordion accordion-flush">
+                            <div class="accordion-item" data-aos="fade-up">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#faq-1"
+                                    >
+                                        Q: 홈페이지 제작 경험이 전혀 없는데
+                                        가능한가요?
+                                    </button>
+                                </h2>
+                                <div
+                                    id="faq-1"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#faq"
+                                >
+                                    <div class="accordion-body">
+                                        A: 영상 따라 하기만 하면 완성됩니다.
+                                        무료 호스팅/도메인까지 세팅 포함입니다.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item" data-aos="fade-up">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#faq-2"
+                                    >
+                                        Q: 광고비 부담이 큰데 효율적으로 운영
+                                        가능한가요?
+                                    </button>
+                                </h2>
+                                <div
+                                    id="faq-2"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#faq"
+                                >
+                                    <div class="accordion-body">
+                                        A: 메타/아드리엘 광고 모두 ‘적게 넣고
+                                        많이 버는’ 구조로 안내드립니다. 환급
+                                        세팅도 포함됩니다.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item" data-aos="fade-up">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#faq-3"
+                                    >
+                                        Q: 홈페이지 외주 없이도 디자인
+                                        가능한가요?
+                                    </button>
+                                </h2>
+                                <div
+                                    id="faq-3"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#faq"
+                                >
+                                    <div class="accordion-body">
+                                        A: 템플릿 복붙만으로 고퀄리티 홈페이지
+                                        완성 가능합니다.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item" data-aos="fade-up">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#faq-4"
+                                    >
+                                        Q: 상세페이지는 매번 새로 만들어야
+                                        하나요?
+                                    </button>
+                                </h2>
+                                <div
+                                    id="faq-4"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#faq"
+                                >
+                                    <div class="accordion-body">
+                                        A: 자동생성기 + 템플릿 제공으로 누구나
+                                        쉽게 제작 가능합니다.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item" data-aos="fade-up">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#faq-5"
+                                    >
+                                        Q: 강의와 전자책을 동시에 팔 수 있나요?
+                                    </button>
+                                </h2>
+                                <div
+                                    id="faq-5"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#faq"
+                                >
+                                    <div class="accordion-body">
+                                        A: 이번 과정은
+                                        ’VOD+전자책+블로그+자동배송’까지
+                                        포함되어 있습니다.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item" data-aos="fade-up">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#faq-6"
+                                    >
+                                        Q: 환불은 가능한가요?
+                                    </button>
+                                </h2>
+                                <div
+                                    id="faq-6"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#faq"
+                                >
+                                    <div class="accordion-body">
+                                        A: 평생교육법 시행령 제23조 학습비 반환
+                                        규정에 따라 아래 기준으로 환불이
+                                        가능합니다.
+                                        <br />
+                                        ✅ 수강기간: 결제일 기준 30일 (유료 수강
+                                        1개월 + 무료 복습 1개월)<br />
+                                        ✅ 환불은 환불의사를 밝힌 다음 날부터
+                                        영업일 기준으로 정산됩니다.<br />
+                                        ✅ 반환 사유 발생 시 5일(영업일) 이내
+                                        환불됩니다.
+                                        <br /><br />
+                                        [환불 예시]<br />
+                                        o 결제일: 6월 1일 기준<br />
+                                        o 6월 1일 ~ 6월 7일: (3강 미만 수강 시)
+                                        전액 환불<br />
+                                        o 6월 8일 ~ 6월 10일: 2/3 환불<br />
+                                        o 6월 11일 ~ 6월 15일: 1/2 환불<br />
+                                        o 6월 16일 이후: 환불 불가
+                                        <br /><br />
+                                        💯 추가 환불 보증: 강의 내용을 100%
+                                        동일하게 따라했음에도 수익이 발생하지
+                                        않았다면, 2개월 이내 100% 환불을
+                                        보장합니다.
+                                        <br /><br />
+                                        [첨부파일로 입증해야 하는 내용 — 아래
+                                        항목 모두]<br />
+                                        o 홈페이지 완성본 URL 및 캡처<br />
+                                        o 픽셀 설치 완료 스크린샷<br />
+                                        o 전환광고 관리자 세팅 스크린샷<br />
+                                        o 1주일 이상 광고한 내역 스크린샷<br />
+                                        o 상세페이지 제작 결과물 (자동생성기
+                                        포함)<br />
+                                        o 최소 2개 이상 채널에 등록된 링크<br />
+                                        o 강의 콘텐츠(VOD) 업로드 또는 생성화면
+                                        캡처<br />
+                                        o 자동배송 세팅화면<br />
+                                        o AI 도구 사용 캡처 (ChatGPT/Claude 등)
+                                        <br /><br />
+                                        위 항목 모두를 실행한 입증자료를
+                                        제출하시면 5영업일 이내 100% 환불이
+                                        처리됩니다.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Floating CTA -->
+        <div class="cta-floating d-md-none">
+            <a
+                href="#pricing"
+                class="btn btn-premium btn-sm text-decoration-none"
+            >
+                <i class="fas fa-bolt me-1"></i>119,000원으로 시작하기
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container text-center text-md-start">
+                <div class="row gy-4">
+                    <div class="col-lg-4 col-md-12">
+                        <img
+                            src="attached_assets/c55eb7e7b16af_upscayl_4x_upscayl-standard-4x_1751101180619.png"
+                            alt="MCSELLER Logo"
+                            class="mb-3"
+                            style="height: 30px"
+                        />
+                        <p>
+                            판매자: 맥셀러 (대표 박지후)<br />사업자등록번호:
+                            405-10-71617
+                        </p>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <h5 class="text-white mb-3">Contact</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">Email: meseller369@gmail.com</li>
+                            <li>Phone: 010-7200-8322</li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <h5 class="text-white mb-3">Links</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><a href="#">이용약관</a></li>
+                            <li><a href="#">개인정보처리방침</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div
+                    class="text-center pt-4 mt-4 border-top border-secondary border-opacity-25"
+                >
+                    <p class="mb-0">
+                        &copy; 2025 MCSELLER. All rights reserved.
+                    </p>
                 </div>
             </div>
         </footer>
 
         <!-- Scripts -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
         <script>
             AOS.init({
-                duration: 1000,
-                once: true
+                duration: 800,
+                once: true,
+                offset: 50,
             });
         </script>
     </body>
