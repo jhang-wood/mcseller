@@ -3,23 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>결제 - MCSELLER</title>
+    <title>수강신청 - MCSELLER</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .progress-steps { display: flex; justify-content: center; margin: 30px 0; }
+        .step { flex: 1; text-align: center; padding: 15px; border-bottom: 3px solid #ddd; position: relative; }
+        .step.active { border-color: #0066cc; color: #0066cc; font-weight: bold; }
+        .step.completed { border-color: #28a745; color: #28a745; }
+        .urgency-banner { background: linear-gradient(45deg, #ff4757, #ff6b7a); color: white; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
+        .trust-badges { display: flex; gap: 15px; margin: 15px 0; font-size: 14px; flex-wrap: wrap; }
+        .trust-badge { display: flex; align-items: center; gap: 5px; }
+        .payment-btn { background: linear-gradient(135deg, #0066cc, #004499); border: none; padding: 16px; border-radius: 8px; font-size: 18px; font-weight: bold; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,102,204,0.3); }
+        .payment-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,102,204,0.4); }
+        .payment-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .countdown { font-size: 20px; font-weight: bold; color: #ff4757; }
+        .stock-counter { background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 5px; margin: 15px 0; }
+        .cart-item { border: 1px solid #dee2e6; padding: 15px; border-radius: 8px; margin: 10px 0; }
+        .recommendation { border: 1px solid #e3f2fd; background: #f8f9ff; padding: 15px; border-radius: 8px; margin: 15px 0; }
+        .loading-spinner { border: 2px solid #f3f3f3; border-top: 2px solid #0066cc; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; margin-right: 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
 <body class="bg-light">
-    <div class="container py-5">
+    <div class="container py-4">
+        <!-- 진행률 표시 -->
+        <div class="progress-steps">
+            <div class="step completed">수강신청</div>
+            <div class="step active">결제</div>
+            <div class="step">바로시청하기</div>
+        </div>
+
         <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h4>결제</h4>
-                    </div>
+            <div class="col-lg-8">
+                <!-- 긴급성 배너 -->
+                <div class="urgency-banner">
+                    🚨 <strong id="discount-timer">24:00:00</strong> 후 할인 종료! 선착순 <span id="stock-left">47</span>명 한정
+                </div>
+
+                <div class="card shadow">
                     <div class="card-body">
                         <!-- 상품 정보 -->
                         <div id="product-info" class="mb-4">
-                            <h5 id="product-title">로딩중...</h5>
-                            <p id="product-price" class="h4 text-primary">₩0</p>
+                            <h4 id="product-title">로딩중...</h4>
+                            <p class="text-muted">강사: MCSELLER 대표 (前 온라인 마케팅 전문가)</p>
+                            <div class="h4 text-primary" id="product-price">₩0</div>
+                        </div>
+
+                        <!-- 신뢰 요소 -->
+                        <div class="trust-badges">
+                            <div class="trust-badge"><i class="fas fa-shield-alt text-success"></i> 7일 내 100% 환불</div>
+                            <div class="trust-badge"><i class="fas fa-users text-info"></i> 1,200+ 수강생</div>
+                            <div class="trust-badge"><i class="fas fa-star text-warning"></i> 평점 4.9/5</div>
+                        </div>
+
+                        <!-- 실시간 재고 -->
+                        <div class="stock-counter">
+                            <i class="fas fa-fire text-danger"></i> <strong>실시간 수강생:</strong> <span id="current-students">1,247명</span> | 
+                            <strong>남은 자리:</strong> <span id="stock-left-detail" class="text-danger">13석</span>
+                        </div>
+
+                        <!-- 장바구니 상품들 -->
+                        <div id="cart-section" class="mb-4">
+                            <h5><i class="fas fa-shopping-cart"></i> 수강 과정</h5>
+                            <div id="cart-items"></div>
+                        </div>
+
+                        <!-- 추천 상품 -->
+                        <div id="recommendations" class="recommendation">
+                            <h6><i class="fas fa-star"></i> 함께 수강하면 좋은 과정</h6>
+                            <div id="recommended-items"></div>
                         </div>
 
                         <!-- 할인코드 -->
@@ -45,7 +100,7 @@
                         </div>
 
                         <!-- 결제 금액 -->
-                        <div class="mb-4">
+                        <div class="mb-4 p-3 bg-light rounded">
                             <div class="d-flex justify-content-between">
                                 <span>원가:</span>
                                 <span id="original-price">₩0</span>
@@ -59,35 +114,42 @@
                                 <span id="points-amount">-₩0</span>
                             </div>
                             <hr>
-                            <div class="d-flex justify-content-between h5">
+                            <div class="d-flex justify-content-between h4">
                                 <span>최종 결제금액:</span>
                                 <span id="final-amount" class="text-primary">₩0</span>
                             </div>
                         </div>
 
                         <!-- 결제 방법 -->
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <label class="form-label">결제 방법</label>
-                            <div class="row">
-                                <div class="col-4">
+                            <div class="row g-2">
+                                <div class="col-6">
                                     <input type="radio" class="btn-check" name="payment-method" id="card" value="card" checked>
-                                    <label class="btn btn-outline-primary w-100" for="card">카드</label>
+                                    <label class="btn btn-outline-primary w-100" for="card"><i class="fas fa-credit-card"></i> 카드</label>
                                 </div>
-                                <div class="col-4">
+                                <div class="col-6">
+                                    <input type="radio" class="btn-check" name="payment-method" id="kakaopay" value="kakaopay">
+                                    <label class="btn btn-outline-warning w-100" for="kakaopay"><i class="fas fa-comment"></i> 카카오페이</label>
+                                </div>
+                                <div class="col-6">
                                     <input type="radio" class="btn-check" name="payment-method" id="bank" value="bank">
-                                    <label class="btn btn-outline-primary w-100" for="bank">계좌</label>
+                                    <label class="btn btn-outline-success w-100" for="bank"><i class="fas fa-university"></i> 계좌이체</label>
                                 </div>
-                                <div class="col-4">
+                                <div class="col-6">
                                     <input type="radio" class="btn-check" name="payment-method" id="phone" value="phone">
-                                    <label class="btn btn-outline-primary w-100" for="phone">휴대폰</label>
+                                    <label class="btn btn-outline-info w-100" for="phone"><i class="fas fa-mobile-alt"></i> 휴대폰</label>
                                 </div>
                             </div>
                         </div>
 
                         <!-- 결제 버튼 -->
-                        <button id="pay-btn" class="btn btn-primary w-100 py-3" onclick="processPay()">
-                            결제하기
+                        <button id="pay-btn" class="btn payment-btn w-100" onclick="processPay()">
+                            <i class="fas fa-lock"></i> 안전하게 수강 신청하기
                         </button>
+                        
+                        <!-- 오류 메시지 -->
+                        <div id="error-message" class="alert alert-danger mt-3" style="display: none;"></div>
                     </div>
                 </div>
             </div>
