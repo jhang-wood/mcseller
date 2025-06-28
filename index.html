@@ -1556,13 +1556,13 @@
                     <div class="d-flex gap-2 align-items-center">
                         <!-- 사용자 정보 (작은 크기) -->
                         <div id="user-info" style="display: none;">
-                            <small class="text-light me-2">
+                            <small class="text-light d-flex align-items-center gap-2">
                                 <span id="user-type-indicator"></span>
-                                <a href="#" id="user-page-link" class="text-decoration-none text-light me-2">
+                                <a href="#" id="user-page-link" class="text-decoration-none text-light">
                                     <i class="fas fa-user" style="font-size: 12px;"></i>
                                 </a>
-                                <a href="#" id="logout-link" class="text-decoration-none text-light" style="font-size: 12px;">
-                                    <i class="fas fa-sign-out-alt"></i> 로그아웃
+                                <a href="#" id="logout-link" class="text-decoration-none text-light">
+                                    <i class="fas fa-sign-out-alt" style="font-size: 12px;"></i>
                                 </a>
                             </small>
                         </div>
@@ -2925,16 +2925,21 @@
                         userInfo.style.display = 'block';
                         userInfo.style.visibility = 'visible';
                         
-                        if (userTypeIndicator && userPageLink) {
+                        if (userPageLink) {
                             if (user.isAdmin) {
-                                userTypeIndicator.textContent = '관리자';
                                 userPageLink.href = 'admin.html';
                                 userPageLink.title = '관리자페이지';
+                                userPageLink.innerHTML = '<i class="fas fa-cog" style="font-size: 12px;"></i> 관리자';
                             } else {
-                                userTypeIndicator.textContent = '회원';
                                 userPageLink.href = 'mypage.html';
                                 userPageLink.title = '마이페이지';
+                                userPageLink.innerHTML = '<i class="fas fa-user" style="font-size: 12px;"></i> 마이페이지';
                             }
+                        }
+                        
+                        // userTypeIndicator 숨기기
+                        if (userTypeIndicator) {
+                            userTypeIndicator.style.display = 'none';
                         }
                     }
                     if (loginInfo) {
