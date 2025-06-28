@@ -1532,7 +1532,7 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto me-4">
+                    <ul class="navbar-nav me-4" style="margin-left: -100px;">
                         <li class="nav-item">
                             <a class="nav-link" href="#courses">강의 과정</a>
                         </li>
@@ -1553,31 +1553,56 @@
                             <a class="nav-link" href="#faq">FAQ</a>
                         </li>
                     </ul>
-                    <div class="d-flex gap-2 align-items-center">
-                        <!-- 사용자 정보 (작은 크기) -->
-                        <div id="user-info" style="display: none;">
-                            <small class="text-light d-flex align-items-center gap-2">
-                                <span id="user-type-indicator"></span>
-                                <a href="#" id="user-page-link" class="text-decoration-none text-light">
-                                    <i class="fas fa-user" style="font-size: 12px;"></i>
-                                </a>
-                                <a href="#" id="logout-link" class="text-decoration-none text-light">
-                                    <i class="fas fa-sign-out-alt" style="font-size: 12px;"></i> 로그아웃
-                                </a>
-                            </small>
-                        </div>
-                        
+                    <div class="d-flex gap-3 align-items-center ms-auto">
                         <!-- 로그인 버튼 (로그아웃 상태) -->
-                        <div id="login-info" class="d-flex gap-2" style="display: none;">
+                        <div id="login-info" style="display: none;">
                             <a href="auth.html" class="btn btn-outline-light btn-sm">
                                 <i class="fas fa-sign-in-alt me-1"></i>로그인
                             </a>
                         </div>
                         
-                        <!-- 지금 시작하기 버튼 -->
-                        <a href="#courses" class="btn btn-premium">
-                            <i class="fas fa-rocket me-2"></i>지금 시작하기
-                        </a>
+                        <!-- 프로필 드롭다운 (로그인 상태) -->
+                        <div id="profile-dropdown" class="dropdown" style="display: none;">
+                            <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user me-2"></i><span id="profile-text">프로필</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                                <li><h6 class="dropdown-header" id="user-email-display">사용자 정보</h6></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="#" id="profile-mypage-link">
+                                        <i class="fas fa-user me-2"></i>마이페이지
+                                    </a>
+                                </li>
+                                <li>
+                                    <div class="dropdown-item-text">
+                                        <small class="text-muted">
+                                            <i class="fas fa-coins me-2"></i>적립금: <span id="user-points-display">5,000원</span>
+                                        </small>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="dropdown-item-text">
+                                        <small class="text-muted">
+                                            <i class="fas fa-ticket-alt me-2"></i>보유 쿠폰: <span id="user-coupons-display">0개</span>
+                                        </small>
+                                    </div>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="#" id="profile-logout-link">
+                                        <i class="fas fa-sign-out-alt me-2"></i>로그아웃
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- 지금 시작하기 버튼 (로그아웃 상태에서만) -->
+                        <div id="start-button" style="display: none;">
+                            <a href="#courses" class="btn btn-premium">
+                                <i class="fas fa-rocket me-2"></i>지금 시작하기
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2908,54 +2933,51 @@
 
             // 네비게이션 UI 업데이트 함수
             function updateNavigationUI(user) {
-                const userInfo = document.getElementById('user-info');
                 const loginInfo = document.getElementById('login-info');
-                const userPageLink = document.getElementById('user-page-link');
-                const userTypeIndicator = document.getElementById('user-type-indicator');
+                const profileDropdown = document.getElementById('profile-dropdown');
+                const startButton = document.getElementById('start-button');
+                const profileText = document.getElementById('profile-text');
+                const userEmailDisplay = document.getElementById('user-email-display');
+                const profileMypageLink = document.getElementById('profile-mypage-link');
+                const profileLogoutLink = document.getElementById('profile-logout-link');
                 
                 console.log('UI 업데이트:', user);
                 
-                // 먼저 모든 요소 숨기기
-                if (userInfo) userInfo.style.display = 'none';
+                // 모든 요소 초기화
                 if (loginInfo) loginInfo.style.display = 'none';
+                if (profileDropdown) profileDropdown.style.display = 'none';
+                if (startButton) startButton.style.display = 'none';
                 
                 if (user) {
-                    // 로그인된 상태
-                    if (userInfo) {
-                        userInfo.style.display = 'block';
-                        userInfo.style.visibility = 'visible';
+                    // 로그인된 상태 - 프로필 드롭다운 표시
+                    if (profileDropdown) {
+                        profileDropdown.style.display = 'block';
                         
-                        if (userPageLink) {
+                        // 프로필 텍스트 설정
+                        if (profileText) {
+                            profileText.textContent = user.isAdmin ? '관리자' : '회원';
+                        }
+                        
+                        // 사용자 이메일 표시
+                        if (userEmailDisplay) {
+                            userEmailDisplay.textContent = user.email || 'user@test.com';
+                        }
+                        
+                        // 마이페이지 링크 설정
+                        if (profileMypageLink) {
                             if (user.isAdmin) {
-                                userPageLink.href = 'admin.html';
-                                userPageLink.title = '관리자페이지';
-                                userPageLink.innerHTML = '<i class="fas fa-cog" style="font-size: 12px;"></i> 관리자';
+                                profileMypageLink.href = 'admin.html';
+                                profileMypageLink.innerHTML = '<i class="fas fa-cog me-2"></i>관리자페이지';
                             } else {
-                                userPageLink.href = 'mypage.html';
-                                userPageLink.title = '마이페이지';
-                                userPageLink.innerHTML = '<i class="fas fa-user" style="font-size: 12px;"></i> 마이페이지';
+                                profileMypageLink.href = 'mypage.html';
+                                profileMypageLink.innerHTML = '<i class="fas fa-user me-2"></i>마이페이지';
                             }
                         }
-                        
-                        // userTypeIndicator 숨기기
-                        if (userTypeIndicator) {
-                            userTypeIndicator.style.display = 'none';
-                        }
-                    }
-                    if (loginInfo) {
-                        loginInfo.style.display = 'none';
-                        loginInfo.style.visibility = 'hidden';
                     }
                 } else {
-                    // 로그아웃된 상태
-                    if (userInfo) {
-                        userInfo.style.display = 'none';
-                        userInfo.style.visibility = 'hidden';
-                    }
-                    if (loginInfo) {
-                        loginInfo.style.display = 'flex';
-                        loginInfo.style.visibility = 'visible';
-                    }
+                    // 로그아웃된 상태 - 로그인 버튼과 시작하기 버튼 표시
+                    if (loginInfo) loginInfo.style.display = 'block';
+                    if (startButton) startButton.style.display = 'block';
                 }
             }
 
@@ -3023,9 +3045,10 @@
                     checkAndUpdateUI();
                 }, 100);
                 
-                // 로그아웃 버튼 이벤트 (동적으로 추가)
+                // 프로필 드롭다운 이벤트 리스너
                 document.addEventListener('click', async function(e) {
-                    if (e.target.id === 'logout-link' || e.target.closest('#logout-link')) {
+                    // 로그아웃 처리
+                    if (e.target.id === 'profile-logout-link' || e.target.closest('#profile-logout-link')) {
                         e.preventDefault();
                         
                         // 테스트 사용자 로그아웃
@@ -3042,6 +3065,15 @@
                             if (success) {
                                 updateNavigationUI(null);
                             }
+                        }
+                    }
+                    
+                    // 마이페이지/관리자페이지 링크 처리
+                    if (e.target.id === 'profile-mypage-link' || e.target.closest('#profile-mypage-link')) {
+                        e.preventDefault();
+                        const link = e.target.closest('#profile-mypage-link');
+                        if (link && link.href) {
+                            window.location.href = link.href;
                         }
                     }
                 });
