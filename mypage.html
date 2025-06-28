@@ -81,19 +81,46 @@
     <script src="js/supabase-client.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            // 로그인 확인
-            const user = await getCurrentUser();
+            // 로그인 확인 (테스트 계정 지원)
+            let user = null;
+            
+            // 테스트 사용자 확인
+            const testUser = localStorage.getItem('testUser');
+            if (testUser) {
+                user = JSON.parse(testUser);
+            } else if (window.getCurrentUser) {
+                user = await getCurrentUser();
+            }
+            
             if (!user) {
+                alert('로그인이 필요합니다.');
                 window.location.href = 'auth.html';
                 return;
             }
             
-            // 사용자 정보 표시 (임시)
+            // 관리자는 마이페이지 접근 불가
+            if (user.isAdmin) {
+                alert('관리자는 관리자 페이지를 이용해주세요.');
+                window.location.href = 'admin.html';
+                return;
+            }
+            
+            // 사용자 정보 표시
             document.getElementById('user-email').textContent = user.email || 'user@test.com';
         });
 
         async function logout() {
-            await signOut();
+            // 테스트 사용자 로그아웃
+            if (localStorage.getItem('testUser')) {
+                localStorage.removeItem('testUser');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Supabase 로그아웃
+            if (window.signOut) {
+                await signOut();
+            }
             window.location.href = 'index.html';
         }
     </script>

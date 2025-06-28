@@ -1553,41 +1553,31 @@
                             <a class="nav-link" href="#faq">FAQ</a>
                         </li>
                     </ul>
-                    <div class="d-flex gap-2" id="nav-buttons">
-                        <!-- 로그아웃 상태 버튼들 -->
-                        <div id="logged-out-buttons" class="d-flex gap-2">
-                            <a href="auth.html" class="btn btn-outline-light">
-                                <i class="fas fa-sign-in-alt me-2"></i>로그인
-                            </a>
-                            <a href="#courses" class="btn btn-premium">
-                                <i class="fas fa-rocket me-2"></i>지금 시작하기
+                    <div class="d-flex gap-2 align-items-center">
+                        <!-- 사용자 정보 (작은 크기) -->
+                        <div id="user-info" style="display: none;">
+                            <small class="text-light me-2">
+                                <span id="user-type-indicator"></span>
+                                <a href="#" id="user-page-link" class="text-decoration-none text-light me-2">
+                                    <i class="fas fa-user" style="font-size: 12px;"></i>
+                                </a>
+                                <a href="#" id="logout-link" class="text-decoration-none text-light" style="font-size: 12px;">
+                                    <i class="fas fa-sign-out-alt"></i> 로그아웃
+                                </a>
+                            </small>
+                        </div>
+                        
+                        <!-- 로그인 버튼 (로그아웃 상태) -->
+                        <div id="login-info" class="d-flex gap-2">
+                            <a href="auth.html" class="btn btn-outline-light btn-sm">
+                                <i class="fas fa-sign-in-alt me-1"></i>로그인
                             </a>
                         </div>
                         
-                        <!-- 로그인 상태 버튼들 -->
-                        <div id="logged-in-buttons" class="d-flex gap-2" style="display: none;">
-                            <!-- 일반 사용자 버튼들 -->
-                            <div id="user-buttons" class="d-flex gap-2">
-                                <a href="mypage.html" class="btn btn-outline-light">
-                                    <i class="fas fa-user me-2"></i>마이페이지
-                                </a>
-                            </div>
-                            
-                            <!-- 관리자 버튼들 -->
-                            <div id="admin-buttons" class="d-flex gap-2" style="display: none;">
-                                <a href="admin.html" class="btn btn-outline-warning">
-                                    <i class="fas fa-cog me-2"></i>관리자페이지
-                                </a>
-                            </div>
-                            
-                            <!-- 공통 버튼들 -->
-                            <a href="#courses" class="btn btn-premium">
-                                <i class="fas fa-rocket me-2"></i>지금 시작하기
-                            </a>
-                            <button id="logout-btn" class="btn btn-outline-danger">
-                                <i class="fas fa-sign-out-alt me-2"></i>로그아웃
-                            </button>
-                        </div>
+                        <!-- 지금 시작하기 버튼 -->
+                        <a href="#courses" class="btn btn-premium">
+                            <i class="fas fa-rocket me-2"></i>지금 시작하기
+                        </a>
                     </div>
                 </div>
             </div>
@@ -2918,28 +2908,29 @@
 
             // 네비게이션 UI 업데이트 함수
             function updateNavigationUI(user) {
-                const loggedOutButtons = document.getElementById('logged-out-buttons');
-                const loggedInButtons = document.getElementById('logged-in-buttons');
-                const userButtons = document.getElementById('user-buttons');
-                const adminButtons = document.getElementById('admin-buttons');
+                const userInfo = document.getElementById('user-info');
+                const loginInfo = document.getElementById('login-info');
+                const userPageLink = document.getElementById('user-page-link');
+                const userTypeIndicator = document.getElementById('user-type-indicator');
                 
                 if (user) {
                     // 로그인된 상태
-                    loggedOutButtons.style.display = 'none';
-                    loggedInButtons.style.display = 'flex';
+                    userInfo.style.display = 'block';
+                    loginInfo.style.display = 'none';
                     
-                    // 관리자인지 확인
                     if (user.isAdmin) {
-                        userButtons.style.display = 'none';
-                        adminButtons.style.display = 'flex';
+                        userTypeIndicator.textContent = '관리자';
+                        userPageLink.href = 'admin.html';
+                        userPageLink.title = '관리자페이지';
                     } else {
-                        userButtons.style.display = 'flex';
-                        adminButtons.style.display = 'none';
+                        userTypeIndicator.textContent = '회원';
+                        userPageLink.href = 'mypage.html';
+                        userPageLink.title = '마이페이지';
                     }
                 } else {
                     // 로그아웃된 상태
-                    loggedOutButtons.style.display = 'flex';
-                    loggedInButtons.style.display = 'none';
+                    userInfo.style.display = 'none';
+                    loginInfo.style.display = 'flex';
                 }
             }
 
@@ -3006,7 +2997,7 @@
                 checkAndUpdateUI();
                 
                 // 로그아웃 버튼 이벤트
-                document.getElementById('logout-btn').addEventListener('click', async function(e) {
+                document.getElementById('logout-link').addEventListener('click', async function(e) {
                     e.preventDefault();
                     
                     // 테스트 사용자 로그아웃
