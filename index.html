@@ -1532,7 +1532,7 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav me-4" style="margin-left: -100px;">
+                    <ul class="navbar-nav ms-auto me-4">
                         <li class="nav-item">
                             <a class="nav-link" href="#courses">강의 과정</a>
                         </li>
@@ -1599,7 +1599,7 @@
                         
                         <!-- 지금 시작하기 버튼 (로그아웃 상태에서만) -->
                         <div id="start-button" style="display: none;">
-                            <a href="#courses" class="btn btn-premium">
+                            <a href="ai-master-landing.html" class="btn btn-premium">
                                 <i class="fas fa-rocket me-2"></i>지금 시작하기
                             </a>
                         </div>
@@ -3084,10 +3084,11 @@
                         console.log('UI 확인 시작');
                         
                         // 요소 존재 확인
-                        const userInfo = document.getElementById('user-info');
                         const loginInfo = document.getElementById('login-info');
+                        const profileDropdown = document.getElementById('profile-dropdown');
+                        const startButton = document.getElementById('start-button');
                         
-                        if (!userInfo || !loginInfo) {
+                        if (!loginInfo || !profileDropdown || !startButton) {
                             console.log('UI 요소를 찾을 수 없음');
                             return;
                         }
