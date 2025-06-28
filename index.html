@@ -1,938 +1,2383 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MCSELLER - 온라인 수익화 전문 교육 플랫폼</title>
-    
-    <!-- Meta Tags for SEO -->
-    <meta name="description" content="초보자도 쉽게 월 100만원 이상 온라인 수익 달성! MCSELLER 실전 수익화 전략으로 경제적 자유를 실현하세요.">
-    <meta name="keywords" content="온라인 수익화, 부업, 사이드 프로젝트, 중고거래, 스마트스토어, 온라인 교육">
-    
-    <!-- Open Graph -->
-    <meta property="og:title" content="MCSELLER - 현실적인 온라인 수익화 전략">
-    <meta property="og:description" content="하루 1-3시간으로 월 100만원 이상 안정적 수익! 90% 이상이 2개월 내 첫 수익 달성한 검증된 노하우">
-    <meta property="og:type" content="website">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
-    
-    <!-- External CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
-    
-    <!-- AOS Animation -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    
-    <!-- Custom CSS -->
-    <link href="css/modern-style.css" rel="stylesheet">
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top modern-navbar">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="#home">
-                <img src="attached_assets/c55eb7e7b16af_upscayl_4x_upscayl-standard-4x_1751079408122.png" 
-                     alt="MCSELLER" class="logo-img me-2">
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto me-4">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#courses">강의</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#success-stories">성과</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#pricing">특가</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#faq">FAQ</a>
-                    </li>
-                </ul>
-                <div class="navbar-buttons">
-                    <a href="auth.html" class="btn btn-outline-light me-2">로그인</a>
-                    <a href="#cta-main" class="btn btn-premium">지금 시작하기</a>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>MCSELLER - 온라인 수익화 전문 교육 플랫폼</title>
+
+        <!-- Meta Tags for SEO -->
+        <meta
+            name="description"
+            content="K4 플랫폼 전자책 부문 1위! 실제 평균 첫 달 수익 156만원. MCSELLER 실전 수익화 전략으로 경제적 자유를 실현하세요."
+        />
+        <meta
+            name="keywords"
+            content="온라인 수익화, 부업, 사이드 프로젝트, 중고거래, 스마트스토어, 온라인 교육, 레고리셀, 명품리셀, 전자책자동화"
+        />
+
+        <!-- Open Graph -->
+        <meta
+            property="og:title"
+            content="MCSELLER - 현실적인 온라인 수익화 전략"
+        />
+        <meta
+            property="og:description"
+            content="프리랜서 마켓 5점 후기 200개 이상! 와디즈 펀딩 5,283% 달성한 검증된 노하우"
+        />
+        <meta property="og:type" content="website" />
+
+        <!-- Favicon -->
+        <link
+            rel="icon"
+            type="image/png"
+            href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>"
+        />
+
+        <!-- External CSS -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+            rel="stylesheet"
+        />
+        <link
+            href="https://unpkg.com/aos@2.3.1/dist/aos.css"
+            rel="stylesheet"
+        />
+
+        <style>
+            /* Custom CSS with gradient backgrounds and modern styling */
+            :root {
+                --primary-gradient: linear-gradient(
+                    135deg,
+                    #111111 0%,
+                    #23272f 100%
+                );
+                --accent-gradient: linear-gradient(90deg, #ff9900, #ffe259);
+                --border-gradient: linear-gradient(
+                    90deg,
+                    #ff9900,
+                    #ffe259,
+                    #ff9900
+                );
+                --text-light: #e0e0e0;
+                --text-muted: #b5b5b5;
+                --white: #ffffff;
+                --dark: #111111;
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: "Noto Sans KR", sans-serif;
+                background: var(--primary-gradient);
+                color: var(--text-light);
+                line-height: 1.6;
+            }
+
+            /* Navigation */
+            .modern-navbar {
+                background: rgba(17, 17, 17, 0.95);
+                backdrop-filter: blur(10px);
+                border-bottom: 1px solid rgba(255, 153, 0, 0.3);
+                transition: all 0.3s ease;
+            }
+
+            .navbar-brand .logo-img {
+                height: 40px;
+                width: auto;
+            }
+
+            .trust-badge {
+                background: var(--accent-gradient);
+                color: var(--dark);
+                padding: 4px 12px;
+                border-radius: 15px;
+                font-size: 0.8rem;
+                font-weight: 700;
+                margin-left: 10px;
+            }
+
+            .nav-link {
+                color: var(--text-light) !important;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .nav-link:hover {
+                color: #ff9900 !important;
+            }
+
+            .nav-link:hover::after {
+                content: "";
+                position: absolute;
+                bottom: -5px;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: var(--accent-gradient);
+            }
+
+            /* Buttons */
+            .btn-premium {
+                background: var(--accent-gradient);
+                border: none;
+                color: var(--dark);
+                font-weight: 700;
+                padding: 12px 30px;
+                border-radius: 25px;
+                transition: all 0.3s ease;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .btn-premium:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 30px rgba(255, 153, 0, 0.4);
+                color: var(--dark);
+            }
+
+            .btn-outline-light {
+                border: 2px solid var(--text-light);
+                color: var(--text-light);
+                font-weight: 600;
+                padding: 12px 30px;
+                border-radius: 25px;
+                transition: all 0.3s ease;
+            }
+
+            .btn-outline-light:hover {
+                background: var(--text-light);
+                color: var(--dark);
+                transform: translateY(-2px);
+            }
+
+            /* Hero Section */
+            .hero-section {
+                min-height: 100vh;
+                background: var(--primary-gradient);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .hero-content {
+                padding: 80px 0 20px;
+            }
+
+            .hero-badge {
+                display: inline-flex;
+                align-items: center;
+                background: rgba(255, 153, 0, 0.1);
+                border: 2px solid #ff9900;
+                border-radius: 50px;
+                padding: 8px 20px;
+                color: #ff9900;
+                font-weight: 600;
+                font-size: 14px;
+                animation: pulse 2s infinite;
+            }
+
+            @keyframes pulse {
+                0%,
+                100% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.05);
+                }
+            }
+
+            .hero-title {
+                font-size: 3.5rem;
+                font-weight: 900;
+                line-height: 1.2;
+                margin-bottom: 30px;
+            }
+
+            .text-gradient {
+                background: var(--accent-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .hero-subtitle {
+                font-size: 1.3rem;
+                color: var(--text-light);
+                margin-bottom: 40px;
+                line-height: 1.6;
+            }
+
+            /* Stats */
+            .hero-stats {
+                margin: 40px 0;
+            }
+
+            .stat-item {
+                text-align: center;
+                padding: 15px;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 15px;
+                border: 1px solid rgba(255, 153, 0, 0.2);
+            }
+
+            .stat-number {
+                font-size: 2rem;
+                font-weight: 900;
+                color: #ff9900;
+                margin-bottom: 5px;
+            }
+
+            .stat-label {
+                font-size: 0.9rem;
+                color: var(--text-muted);
+            }
+
+            /* Character Image */
+            .character-image {
+                width: 100%;
+                max-width: 400px;
+                height: auto;
+                filter: drop-shadow(0 20px 40px rgba(255, 153, 0, 0.3));
+                animation: float 3s ease-in-out infinite;
+            }
+
+            @keyframes float {
+                0%,
+                100% {
+                    transform: translateY(0px);
+                }
+                50% {
+                    transform: translateY(-15px);
+                }
+            }
+
+            /* Section Styling */
+            .section-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                background: rgba(255, 153, 0, 0.1);
+                border: 1px solid #ff9900;
+                border-radius: 25px;
+                padding: 8px 20px;
+                color: #ff9900;
+                font-weight: 600;
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+                font-weight: 800;
+                margin-bottom: 30px;
+                line-height: 1.3;
+            }
+
+            .section-subtitle {
+                font-size: 1.1rem;
+                color: var(--text-muted);
+                margin-bottom: 40px;
+                line-height: 1.6;
+            }
+
+            /* Problem Section */
+            .problem-section {
+                background: rgba(20, 20, 20, 0.8);
+                backdrop-filter: blur(10px);
+            }
+
+            .problem-hero {
+                text-align: center;
+                margin-bottom: 60px;
+            }
+
+            .problem-title {
+                font-size: 3rem;
+                font-weight: 900;
+                line-height: 1.2;
+                margin-bottom: 30px;
+            }
+
+            .problem-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 20px;
+                margin-bottom: 30px;
+                padding: 20px;
+                background: rgba(255, 0, 0, 0.05);
+                border-left: 4px solid #dc3545;
+                border-radius: 0 10px 10px 0;
+            }
+
+            .problem-icon {
+                color: #dc3545;
+                font-size: 1.5rem;
+                margin-top: 5px;
+            }
+
+            .problem-text h5 {
+                color: var(--white);
+                font-weight: 700;
+                margin-bottom: 10px;
+            }
+
+            .problem-text p {
+                color: var(--text-muted);
+                margin: 0;
+            }
+
+            .warning-box {
+                background: rgba(220, 53, 69, 0.1);
+                border: 2px solid #dc3545;
+                border-radius: 15px;
+                padding: 30px;
+                color: var(--white);
+                text-align: center;
+                font-size: 1.1rem;
+                font-weight: 600;
+            }
+
+            /* Solution Section */
+            .solution-section {
+                background: var(--primary-gradient);
+                padding: 80px 0;
+            }
+
+            .solution-card {
+                background: rgba(255, 255, 255, 0.05);
+                border: 2px solid transparent;
+                border-radius: 20px;
+                padding: 40px 30px;
+                text-align: center;
+                height: 100%;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .solution-card::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                border-radius: 20px;
+                padding: 2px;
+                background: var(--border-gradient);
+                mask:
+                    linear-gradient(#fff 0 0) content-box,
+                    linear-gradient(#fff 0 0);
+                mask-composite: exclude;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .solution-card:hover::before {
+                opacity: 1;
+            }
+
+            .solution-card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 20px 40px rgba(255, 153, 0, 0.2);
+            }
+
+            .solution-icon {
+                background: var(--accent-gradient);
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 20px;
+                font-size: 2rem;
+                color: var(--dark);
+            }
+
+            .solution-card h4 {
+                font-size: 1.5rem;
+                font-weight: 700;
+                margin-bottom: 20px;
+                color: var(--white);
+            }
+
+            .solution-features {
+                list-style: none;
+                text-align: left;
+                margin-top: 20px;
+            }
+
+            .solution-features li {
+                padding: 8px 0;
+                color: var(--text-light);
+            }
+
+            .solution-features i {
+                color: #28a745;
+                margin-right: 10px;
+            }
+
+            /* Course Cards */
+            .course-card {
+                background: rgba(255, 255, 255, 0.05);
+                border: 2px solid rgba(255, 153, 0, 0.3);
+                border-radius: 20px;
+                padding: 30px;
+                height: 100%;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .course-card::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: var(--accent-gradient);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                z-index: -1;
+            }
+
+            .course-card:hover::before {
+                opacity: 0.1;
+            }
+
+            .course-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 35px rgba(255, 153, 0, 0.3);
+            }
+
+            .course-level {
+                display: inline-block;
+                background: var(--accent-gradient);
+                color: var(--dark);
+                padding: 5px 15px;
+                border-radius: 20px;
+                font-size: 0.9rem;
+                font-weight: 700;
+                margin-bottom: 15px;
+            }
+
+            .course-title {
+                font-size: 1.4rem;
+                font-weight: 700;
+                margin-bottom: 15px;
+                color: var(--white);
+            }
+
+            .course-description {
+                color: var(--text-muted);
+                margin-bottom: 20px;
+                line-height: 1.6;
+            }
+
+            .course-price {
+                font-size: 1.5rem;
+                font-weight: 800;
+                color: #ff9900;
+                margin-bottom: 20px;
+            }
+
+            .course-investment {
+                background: rgba(255, 153, 0, 0.1);
+                border: 1px solid #ff9900;
+                border-radius: 10px;
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            .course-investment h6 {
+                color: #ff9900;
+                font-weight: 700;
+                margin-bottom: 5px;
+            }
+
+            .course-investment p {
+                color: var(--text-light);
+                margin: 0;
+                font-size: 0.9rem;
+            }
+
+            .course-features {
+                list-style: none;
+                margin-bottom: 30px;
+            }
+
+            .course-features li {
+                padding: 5px 0;
+                color: var(--text-light);
+            }
+
+            .course-features i {
+                color: #28a745;
+                margin-right: 8px;
+            }
+
+            /* Success Stories */
+            .success-card {
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 153, 0, 0.2);
+                border-radius: 20px;
+                padding: 25px;
+                height: 100%;
+                transition: all 0.3s ease;
+            }
+
+            .success-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(255, 153, 0, 0.2);
+            }
+
+            .success-header {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+
+            .success-avatar {
+                width: 50px;
+                height: 50px;
+                background: var(--accent-gradient);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: var(--dark);
+                font-size: 1.2rem;
+            }
+
+            .success-info h5 {
+                margin: 0;
+                color: var(--white);
+                font-weight: 700;
+            }
+
+            .success-info span {
+                color: var(--text-muted);
+                font-size: 0.9rem;
+            }
+
+            .success-quote {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: var(--white);
+                margin-bottom: 20px;
+                line-height: 1.5;
+            }
+
+            .success-details {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+            }
+
+            .detail-item {
+                text-align: center;
+                padding: 15px;
+                background: rgba(255, 153, 0, 0.1);
+                border-radius: 10px;
+            }
+
+            .detail-item .label {
+                display: block;
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                margin-bottom: 5px;
+            }
+
+            .detail-item .value {
+                font-size: 1.2rem;
+                font-weight: 700;
+                color: #ff9900;
+            }
+
+            /* Achievement Section */
+            .achievement-section {
+                background: rgba(255, 153, 0, 0.05);
+                border-top: 1px solid rgba(255, 153, 0, 0.2);
+                border-bottom: 1px solid rgba(255, 153, 0, 0.2);
+            }
+
+            .achievement-card {
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 153, 0, 0.3);
+                border-radius: 15px;
+                padding: 30px;
+                text-align: center;
+                height: 100%;
+            }
+
+            .achievement-icon {
+                background: var(--accent-gradient);
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 15px;
+                font-size: 1.5rem;
+                color: var(--dark);
+            }
+
+            .achievement-number {
+                font-size: 2rem;
+                font-weight: 900;
+                color: #ff9900;
+                margin-bottom: 10px;
+            }
+
+            .achievement-label {
+                color: var(--text-light);
+                font-weight: 600;
+            }
+
+            /* Pricing Section */
+            .pricing-card {
+                background: rgba(255, 255, 255, 0.05);
+                border: 3px solid #ff9900;
+                border-radius: 25px;
+                padding: 40px;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .pricing-badge {
+                position: absolute;
+                top: -15px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: var(--accent-gradient);
+                color: var(--dark);
+                padding: 10px 30px;
+                border-radius: 25px;
+                font-weight: 700;
+                font-size: 0.9rem;
+            }
+
+            .pricing-header {
+                text-align: center;
+                margin-bottom: 40px;
+            }
+
+            .pricing-price {
+                margin: 30px 0;
+            }
+
+            .original-price {
+                font-size: 1.2rem;
+                color: var(--text-muted);
+                text-decoration: line-through;
+                margin-right: 10px;
+            }
+
+            .discounted-price {
+                font-size: 2.5rem;
+                font-weight: 900;
+                color: #ff9900;
+            }
+
+            .discount-badge {
+                background: #dc3545;
+                color: white;
+                padding: 5px 15px;
+                border-radius: 20px;
+                font-size: 0.9rem;
+                font-weight: 700;
+                margin-left: 15px;
+            }
+
+            /* Timer */
+            .pricing-timer {
+                background: rgba(220, 53, 69, 0.1);
+                border: 2px solid #dc3545;
+                border-radius: 15px;
+                padding: 15px;
+                text-align: center;
+                margin: 20px 0;
+            }
+
+            .timer {
+                font-size: 1.5rem;
+                font-weight: 900;
+                color: #dc3545;
+                margin-top: 10px;
+            }
+
+            /* Feature Groups */
+            .feature-group {
+                margin-bottom: 30px;
+            }
+
+            .feature-group h5 {
+                color: var(--white);
+                font-weight: 700;
+                margin-bottom: 15px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .feature-group ul {
+                list-style: none;
+            }
+
+            .feature-group li {
+                padding: 8px 0;
+                color: var(--text-light);
+                position: relative;
+                padding-left: 25px;
+            }
+
+            .feature-group li::before {
+                content: "✓";
+                position: absolute;
+                left: 0;
+                color: #28a745;
+                font-weight: 700;
+            }
+
+            /* Guarantee Box */
+            .guarantee-box {
+                background: rgba(40, 167, 69, 0.1);
+                border: 2px solid #28a745;
+                border-radius: 15px;
+                padding: 20px;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                margin: 30px 0;
+            }
+
+            .guarantee-box i {
+                font-size: 2rem;
+                color: #28a745;
+            }
+
+            .guarantee-box h6 {
+                margin: 0;
+                color: var(--white);
+                font-weight: 700;
+            }
+
+            .guarantee-box p {
+                margin: 0;
+                color: var(--text-muted);
+                font-size: 0.9rem;
+            }
+
+            /* FAQ */
+            .accordion-item {
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 153, 0, 0.3);
+                margin-bottom: 10px;
+                border-radius: 15px;
+                overflow: hidden;
+            }
+
+            .accordion-button {
+                background: transparent;
+                color: var(--white);
+                font-weight: 600;
+                border: none;
+                padding: 20px;
+            }
+
+            .accordion-button:not(.collapsed) {
+                background: rgba(255, 153, 0, 0.1);
+                color: var(--white);
+            }
+
+            .accordion-body {
+                background: transparent;
+                color: var(--text-light);
+                border-top: 1px solid rgba(255, 153, 0, 0.2);
+            }
+
+            /* Footer */
+            .modern-footer {
+                background: rgba(10, 10, 10, 0.9);
+                border-top: 1px solid rgba(255, 153, 0, 0.3);
+            }
+
+            .footer-title {
+                color: var(--white);
+                font-weight: 700;
+                margin-bottom: 20px;
+            }
+
+            .footer-links {
+                list-style: none;
+            }
+
+            .footer-links li {
+                margin-bottom: 10px;
+            }
+
+            .footer-links a {
+                color: var(--text-muted);
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            .footer-links a:hover {
+                color: #ff9900;
+            }
+
+            /* Product Detail Modal Styles */
+            .product-modal {
+                background: rgba(0, 0, 0, 0.9);
+            }
+
+            .product-modal .modal-dialog {
+                max-width: 1000px;
+            }
+
+            .product-modal .modal-content {
+                background: var(--primary-gradient);
+                border: 2px solid #ff9900;
+                border-radius: 20px;
+            }
+
+            .product-header {
+                text-align: center;
+                padding: 40px 20px 20px;
+                border-bottom: 1px solid rgba(255, 153, 0, 0.3);
+            }
+
+            .product-level-badge {
+                background: var(--accent-gradient);
+                color: var(--dark);
+                padding: 8px 25px;
+                border-radius: 25px;
+                font-weight: 700;
+                margin-bottom: 20px;
+                display: inline-block;
+            }
+
+            .product-title {
+                font-size: 2rem;
+                font-weight: 800;
+                color: var(--white);
+                margin-bottom: 15px;
+            }
+
+            .product-subtitle {
+                color: var(--text-muted);
+                font-size: 1.1rem;
+                margin-bottom: 30px;
+            }
+
+            .product-price-section {
+                text-align: center;
+                margin: 30px 0;
+            }
+
+            .price-comparison {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 20px;
+                margin-bottom: 20px;
+            }
+
+            .old-price {
+                font-size: 1.5rem;
+                color: var(--text-muted);
+                text-decoration: line-through;
+            }
+
+            .new-price {
+                font-size: 2.5rem;
+                font-weight: 900;
+                color: #ff9900;
+            }
+
+            .save-amount {
+                background: #dc3545;
+                color: white;
+                padding: 8px 20px;
+                border-radius: 25px;
+                font-weight: 700;
+            }
+
+            .landing-page {
+                background: var(--primary-gradient);
+                min-height: 100vh;
+                padding: 100px 0 50px;
+            }
+
+            .landing-nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: rgba(17, 17, 17, 0.95);
+                backdrop-filter: blur(10px);
+                padding: 15px 0;
+                border-bottom: 1px solid rgba(255, 153, 0, 0.3);
+            }
+
+            .review-carousel {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 15px;
+                padding: 20px;
+                margin: 20px 0;
+            }
+
+            .review-item {
+                background: rgba(255, 153, 0, 0.1);
+                border-radius: 10px;
+                padding: 20px;
+                margin-bottom: 15px;
+                border-left: 4px solid #ff9900;
+            }
+
+            .review-text {
+                color: var(--white);
+                font-style: italic;
+                margin-bottom: 10px;
+            }
+
+            .review-author {
+                color: var(--text-muted);
+                font-size: 0.9rem;
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .hero-title {
+                    font-size: 2.5rem;
+                }
+
+                .section-title {
+                    font-size: 2rem;
+                }
+
+                .problem-title {
+                    font-size: 2rem;
+                }
+
+                .btn-premium,
+                .btn-outline-light {
+                    padding: 10px 20px;
+                    font-size: 0.9rem;
+                }
+
+                .success-details {
+                    grid-template-columns: 1fr;
+                }
+
+                .price-comparison {
+                    flex-direction: column;
+                    gap: 10px;
+                }
+            }
+
+            /* Loading Animation */
+            @keyframes slideInUp {
+                from {
+                    transform: translateY(30px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            .slide-in-up {
+                animation: slideInUp 0.6s ease-out;
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- Navigation -->
+        <nav
+            class="navbar navbar-expand-lg navbar-dark fixed-top modern-navbar"
+        >
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" href="#home">
+                    <img
+                        src="attached_assets/c55eb7e7b16af_upscayl_4x_upscayl-standard-4x_1751101180619.png"
+                        alt="MCSELLER"
+                        class="logo-img me-2"
+                    />
+                </a>
+
+                <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                >
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto me-4">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#courses">강의 과정</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#success-stories"
+                                >성공 사례</a
+                            >
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#achievements"
+                                >실제 성과</a
+                            >
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#faq">FAQ</a>
+                        </li>
+                    </ul>
+                    <div class="d-flex gap-2">
+                        <a href="#cta-main" class="btn btn-premium">
+                            <i class="fas fa-rocket me-2"></i>지금 시작하기
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </nav>
+        </nav>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero-section">
-        <div class="hero-background">
-            <div class="hero-overlay"></div>
-        </div>
-        <div class="container">
-            <div class="row align-items-center min-vh-100">
-                <div class="col-lg-6" data-aos="fade-right" data-aos-duration="1000">
-                    <div class="hero-content">
-                        <div class="hero-badge mb-4">
-                            <i class="fas fa-fire"></i>
-                            <span>최초 100명 한정 50% 특별 할인</span>
-                        </div>
-                        
-                        <h1 class="hero-title mb-4">
-                            <span class="text-gradient">디지털 노가다에 지친 당신,</span><br>
-                            아직도 혼자서 헤매고 계신가요?
-                        </h1>
-                        
-                        <p class="hero-subtitle mb-5">
-                            <strong>현실적으로 가장 빠르게 수익화 가능한</strong> 노하우로<br>
-                            하루 1~3시간만으로 <span class="text-warning fw-bold">월 100만원 이상</span> 안정적 수익 달성
-                        </p>
-                        
-                        <div class="hero-stats mb-5">
-                            <div class="row g-3">
-                                <div class="col-4">
-                                    <div class="stat-item">
-                                        <div class="stat-number">90%</div>
-                                        <div class="stat-label">2개월 내 첫 수익</div>
+        <!-- Hero Section -->
+        <section id="home" class="hero-section">
+            <div class="container">
+                <div class="row align-items-center min-vh-100">
+                    <div
+                        class="col-lg-6"
+                        data-aos="fade-right"
+                        data-aos-duration="1000"
+                    >
+                        <div class="hero-content">
+                            <div class="hero-badge mb-4">
+                                <i class="fas fa-fire"></i>
+                                <span
+                                    >와디즈 펀딩 5,283% 달성! 검증된
+                                    노하우</span
+                                >
+                            </div>
+
+                            <h1 class="hero-title mb-4">
+                                <span class="text-gradient"
+                                    >진짜 수익화 가능한</span
+                                ><br />
+                                온라인 부업을 찾고 계신가요?
+                            </h1>
+
+                            <p class="hero-subtitle mb-4">
+                                <strong>K4 플랫폼 전자책 부문 1위</strong>,
+                                프리랜서 마켓 5점 후기 200개 이상<br />
+                                <span class="text-warning fw-bold"
+                                    >평균 첫 달 수익 156만원</span
+                                >
+                                달성한 검증된 수익화 전략
+                            </p>
+
+                            <div class="hero-stats mb-4">
+                                <div class="row g-3">
+                                    <div class="col-4">
+                                        <div class="stat-item">
+                                            <div class="stat-number">600+</div>
+                                            <div class="stat-label">
+                                                누적 수강생
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-4">
-                                    <div class="stat-item">
-                                        <div class="stat-number">2,850+</div>
-                                        <div class="stat-label">성공 수강생</div>
+                                    <div class="col-4">
+                                        <div class="stat-item">
+                                            <div class="stat-number">
+                                                5,283%
+                                            </div>
+                                            <div class="stat-label">
+                                                와디즈 펀딩율
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-4">
-                                    <div class="stat-item">
-                                        <div class="stat-number">100%</div>
-                                        <div class="stat-label">환불 보장</div>
+                                    <div class="col-4">
+                                        <div class="stat-item">
+                                            <div class="stat-number">
+                                                156만원
+                                            </div>
+                                            <div class="stat-label">
+                                                평균 첫 달 수익
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="d-flex flex-wrap gap-3 mb-4">
+                                <a
+                                    href="register.html"
+                                    class="btn btn-premium btn-lg"
+                                >
+                                    <i class="fas fa-rocket me-2"></i>지금 바로 시작하기
+                                </a>
+                                <a
+                                    href="#achievements"
+                                    class="btn btn-outline-light btn-lg"
+                                >
+                                    <i class="fas fa-chart-line me-2"></i>실제
+                                    성과 확인
+                                </a>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas fa-shield-alt text-success"></i>
+                                <small
+                                    >60일 내 100% 환불 보장 · 1:1 상담 무료
+                                    제공</small
+                                >
+                            </div>
                         </div>
-                        
-                        <div class="hero-cta">
-                            <a href="#cta-main" class="btn btn-premium btn-lg me-3">
-                                <i class="fas fa-rocket me-2"></i>
-                                지금 바로 시작하기
-                            </a>
-                            <a href="#courses" class="btn btn-outline-light btn-lg">
-                                <i class="fas fa-play me-2"></i>
-                                무료 체험하기
-                            </a>
-                        </div>
-                        
-                        <div class="hero-guarantee mt-4">
-                            <i class="fas fa-shield-alt text-success me-2"></i>
-                            <small>불만족 시 100% 환불 보장 · 무료 1:1 상담 포함</small>
+                    </div>
+
+                    <div
+                        class="col-lg-6"
+                        data-aos="fade-left"
+                        data-aos-duration="1000"
+                        data-aos-delay="200"
+                    >
+                        <div class="text-center">
+                            <img
+                                src="attached_assets/제목 추가_upscayl_4x_upscayl-standard-4x_1751101180619.png"
+                                alt="MCSELLER 검증된 수익화 전문가"
+                                class="character-image"
+                                style="max-width: 400px; height: auto; border-radius: 20px; box-shadow: 0 8px 40px rgba(0,0,0,0.16);"
+                            />
                         </div>
                     </div>
                 </div>
-                
-                <div class="col-lg-6" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
-                    <div class="hero-image">
-                        <div class="floating-elements">
-                            <div class="floating-card card-1">
-                                <i class="fas fa-chart-line"></i>
-                                <span>월 250만원 달성</span>
-                            </div>
-                            <div class="floating-card card-2">
-                                <i class="fas fa-coins"></i>
-                                <span>2주만에 150만원</span>
-                            </div>
-                            <div class="floating-card card-3">
-                                <i class="fas fa-trophy"></i>
-                                <span>성공률 90%</span>
-                            </div>
-                        </div>
-                        <img src="attached_assets/제목 추가_upscayl_4x_upscayl-standard-4x_1751079410109.png" 
-                             alt="MCSELLER 성공 사례" class="hero-main-image">
-                    </div>
-                </div>
             </div>
-        </div>
-        
-        <!-- Scroll Indicator -->
-        <div class="scroll-indicator">
-            <a href="#problem" class="scroll-link">
-                <i class="fas fa-chevron-down"></i>
-            </a>
-        </div>
-    </section>
+        </section>
 
-    <!-- Problem & Agitation Section -->
-    <section id="problem" class="problem-section py-5">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6" data-aos="fade-right">
-                    <div class="problem-content">
-                        <div class="section-badge mb-4">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <span>현실적인 문제들</span>
-                        </div>
-                        
-                        <h2 class="section-title mb-4">
-                            "온라인 사업 시작하면<br>
-                            <span class="text-danger">누구나 쉽게 돈 번다"</span>고 했지만<br>
-                            현실은 전혀 다릅니다
-                        </h2>
-                        
+        <!-- Problem Section -->
+        <section id="problem" class="problem-section py-5">
+            <div class="container">
+                <div class="problem-hero" data-aos="fade-up">
+                    <div class="section-badge">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>현실적인 문제들</span>
+                    </div>
+
+                    <h2 class="problem-title">
+                        <span class="text-danger"
+                            >"온라인 사업 시작하면 누구나 쉽게 돈 번다"</span
+                        ><br />
+                        했지만 현실은 전혀 다릅니다
+                    </h2>
+                </div>
+
+                <div class="row align-items-center">
+                    <div
+                        class="col-lg-8 mx-auto"
+                        data-aos="fade-up"
+                        data-aos-delay="200"
+                    >
                         <div class="problem-list">
                             <div class="problem-item">
                                 <div class="problem-icon">
                                     <i class="fas fa-times-circle"></i>
                                 </div>
                                 <div class="problem-text">
-                                    <h5>진입장벽 높고 노동량 많아서</h5>
-                                    <p>스마트스토어, 구매대행, 워드프레스... 시작조차 힘듭니다</p>
+                                    <h5>복잡한 시작과 높은 진입장벽</h5>
+                                    <p>
+                                        스마트스토어, 구매대행, 블로그... 배우는
+                                        데만 몇 달, 실제 수익까지는 더 오래
+                                        걸립니다
+                                    </p>
                                 </div>
                             </div>
-                            
+
                             <div class="problem-item">
                                 <div class="problem-icon">
                                     <i class="fas fa-times-circle"></i>
                                 </div>
                                 <div class="problem-text">
-                                    <h5>정보 과부하로 시간과 돈만 낭비</h5>
-                                    <p>잘못된 정보들 때문에 결과 없이 허비하는 경우가 너무 많습니다</p>
+                                    <h5>정보 과부하와 잘못된 교육</h5>
+                                    <p>
+                                        수백만원을 투자해도 실제로는 써먹을 수
+                                        없는 이론만 가득한 강의들
+                                    </p>
                                 </div>
                             </div>
-                            
+
                             <div class="problem-item">
                                 <div class="problem-icon">
                                     <i class="fas fa-times-circle"></i>
                                 </div>
                                 <div class="problem-text">
-                                    <h5>시행착오만 반복하다 포기</h5>
-                                    <p>이미 2,000만원 넘게 쓰고도 결과가 없는 사람들이 너무 많습니다</p>
+                                    <h5>끝없는 시행착오와 포기</h5>
+                                    <p>
+                                        혼자서 헤매다가 결국 "나는 온라인 사업이
+                                        안 맞나 봐" 하고 포기하게 됩니다
+                                    </p>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="warning-box mt-4">
+
+                        <div class="warning-box mt-5">
                             <i class="fas fa-exclamation-triangle me-2"></i>
-                            <strong>지금처럼 계속 헤매시면, 시간과 돈만 허비하다 결국 "나는 안되는구나" 하고 포기하게 됩니다.</strong>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-lg-6" data-aos="fade-left">
-                    <div class="problem-visual">
-                        <div class="chart-container">
-                            <canvas id="failureChart"></canvas>
-                        </div>
-                        <div class="problem-stats">
-                            <div class="stat-card">
-                                <h3>85%</h3>
-                                <p>온라인 사업 실패율</p>
-                            </div>
-                            <div class="stat-card">
-                                <h3>2,000만원</h3>
-                                <p>평균 교육비 손실</p>
-                            </div>
-                            <div class="stat-card">
-                                <h3>18개월</h3>
-                                <p>포기까지 걸리는 시간</p>
-                            </div>
+                            <strong
+                                >더 이상 시간과 돈을 낭비하지 마세요. 이미
+                                검증된 수익화 전략으로 확실하게
+                                시작하세요.</strong
+                            >
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Solution Section -->
-    <section id="solution" class="solution-section py-5">
-        <div class="container">
-            <div class="text-center mb-5" data-aos="fade-up">
-                <div class="section-badge mb-4">
-                    <i class="fas fa-lightbulb"></i>
-                    <span>MCSELLER 솔루션</span>
-                </div>
-                
-                <h2 class="section-title mb-4">
-                    MCSELLER가 <span class="text-gradient">"현실적으로 가장 빠르게<br>
-                    수익화 가능한"</span> 노하우를 제공합니다
-                </h2>
-                
-                <p class="section-subtitle">
-                    중고 플랫폼 활용 모델 등 초보자도 쉽게 따라할 수 있는 확실한 수익화 전략<br>
-                    단계별 난이도로 수익화를 체계화하여, 가장 쉬운 방법부터 고수익 모델까지 명확히 안내
-                </p>
-            </div>
-            
-            <div class="row g-4">
-                <!-- Solution Card 1 -->
-                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-                    <div class="solution-card">
-                        <div class="solution-icon">
-                            <i class="fas fa-rocket"></i>
-                        </div>
-                        <h4>초보자 맞춤 전략</h4>
-                        <p>중고 플랫폼 활용부터 시작하는 현실적인 수익화 모델로 누구나 쉽게 따라할 수 있습니다.</p>
-                        <ul class="solution-features">
-                            <li><i class="fas fa-check"></i> 진입장벽 최소화</li>
-                            <li><i class="fas fa-check"></i> 초기 투자 거의 불필요</li>
-                            <li><i class="fas fa-check"></i> 즉시 실행 가능</li>
-                        </ul>
+        <!-- Achievements Section -->
+        <section id="achievements" class="achievement-section py-5">
+            <div class="container">
+                <div class="text-center mb-5" data-aos="fade-up">
+                    <div class="section-badge">
+                        <i class="fas fa-trophy"></i>
+                        <span>검증된 실제 성과</span>
                     </div>
-                </div>
-                
-                <!-- Solution Card 2 -->
-                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
-                    <div class="solution-card">
-                        <div class="solution-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <h4>단계별 수익화 체계</h4>
-                        <p>가장 쉬운 방법부터 고수익 모델까지 명확한 로드맵으로 단계적으로 성장할 수 있습니다.</p>
-                        <ul class="solution-features">
-                            <li><i class="fas fa-check"></i> 1단계: 월 30만원</li>
-                            <li><i class="fas fa-check"></i> 2단계: 월 100만원</li>
-                            <li><i class="fas fa-check"></i> 3단계: 월 300만원+</li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <!-- Solution Card 3 -->
-                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
-                    <div class="solution-card">
-                        <div class="solution-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <h4>실패 확률 최소화</h4>
-                        <p>검증된 노하우와 1:1 멘토링으로 시행착오 없이 안전하게 수익화를 달성합니다.</p>
-                        <ul class="solution-features">
-                            <li><i class="fas fa-check"></i> 개인별 맞춤 전략</li>
-                            <li><i class="fas fa-check"></i> 실시간 피드백</li>
-                            <li><i class="fas fa-check"></i> 100% 환불 보장</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Benefits Section -->
-    <section id="benefits" class="benefits-section py-5">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6" data-aos="fade-right">
-                    <div class="benefits-visual">
-                        <div class="benefit-chart">
-                            <div class="chart-circle">
-                                <div class="chart-inner">
-                                    <h3>월 100만원+</h3>
-                                    <p>안정적 수익</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="benefit-cards">
-                            <div class="benefit-mini-card">
-                                <i class="fas fa-clock"></i>
-                                <span>하루 1-3시간</span>
-                            </div>
-                            <div class="benefit-mini-card">
-                                <i class="fas fa-calendar"></i>
-                                <span>2개월 내 수익</span>
-                            </div>
-                            <div class="benefit-mini-card">
-                                <i class="fas fa-trending-up"></i>
-                                <span>지속적 성장</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-lg-6" data-aos="fade-left">
-                    <div class="benefits-content">
-                        <div class="section-badge mb-4">
-                            <i class="fas fa-gift"></i>
-                            <span>핵심 혜택</span>
-                        </div>
-                        
-                        <h2 class="section-title mb-4">
-                            하루 단 1~3시간으로<br>
-                            <span class="text-gradient">월 100만원 이상의<br>
-                            안정적인 수익 파이프라인</span>을<br>
-                            만들 수 있습니다
-                        </h2>
-                        
-                        <div class="benefit-points">
-                            <div class="benefit-point">
-                                <div class="benefit-icon">
-                                    <i class="fas fa-percentage"></i>
-                                </div>
-                                <div class="benefit-text">
-                                    <h5>시작 2개월 내 90% 이상이 첫 수익 달성</h5>
-                                    <p>검증된 시스템으로 빠른 수익화 실현</p>
-                                </div>
-                            </div>
-                            
-                            <div class="benefit-point">
-                                <div class="benefit-icon">
-                                    <i class="fas fa-road"></i>
-                                </div>
-                                <div class="benefit-text">
-                                    <h5>경제적 자유로 나아가는 현실적인 로드맵</h5>
-                                    <p>명확한 단계별 가이드로 실패 확률 최소화</p>
-                                </div>
-                            </div>
-                            
-                            <div class="benefit-point">
-                                <div class="benefit-icon">
-                                    <i class="fas fa-infinity"></i>
-                                </div>
-                                <div class="benefit-text">
-                                    <h5>지속 가능한 수익 구조 구축</h5>
-                                    <p>한 번 배우면 평생 활용 가능한 핵심 스킬</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="cta-inline mt-4">
-                            <a href="#cta-main" class="btn btn-premium btn-lg">
-                                <i class="fas fa-arrow-right me-2"></i>
-                                지금 바로 시작하기
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+                    <h2 class="section-title">
+                        MCSELLER의
+                        <span class="text-gradient">실제 성과</span>로<br />
+                        검증된 수익화 노하우
+                    </h2>
 
-    <!-- Success Stories Section -->
-    <section id="success-stories" class="success-section py-5">
-        <div class="container">
-            <div class="text-center mb-5" data-aos="fade-up">
-                <div class="section-badge mb-4">
-                    <i class="fas fa-star"></i>
-                    <span>실제 성과</span>
+                    <p class="section-subtitle">
+                        말로만 하는 성공이 아닌, 실제 데이터로 검증된
+                        결과들입니다
+                    </p>
                 </div>
-                
-                <h2 class="section-title mb-4">
-                    실제 MCSELLER 수강생들의<br>
-                    <span class="text-gradient">생생한 성과</span>
-                </h2>
-                
-                <p class="section-subtitle">
-                    이론이 아닌 실제 결과로 증명된 MCSELLER의 노하우
-                </p>
-            </div>
-            
-            <div class="row g-4">
-                <!-- Success Story 1 -->
-                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-                    <div class="success-card">
-                        <div class="success-header">
-                            <div class="success-avatar">
-                                <i class="fas fa-user"></i>
+
+                <div class="row g-4">
+                    <div
+                        class="col-lg-3 col-md-6"
+                        data-aos="fade-up"
+                        data-aos-delay="100"
+                    >
+                        <div class="achievement-card">
+                            <div class="achievement-icon">
+                                <i class="fas fa-medal"></i>
                             </div>
-                            <div class="success-info">
-                                <h5>김** 님</h5>
-                                <span>초보자 · 직장인</span>
-                            </div>
-                            <div class="success-badge">
-                                <i class="fas fa-fire"></i>
+                            <div class="achievement-number">90%</div>
+                            <div class="achievement-label">
+                                2개월 내 수익화 성공률
                             </div>
                         </div>
-                        
-                        <div class="success-content">
+                    </div>
+
+                    <div
+                        class="col-lg-3 col-md-6"
+                        data-aos="fade-up"
+                        data-aos-delay="200"
+                    >
+                        <div class="achievement-card">
+                            <div class="achievement-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="achievement-number">5.0</div>
+                            <div class="achievement-label">
+                                프리랜서 마켓 평점<br />(200개 이상 후기)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="col-lg-3 col-md-6"
+                        data-aos="fade-up"
+                        data-aos-delay="300"
+                    >
+                        <div class="achievement-card">
+                            <div class="achievement-icon">
+                                <i class="fas fa-rocket"></i>
+                            </div>
+                            <div class="achievement-number">5,283%</div>
+                            <div class="achievement-label">
+                                와디즈 펀딩 달성률
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="col-lg-3 col-md-6"
+                        data-aos="fade-up"
+                        data-aos-delay="400"
+                    >
+                        <div class="achievement-card">
+                            <div class="achievement-icon">
+                                <i class="fas fa-won-sign"></i>
+                            </div>
+                            <div class="achievement-number">6천만원</div>
+                            <div class="achievement-label">6개월 누적 수익</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Success Stories Section -->
+        <section id="success-stories" class="success-section py-5">
+            <div class="container">
+                <div class="text-center mb-5" data-aos="fade-up">
+                    <div class="section-badge">
+                        <i class="fas fa-star"></i>
+                        <span>실제 수강생 성과</span>
+                    </div>
+
+                    <h2 class="section-title">
+                        실제 MCSELLER 수강생들의<br />
+                        <span class="text-gradient">생생한 성과</span>
+                    </h2>
+
+                    <p class="section-subtitle">
+                        K4 플랫폼과 프리랜서 마켓에서 검증된 실제 후기들입니다
+                    </p>
+                </div>
+
+                <div class="row g-4">
+                    <div
+                        class="col-lg-4"
+                        data-aos="fade-up"
+                        data-aos-delay="100"
+                    >
+                        <div class="success-card">
+                            <div class="success-header">
+                                <div class="success-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="success-info">
+                                    <h5>김**님</h5>
+                                    <span>레고리셀 수강생</span>
+                                </div>
+                            </div>
+
                             <div class="success-quote">
-                                "시작 2주 만에 150만원 돌파했습니다!"
+                                "첫 달에 42만원, 다음 달 160만원까지 갔어요!"
                             </div>
-                            
+
                             <div class="success-details">
                                 <div class="detail-item">
                                     <span class="label">시작 후</span>
-                                    <span class="value">2주</span>
+                                    <span class="value">1주일</span>
                                 </div>
                                 <div class="detail-item">
-                                    <span class="label">첫 수익</span>
-                                    <span class="value">150만원</span>
+                                    <span class="label">첫 달 수익</span>
+                                    <span class="value">42만원</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="label">2개월 수익</span>
+                                    <span class="value">160만원</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="label">성장률</span>
+                                    <span class="value">+281%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="col-lg-4"
+                        data-aos="fade-up"
+                        data-aos-delay="200"
+                    >
+                        <div class="success-card">
+                            <div class="success-header">
+                                <div class="success-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="success-info">
+                                    <h5>박**님</h5>
+                                    <span>명품리셀 수강생</span>
+                                </div>
+                            </div>
+
+                            <div class="success-quote">
+                                "컨설팅 시작하고 3분만에 3만원 수익 발생!"
+                            </div>
+
+                            <div class="success-details">
+                                <div class="detail-item">
+                                    <span class="label">컨설팅 후</span>
+                                    <span class="value">3분</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="label">즉시 수익</span>
+                                    <span class="value">3만원</span>
                                 </div>
                                 <div class="detail-item">
                                     <span class="label">현재 월수익</span>
                                     <span class="value">280만원</span>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Success Story 2 -->
-                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
-                    <div class="success-card">
-                        <div class="success-header">
-                            <div class="success-avatar">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="success-info">
-                                <h5>이** 님</h5>
-                                <span>회사원 · 부업</span>
-                            </div>
-                            <div class="success-badge">
-                                <i class="fas fa-crown"></i>
-                            </div>
-                        </div>
-                        
-                        <div class="success-content">
-                            <div class="success-quote">
-                                "월급 외 추가 수익 250만원이 꾸준히 나옵니다."
-                            </div>
-                            
-                            <div class="success-details">
                                 <div class="detail-item">
-                                    <span class="label">기존 월급</span>
-                                    <span class="value">320만원</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="label">추가 수익</span>
-                                    <span class="value">250만원</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="label">총 수입</span>
-                                    <span class="value">570만원</span>
+                                    <span class="label">만족도</span>
+                                    <span class="value">5.0★</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Success Story 3 -->
-                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
-                    <div class="success-card">
-                        <div class="success-header">
-                            <div class="success-avatar">
-                                <i class="fas fa-user"></i>
+
+                    <div
+                        class="col-lg-4"
+                        data-aos="fade-up"
+                        data-aos-delay="300"
+                    >
+                        <div class="success-card">
+                            <div class="success-header">
+                                <div class="success-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="success-info">
+                                    <h5>이**님</h5>
+                                    <span>전자책자동화 수강생</span>
+                                </div>
                             </div>
-                            <div class="success-info">
-                                <h5>박** 님</h5>
-                                <span>대학생 · 첫 수익화</span>
-                            </div>
-                            <div class="success-badge">
-                                <i class="fas fa-gem"></i>
-                            </div>
-                        </div>
-                        
-                        <div class="success-content">
+
                             <div class="success-quote">
-                                "처음 온라인 수익화가 가능한 걸 경험했어요."
+                                "정말 체계적이고 실행만 하면 실패할 확률이 1%도
+                                안 된다고 생각해요"
                             </div>
-                            
+
                             <div class="success-details">
                                 <div class="detail-item">
-                                    <span class="label">첫 수익까지</span>
-                                    <span class="value">3주</span>
+                                    <span class="label">학습 기간</span>
+                                    <span class="value">2주</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="label">첫 수익</span>
+                                    <span class="value">89만원</span>
                                 </div>
                                 <div class="detail-item">
                                     <span class="label">현재 월수익</span>
-                                    <span class="value">120만원</span>
+                                    <span class="value">350만원</span>
                                 </div>
                                 <div class="detail-item">
-                                    <span class="label">성장률</span>
-                                    <span class="value">+180%</span>
+                                    <span class="label">추천도</span>
+                                    <span class="value">100%</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Success Stats -->
-            <div class="success-stats mt-5" data-aos="fade-up">
-                <div class="row text-center">
-                    <div class="col-lg-3 col-md-6">
-                        <div class="stat-large">
-                            <h3 class="counter" data-target="2850">0</h3>
-                            <p>성공한 수강생</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="stat-large">
-                            <h3 class="counter" data-target="90">0</h3>
-                            <p>2개월 내 수익화 성공률 (%)</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="stat-large">
-                            <h3><span class="counter" data-target="156">0</span>만원</h3>
-                            <p>평균 첫 달 수익</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="stat-large">
-                            <h3 class="counter" data-target="4.9">0</h3>
-                            <p>수강생 만족도 (5점 만점)</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Courses Section -->
-    <section id="courses" class="courses-section py-5">
-        <div class="container">
-            <div class="text-center mb-5" data-aos="fade-up">
-                <div class="section-badge mb-4">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span>교육 과정</span>
-                </div>
-                
-                <h2 class="section-title mb-4">
-                    검증된 수익화 전략을<br>
-                    <span class="text-gradient">단계별로 마스터하세요</span>
-                </h2>
-            </div>
-            
-            <div class="row g-4" id="courses-container">
-                <!-- Courses will be loaded here dynamically -->
-            </div>
-        </div>
-    </section>
+        <!-- Courses Section -->
+        <section id="courses" class="courses-section py-5">
+            <div class="container">
+                <div class="text-center mb-5" data-aos="fade-up">
+                    <div class="section-badge">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>단계별 교육 과정</span>
+                    </div>
 
-    <!-- Pricing Section -->
-    <section id="pricing" class="pricing-section py-5">
-        <div class="container">
-            <div class="text-center mb-5" data-aos="fade-up">
-                <div class="section-badge mb-4">
-                    <i class="fas fa-tags"></i>
-                    <span>기회는 지금뿐입니다!</span>
-                </div>
-                
-                <h2 class="section-title mb-4">
-                    최초 100명 한정<br>
-                    <span class="text-danger">50% 특별 할인</span> 제공
-                </h2>
-                
-                <p class="section-subtitle">
-                    더 이상 시간과 돈 낭비하지 마시고, 빠르게 경제적 여유를 확보하세요
-                </p>
-            </div>
-            
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="pricing-card premium-card" data-aos="zoom-in">
-                        <div class="pricing-badge">
-                            <i class="fas fa-crown"></i>
-                            <span>BEST CHOICE</span>
-                        </div>
-                        
-                        <div class="pricing-header">
-                            <h3>MCSELLER 마스터 과정</h3>
-                            <p>현실적인 온라인 수익화 완전 정복</p>
-                            
-                            <div class="pricing-price">
-                                <span class="original-price">₩498,000</span>
-                                <span class="discounted-price">₩249,000</span>
-                                <span class="discount-badge">50% OFF</span>
-                            </div>
-                            
-                            <div class="pricing-timer">
-                                <i class="fas fa-clock me-2"></i>
-                                <span>특가 종료까지</span>
-                                <div class="timer" id="countdown-timer">
-                                    <span class="hours">23</span>:
-                                    <span class="minutes">59</span>:
-                                    <span class="seconds">59</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="pricing-features">
-                            <div class="feature-group">
-                                <h5><i class="fas fa-video"></i> 핵심 강의 콘텐츠</h5>
-                                <ul>
-                                    <li>중고 플랫폼 수익화 완전 정복 (5시간)</li>
-                                    <li>스마트스토어 최적화 전략 (3시간)</li>
-                                    <li>고수익 모델 단계별 구축법 (4시간)</li>
-                                    <li>실패 없는 마케팅 전략 (2시간)</li>
-                                </ul>
-                            </div>
-                            
-                            <div class="feature-group">
-                                <h5><i class="fas fa-users"></i> 개인 맞춤 서비스</h5>
-                                <ul>
-                                    <li>1:1 멘토링 세션 (월 2회, 6개월)</li>
-                                    <li>개인별 수익화 전략 수립</li>
-                                    <li>실시간 Q&A 지원</li>
-                                    <li>전용 커뮤니티 평생 이용</li>
-                                </ul>
-                            </div>
-                            
-                            <div class="feature-group">
-                                <h5><i class="fas fa-gift"></i> 특별 보너스</h5>
-                                <ul>
-                                    <li>수익화 체크리스트 (₩50,000 상당)</li>
-                                    <li>템플릿 & 도구 패키지 (₩80,000 상당)</li>
-                                    <li>성공 사례 분석 리포트</li>
-                                    <li>평생 업데이트 무료 제공</li>
-                                </ul>
-                            </div>
-                        </div>
-                        
-                        <div class="pricing-guarantee">
-                            <div class="guarantee-box">
-                                <i class="fas fa-shield-alt"></i>
-                                <div>
-                                    <h6>100% 환불 보장</h6>
-                                    <p>60일 내 만족하지 않으시면 전액 환불해드립니다</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="pricing-cta">
-                            <a href="#cta-main" class="btn btn-premium btn-lg w-100 mb-3">
-                                <i class="fas fa-rocket me-2"></i>
-                                지금 바로 시작하기
-                            </a>
-                            <p class="cta-note">
-                                <i class="fas fa-users me-1"></i>
-                                <strong>73명</strong>이 이미 신청했습니다 · 
-                                <span class="text-danger">27자리</span> 남음
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+                    <h2 class="section-title">
+                        검증된 수익화 전략을<br />
+                        <span class="text-gradient">단계별로 마스터하세요</span>
+                    </h2>
 
-    <!-- CTA Section -->
-    <section id="cta-main" class="cta-section py-5">
-        <div class="cta-background"></div>
-        <div class="container">
-            <div class="row justify-content-center text-center">
-                <div class="col-lg-8" data-aos="zoom-in">
-                    <div class="cta-content">
-                        <h2 class="cta-title mb-4">
-                            지금 바로 클릭하고,<br>
-                            <span class="text-gradient">현실적인 온라인 수익화를 시작하세요!</span>
-                        </h2>
-                        
-                        <p class="cta-subtitle mb-5">
-                            지금 시작하지 않으면, 다시 기회를 잡을 수 없을지도 모릅니다.<br>
-                            불만족 시 <strong>"100% 환불 보장"</strong>으로 부담 없이 경험해보세요.
-                        </p>
-                        
-                        <div class="cta-buttons">
-                            <a href="auth.html?action=signup" class="btn btn-premium btn-xl me-3">
-                                <i class="fas fa-rocket me-2"></i>
-                                지금 즉시 시작하기
-                            </a>
-                            <a href="#pricing" class="btn btn-outline-light btn-xl">
-                                <i class="fas fa-info-circle me-2"></i>
-                                더 자세히 보기
-                            </a>
-                        </div>
-                        
-                        <div class="cta-features mt-4">
-                            <div class="row text-center">
-                                <div class="col-md-4">
-                                    <i class="fas fa-clock mb-2"></i>
-                                    <small>하루 1-3시간만</small>
-                                </div>
-                                <div class="col-md-4">
-                                    <i class="fas fa-shield-alt mb-2"></i>
-                                    <small>100% 환불 보장</small>
-                                </div>
-                                <div class="col-md-4">
-                                    <i class="fas fa-users mb-2"></i>
-                                    <small>2,850+ 성공 사례</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section id="faq" class="faq-section py-5">
-        <div class="container">
-            <div class="text-center mb-5" data-aos="fade-up">
-                <div class="section-badge mb-4">
-                    <i class="fas fa-question-circle"></i>
-                    <span>자주 묻는 질문</span>
-                </div>
-                
-                <h2 class="section-title mb-4">
-                    궁금한 것들을<br>
-                    <span class="text-gradient">미리 해결해드려요</span>
-                </h2>
-            </div>
-            
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="accordion modern-accordion" id="faqAccordion">
-                        <!-- FAQ items will be loaded here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="modern-footer py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4">
-                    <div class="footer-brand">
-                        <img src="attached_assets/c55eb7e7b16af_upscayl_4x_upscayl-standard-4x_1751079408122.png" 
-                             alt="MCSELLER" class="footer-logo mb-3">
-                        <p class="footer-description">
-                            현실적으로 가장 빠르게 수익화 가능한 온라인 교육 플랫폼.<br>
-                            하루 1-3시간으로 월 100만원 이상 안정적 수익 달성을 지원합니다.
-                        </p>
-                        <div class="footer-guarantee">
-                            <i class="fas fa-shield-alt me-2"></i>
-                            <strong>100% 환불 보장</strong>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-lg-2 col-md-6 mb-4">
-                    <h6 class="footer-title">교육 과정</h6>
-                    <ul class="footer-links">
-                        <li><a href="#courses">수익화 기초</a></li>
-                        <li><a href="#courses">중급 전략</a></li>
-                        <li><a href="#courses">고급 마스터</a></li>
-                        <li><a href="#success-stories">성공 사례</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-2 col-md-6 mb-4">
-                    <h6 class="footer-title">지원</h6>
-                    <ul class="footer-links">
-                        <li><a href="#faq">자주 묻는 질문</a></li>
-                        <li><a href="#" data-bs-toggle="modal" data-bs-target="#contactModal">1:1 상담</a></li>
-                        <li><a href="#pricing">환불 정책</a></li>
-                        <li><a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">이용약관</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-4 mb-4">
-                    <h6 class="footer-title">무료 상담 신청</h6>
-                    <p class="mb-3">궁금한 점이 있으시면 언제든 연락주세요.</p>
-                    <div class="contact-info">
-                        <div class="contact-item">
-                            <i class="fas fa-envelope"></i>
-                            <span>support@mcseller.co.kr</span>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-phone"></i>
-                            <span>1588-9999</span>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-clock"></i>
-                            <span>평일 09:00-18:00</span>
-                        </div>
-                    </div>
-                    <div class="social-links mt-3">
-                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="social-link"><i class="fas fa-comment"></i></a>
-                    </div>
-                </div>
-            </div>
-            
-            <hr class="footer-divider">
-            
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <p class="footer-copyright">
-                        &copy; 2025 MCSELLER. All rights reserved.
+                    <p class="section-subtitle">
+                        초보자도 쉽게 따라할 수 있도록 난이도별로 체계화된
+                        커리큘럼
                     </p>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <div class="footer-badges">
+
+                <div class="row g-4">
+                    <!-- 초급 과정: 레고리셀 -->
+                    <div
+                        class="col-lg-6"
+                        data-aos="fade-up"
+                        data-aos-delay="100"
+                    >
+                        <div class="course-card">
+                            <div class="course-level">★☆☆☆☆ 초급</div>
+                            <h3 class="course-title">
+                                휴대폰 1개로 시작하는 레고리셀 치트키
+                            </h3>
+                            <p class="course-description">
+                                완전 초보자도 1일 만에 수익 창출! 가장 쉽고
+                                안전한 중고거래로 시작하는 첫 번째 수익화 전략
+                            </p>
+
+                            <div class="course-investment">
+                                <h6>
+                                    <i class="fas fa-coins me-2"></i>초기 투자비
+                                </h6>
+                                <p>
+                                    100만원 내외 (개인별 상황에 따라 조정 가능)
+                                </p>
+                            </div>
+
+                            <div class="course-price">79,000원부터</div>
+
+                            <ul class="course-features">
+                                <li>
+                                    <i class="fas fa-check"></i> 107페이지 완전
+                                    실전 가이드
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 휴대폰만으로
+                                    바로 시작
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 평균 13일 내
+                                    수익화
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 비밀컬럼 +
+                                    매출관리 프로그램
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 1:1 온라인
+                                    컨설팅 (프리미엄)
+                                </li>
+                            </ul>
+
+                            <button
+                                class="btn btn-premium w-100"
+                                onclick="openCourseLanding('lego')"
+                            >
+                                <i class="fas fa-shopping-cart me-2"></i
+                                >상세보기 & 수강신청
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 중급 과정: 명품리셀 -->
+                    <div
+                        class="col-lg-6"
+                        data-aos="fade-up"
+                        data-aos-delay="200"
+                    >
+                        <div class="course-card">
+                            <div class="course-level">★★★☆☆ 중급</div>
+                            <h3 class="course-title">
+                                1일만에 돌파하는 중고명품 창업사업
+                            </h3>
+                            <p class="course-description">
+                                리셀의 정석! 120페이지 실전 압축서로 월 수익
+                                200만원 이상을 목표로 하는 체계적인 명품리셀
+                                전략
+                            </p>
+
+                            <div class="course-investment">
+                                <h6>
+                                    <i class="fas fa-coins me-2"></i>초기 투자비
+                                </h6>
+                                <p>
+                                    레고리셀보다 다소 필요 (개별 상담을 통해
+                                    안내)
+                                </p>
+                            </div>
+
+                            <div class="course-price">99,000원부터</div>
+
+                            <ul class="course-features">
+                                <li>
+                                    <i class="fas fa-check"></i> 120페이지
+                                    리셀의 정석 완전판
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 12가지 카테고리
+                                    간편 분석법
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 당근마켓
+                                    최신로직 치트키
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 명품키워드 자료
+                                    + 자동화 템플릿
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 실시간 온라인
+                                    컨설팅 (약 2-3시간)
+                                </li>
+                            </ul>
+
+                            <button
+                                class="btn btn-premium w-100"
+                                onclick="openCourseLanding('luxury')"
+                            >
+                                <i class="fas fa-shopping-cart me-2"></i
+                                >상세보기 & 수강신청
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 고급 과정: 전자책 자동화 1탄 -->
+                    <div
+                        class="col-lg-6"
+                        data-aos="fade-up"
+                        data-aos-delay="300"
+                    >
+                        <div class="course-card">
+                            <div class="course-level">★★★★☆ 고급</div>
+                            <h3 class="course-title">
+                                시 캐릭터로 월 1200만원 전자책 자동화 1탄
+                            </h3>
+                            <p class="course-description">
+                                얼굴 노출 없이 블로그 중심의 전자책 자동화 수익!
+                                하루 30분 투자로 월 200-500만원 목표 달성
+                            </p>
+
+                            <div class="course-investment">
+                                <h6>
+                                    <i class="fas fa-coins me-2"></i>목표 수익
+                                </h6>
+                                <p>월 200만원 ~ 500만원</p>
+                            </div>
+
+                            <div class="course-price">
+                                99,000원 (슈퍼얼리버드)
+                            </div>
+
+                            <ul class="course-features">
+                                <li>
+                                    <i class="fas fa-check"></i> 전자책 자동화
+                                    마스터 강의 (40만원 상당)
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 소비자 심리해킹
+                                    전자책 (20만원 상당)
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 마케팅 자동화
+                                    프로그램 (70만원 상당)
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 브랜딩블로그
+                                    제작법 (20만원 상당)
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 1:1 QA 게시판
+                                    (50만원 상당)
+                                </li>
+                            </ul>
+
+                            <button
+                                class="btn btn-premium w-100"
+                                onclick="openCourseLanding('ebook1')"
+                            >
+                                <i class="fas fa-shopping-cart me-2"></i
+                                >상세보기 & 수강신청
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 최상급 과정: 전자책 자동화 2탄 -->
+                    <div
+                        class="col-lg-6"
+                        data-aos="fade-up"
+                        data-aos-delay="400"
+                    >
+                        <div class="course-card">
+                            <div class="course-level">★★★★★ 최상급</div>
+                            <h3 class="course-title">
+                                전자책 자동화 마스터 2탄 (1탄 수강생 전용)
+                            </h3>
+                            <p class="course-description">
+                                자사몰 구축 + 퍼포먼스 광고까지! 월 1200만원을
+                                넘어 진정한 자동화 수익 시스템 완성
+                            </p>
+
+                            <div class="course-investment">
+                                <h6>
+                                    <i class="fas fa-coins me-2"></i>1탄 수강
+                                    필수
+                                </h6>
+                                <p>1탄 구매자만 특별 혜택가 제공 (개별 안내)</p>
+                            </div>
+
+                            <div class="course-price">
+                                1탄 구매자만 특가 제공
+                            </div>
+
+                            <ul class="course-features">
+                                <li>
+                                    <i class="fas fa-check"></i> 자사몰 전자책
+                                    판매 사이트 구축
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 퍼포먼스 광고
+                                    완전 정복
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 마케팅 자동화
+                                    프로그램 (영구버전)
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 픽셀 설치 완전
+                                    가이드
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i> 총 380만원 상당
+                                    자료 제공
+                                </li>
+                            </ul>
+
+                            <button
+                                class="btn btn-premium w-100"
+                                onclick="openCourseLanding('ebook2')"
+                            >
+                                <i class="fas fa-shopping-cart me-2"></i
+                                >상세보기 & 수강신청
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section
+            id="cta-main"
+            class="py-5"
+            style="
+                background: linear-gradient(135deg, #ff9900 0%, #ffe259 100%);
+            "
+        >
+            <div class="container">
+                <div class="row justify-content-center text-center">
+                    <div class="col-lg-8" data-aos="zoom-in">
+                        <h2 class="fw-bold mb-4" style="color: #111">
+                            더 이상 헤매지 마세요.<br />
+                            검증된 수익화 전략으로 시작하세요!
+                        </h2>
+
+                        <p class="mb-5" style="color: #333; font-size: 1.1rem">
+                            K4 플랫폼 1위, 와디즈 펀딩 5,283% 달성한 검증된
+                            노하우<br />
+                            60일 내 <strong>100% 환불 보장</strong>으로 부담
+                            없이 시작하세요
+                        </p>
+
+                        <div
+                            class="d-flex flex-wrap justify-content-center gap-3"
+                        >
+                            <a href="#courses" class="btn btn-dark btn-xl">
+                                <i class="fas fa-graduation-cap me-2"></i>강의
+                                선택하러 가기
+                            </a>
+                            <a
+                                href="#achievements"
+                                class="btn btn-outline-dark btn-xl"
+                            >
+                                <i class="fas fa-chart-line me-2"></i>성과 다시
+                                보기
+                            </a>
+                        </div>
+
+                        <div class="mt-4">
+                            <small style="color: #333">
+                                <i class="fas fa-users me-1"></i>
+                                이미 <strong>600명 이상</strong>이 MCSELLER와
+                                함께 수익화에 성공했습니다
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section id="faq" class="py-5">
+            <div class="container">
+                <div class="text-center mb-5" data-aos="fade-up">
+                    <div class="section-badge">
+                        <i class="fas fa-question-circle"></i>
+                        <span>자주 묻는 질문</span>
+                    </div>
+
+                    <h2 class="section-title">
+                        궁금한 것들을<br />
+                        <span class="text-gradient">미리 해결해드려요</span>
+                    </h2>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="accordion" id="faqAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#faq1"
+                                    >
+                                        정말 초보자도 할 수 있나요?
+                                    </button>
+                                </h2>
+                                <div
+                                    id="faq1"
+                                    class="accordion-collapse collapse show"
+                                    data-bs-parent="#faqAccordion"
+                                >
+                                    <div class="accordion-body">
+                                        네, 가능합니다. 실제로 휴대폰만으로 1일
+                                        만에 수익을 낸 완전 초보자들이 많습니다.
+                                        모든 과정이 스크린샷과 함께 단계별로
+                                        설명되어 있어서 따라하기만 하면 됩니다.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#faq2"
+                                    >
+                                        초기 투자금이 얼마나 필요한가요?
+                                    </button>
+                                </h2>
+                                <div
+                                    id="faq2"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#faqAccordion"
+                                >
+                                    <div class="accordion-body">
+                                        레고리셀의 경우 100만원 내외로 시작
+                                        가능하며, 개인 상황에 따라 조정할 수
+                                        있습니다. 명품리셀은 다소 더 필요하지만
+                                        개별 상담을 통해 맞춤 안내해드립니다.
+                                        전자책 자동화는 초기 투자비보다는 시간
+                                        투자가 중요합니다.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#faq3"
+                                    >
+                                        환불이 정말 가능한가요?
+                                    </button>
+                                </h2>
+                                <div
+                                    id="faq3"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#faqAccordion"
+                                >
+                                    <div class="accordion-body">
+                                        네, 60일 내 만족하지 않으시면 조건 없이
+                                        100% 전액 환불해드립니다. K4 플랫폼의
+                                        환불 정책을 따르며, 실제로 환불 요청하신
+                                        분들께 모두 처리해드렸습니다.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#faq4"
+                                    >
+                                        정말 평균 156만원 벌 수 있나요?
+                                    </button>
+                                </h2>
+                                <div
+                                    id="faq4"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#faqAccordion"
+                                >
+                                    <div class="accordion-body">
+                                        평균 156만원은 실제 수강생들의 첫 달
+                                        수익 평균입니다. 개인차는 있지만,
+                                        체계적으로 따라하신 분들은 대부분 첫
+                                        달부터 수익을 얻고 계십니다. 단, 개인의
+                                        노력과 상황에 따라 차이가 있을 수
+                                        있습니다.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#faq5"
+                                    >
+                                        어떤 과정부터 시작해야 할까요?
+                                    </button>
+                                </h2>
+                                <div
+                                    id="faq5"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#faqAccordion"
+                                >
+                                    <div class="accordion-body">
+                                        완전 초보자라면 레고리셀부터 시작하세요.
+                                        가장 쉽고 빠르게 수익을 경험할 수
+                                        있습니다. 어느 정도 온라인 거래 경험이
+                                        있다면 명품리셀로 바로 시작해도 됩니다.
+                                        전자책 자동화는 리셀 경험 후
+                                        추천드립니다.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="modern-footer py-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4 mb-4">
+                        <h6 class="footer-title">MCSELLER</h6>
+                        <p class="text-muted">
+                            K4 플랫폼 전자책 부문 1위, 와디즈 펀딩 5,283%
+                            달성<br />
+                            검증된 온라인 수익화 전문 교육 플랫폼입니다.
+                        </p>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-shield-alt text-success"></i>
+                            <strong>60일 내 100% 환불 보장</strong>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-6 mb-4">
+                        <h6 class="footer-title">교육 과정</h6>
+                        <ul class="footer-links">
+                            <li>
+                                <a href="javascript:openCourseLanding('lego')"
+                                    >레고리셀 (초급)</a
+                                >
+                            </li>
+                            <li>
+                                <a href="javascript:openCourseLanding('luxury')"
+                                    >명품리셀 (중급)</a
+                                >
+                            </li>
+                            <li>
+                                <a href="javascript:openCourseLanding('ebook1')"
+                                    >전자책자동화 1탄</a
+                                >
+                            </li>
+                            <li>
+                                <a href="javascript:openCourseLanding('ebook2')"
+                                    >전자책자동화 2탄</a
+                                >
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="col-lg-2 col-md-6 mb-4">
+                        <h6 class="footer-title">지원</h6>
+                        <ul class="footer-links">
+                            <li><a href="#faq">자주 묻는 질문</a></li>
+                            <li><a href="#cta-main">1:1 상담</a></li>
+                            <li><a href="#achievements">실제 성과</a></li>
+                            <li><a href="#">이용약관</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-lg-4 mb-4">
+                        <h6 class="footer-title">1:1 무료 상담</h6>
+                        <p class="text-muted mb-3">
+                            어떤 과정이 맞는지 궁금하시면 언제든 연락주세요.
+                        </p>
+                        <div class="contact-info">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="fas fa-phone"></i>
+                                <span>010-720-8322</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="fas fa-envelope"></i>
+                                <span>mcseller369@gmail.com</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas fa-clock"></i>
+                                <span>평일 9시-18시 (1시간 내 응답)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr style="border-color: rgba(255, 153, 0, 0.3)" />
+
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p class="mb-0 text-muted">
+                            &copy; 2025 MCSELLER. All rights reserved.
+                        </p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
                         <span class="badge bg-success me-2">
                             <i class="fas fa-shield-alt me-1"></i>SSL 보안
                         </span>
-                        <span class="badge bg-primary">
-                            <i class="fas fa-award me-1"></i>신뢰 플랫폼
+                        <span class="badge bg-warning text-dark">
+                            <i class="fas fa-star me-1"></i>5.0점 (200+ 후기)
                         </span>
                     </div>
                 </div>
             </div>
-        </div>
-    </footer>
+        </footer>
 
-    <!-- Contact Modal -->
-    <div class="modal fade" id="contactModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">무료 1:1 상담 신청</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="contactForm">
-                        <div class="mb-3">
-                            <label class="form-label">이름</label>
-                            <input type="text" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">연락처</label>
-                            <input type="tel" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">상담 희망 시간</label>
-                            <select class="form-select" required>
-                                <option value="">선택하세요</option>
-                                <option value="morning">오전 (9-12시)</option>
-                                <option value="afternoon">오후 (1-6시)</option>
-                                <option value="evening">저녁 (7-9시)</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">궁금한 점</label>
-                            <textarea class="form-control" rows="3" placeholder="어떤 것이 가장 궁금하신가요?"></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                    <button type="button" class="btn btn-premium">상담 신청하기</button>
-                </div>
-            </div>
+        <!-- Course Landing Pages (Hidden by default) -->
+        <div id="courseLandings" style="display: none">
+            <!-- 각 강의별 랜딩페이지가 여기에 동적으로 로드됩니다 -->
         </div>
-    </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <!-- Data Scripts -->
-    <script src="data/products.js"></script>
-    <script src="data/reviews-lecture.js"></script>
-    <script src="data/reviews-ebook.js"></script>
-    
-    <!-- Custom Scripts -->
-    <script src="js/config.js"></script>
-    <script src="js/supabase-client.js"></script>
-    <script src="js/modern-main.js"></script>
-    
-    <script>
-        // Initialize AOS
-        AOS.init({
-            duration: 1000,
-            once: true,
-            offset: 100
-        });
-        
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeModernPage();
-        });
-    </script>
-</body>
+        <!-- Scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+        <script>
+            // Initialize AOS
+            AOS.init({
+                duration: 1000,
+                once: true,
+                offset: 100,
+            });
+
+            // Course landing data
+            const courseLandings = {
+                lego: {
+                    title: "휴대폰 1개로 시작하는 레고리셀 치트키",
+                    subtitle:
+                        "완전 초보자도 1일 만에 수익 창출하는 가장 쉬운 시작",
+                    price: "79,000원부터",
+                    originalPrice: "190,000원",
+                    investment: "100만원 내외",
+                    features: [
+                        "107페이지 완전 실전 가이드북",
+                        "휴대폰만으로 바로 시작 가능",
+                        "평균 13일 내 첫 수익 달성",
+                        "비밀컬럼 열람권 + 매출관리 프로그램",
+                        "중고거래 매매계약서 템플릿",
+                        "실시간 업데이트 (평생 제공)",
+                        "1:1 온라인 컨설팅 (프리미엄 패키지)",
+                    ],
+                    reviews: [
+                        "정말 디테일하게 기술되어서 실행할 일만 남았어요!",
+                        "첫 달에 42만원, 다음 달 160만원까지 갔어요!",
+                        "이렇게까지 자세한 방법을 제시해주셔서 너무 감사해요",
+                        "컨설팅 시작하고 3분만에 3만원 수익 발생했습니다!",
+                    ],
+                    link: "https://kmong.com/gig/480461", // 실제 크몽 링크로 교체
+                },
+                luxury: {
+                    title: "1일만에 돌파하는 중고명품 창업사업",
+                    subtitle:
+                        "리셀의 정석! 월 200만원 이상을 목표로 하는 체계적인 명품리셀 전략",
+                    price: "99,000원부터",
+                    originalPrice: "290,000원",
+                    investment: "레고리셀보다 다소 필요 (개별 상담 안내)",
+                    features: [
+                        "120페이지 리셀의 정석 완전판",
+                        "12가지 카테고리 간편 분석법",
+                        "당근마켓 최신로직 치트키 완전 공개",
+                        "명품키워드 자료 + 자동화 매출관리 템플릿",
+                        "중고명품 VOD 강의 제공",
+                        "실시간 온라인 컨설팅 (약 2-3시간)",
+                        "1:1 개인별 맞춤 전략 수립",
+                    ],
+                    reviews: [
+                        "전자책에 선생님의 노하우가 쉽게 녹아있어서 바로 실행할 수 있는 점이 매력적이었습니다",
+                        "컨설팅 시작하고 3분만에 3만원 정도 수익이 발생했습니다!",
+                        "이런 강의는 처음 봤습니다. 실행만 하면 실패할 확률이 1%도 안 된다고 생각해요",
+                        "3시간 정도의 긴 컨설팅임에도 하나도 지치지 않으시고 계속 도움이 되는 이야기를 해주셔서 감사합니다",
+                    ],
+                    link: "https://kmong.com/gig/480462", // 실제 크몽 링크로 교체
+                },
+                ebook1: {
+                    title: "시 캐릭터로 월 1200만원 전자책 자동화 1탄",
+                    subtitle:
+                        "얼굴 노출 없이 블로그 중심의 전자책 자동화 수익 시스템",
+                    price: "99,000원 (슈퍼얼리버드)",
+                    originalPrice: "590,000원",
+                    investment: "목표 수익: 월 200만원 ~ 500만원",
+                    features: [
+                        "전자책 자동화 마스터 강의 (40만원 상당)",
+                        "소비자 심리해킹 전자책 (20만원 상당)",
+                        "마케팅 자동화 프로그램 영구버전 (70만원 상당)",
+                        "브랜딩블로그 제작법 (20만원 상당)",
+                        "맥셀러 협업 제안권 (100만원 상당)",
+                        "VIP 단톡방 이용권 (30만원 상당)",
+                        "1:1 QA 게시판 지원 (50만원 상당)",
+                    ],
+                    reviews: [
+                        "이 가격에 마케팅 자동화 프로그램까지 드리는 강의는 단언컨대 최초입니다",
+                        "강의 시장의 심각한 문제점들을 완벽하게 해결해주는 강의예요",
+                        "구체적인 방법과 확신이 있어 보여서 믿고 따라할 수 있었어요",
+                        "세세한 방법까지 무료강의에서도 알려주셔서 넘 감사합니다!",
+                    ],
+                    note: "2탄 진행을 위해서는 1탄 수강이 필수입니다",
+                    link: "https://kmong.com/gig/480463", // 실제 크몽 링크로 교체
+                },
+                ebook2: {
+                    title: "전자책 자동화 마스터 2탄",
+                    subtitle:
+                        "자사몰 구축 + 퍼포먼스 광고로 진정한 자동화 수익 시스템 완성",
+                    price: "1탄 구매자만 특별가 제공",
+                    originalPrice: "별도 공개",
+                    investment: "1탄 수강 필수 조건",
+                    features: [
+                        "전자책 자동화 마스터 강의 2탄 (80만원 상당)",
+                        "나만의 마케팅 프로그램 만들기 (100만원 상당)",
+                        "자사몰 전자책 판매 사이트 생성법 (30만원 상당)",
+                        "픽셀 설치 완전 가이드 (50만원 상당)",
+                        "1.5배~3배 수익폭등 퍼포먼스광고 (50만원 상당)",
+                        "상세페이지 애니메이션 기능 추가",
+                        "총 380만원 상당의 자료 제공",
+                    ],
+                    reviews: [
+                        "4개월간 6천만원 벌어들이는 진정한 디지털노마드로 성장했어요",
+                        "자동화 수익 X 3배 더 강력해진 고수익 비밀을 알게 되었습니다",
+                        "이 가격에 다시 보시기 힘드실 거예요. 정말 마지막 기회같아요",
+                        "7월 15일-20일 사이 자료 발송되는데 정말 기대됩니다",
+                    ],
+                    note: "1탄을 보시지 않으신 분은 2탄 내용을 절대 이해하실 수 없습니다. 반드시 1탄부터 시작해주세요.",
+                    link: "https://kmong.com/gig/480464", // 실제 크몽 링크로 교체
+                },
+            };
+
+            // Open course landing page
+            function openCourseLanding(courseId) {
+                const course = courseLandings[courseId];
+                if (!course) return;
+
+                // Create landing page content
+                const landingHTML = `
+                <div class="landing-page" id="landing-${courseId}">
+                    <div class="landing-nav">
+                        <div class="container">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 60'><rect width='200' height='60' fill='%23ff9900'/><text x='100' y='35' text-anchor='middle' dy='0.35em' font-size='24' fill='%23111' font-weight='bold'>MCSELLER</text></svg>" alt="MCSELLER" style="height:35px" class="me-2" />
+                                    <span class="trust-badge">K4 플랫폼 1위</span>
+                                </div>
+                                <button class="btn btn-outline-light btn-sm" onclick="closeLanding()">
+                                    <i class="fas fa-times me-2"></i>돌아가기
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8">
+                                <!-- Header -->
+                                <div class="product-header">
+                                    <div class="product-level-badge">${courseId === "lego" ? "★☆☆☆☆ 초급" : courseId === "luxury" ? "★★★☆☆ 중급" : courseId === "ebook1" ? "★★★★☆ 고급" : "★★★★★ 최상급"}</div>
+                                    <h1 class="product-title">${course.title}</h1>
+                                    <p class="product-subtitle">${course.subtitle}</p>
+                                </div>
+
+                                <!-- Price Section -->
+                                <div class="product-price-section">
+                                    <div class="price-comparison">
+                                        ${course.originalPrice ? `<span class="old-price">${course.originalPrice}</span>` : ""}
+                                        <span class="new-price">${course.price}</span>
+                                        ${course.originalPrice ? '<span class="save-amount">특별가</span>' : ""}
+                                    </div>
+                                    <div class="course-investment mb-4">
+                                        <h6><i class="fas fa-info-circle me-2"></i>필요 조건</h6>
+                                        <p>${course.investment}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Features & Reviews -->
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <h5 class="text-white mb-3"><i class="fas fa-check-circle text-success me-2"></i>포함 내용</h5>
+                                        <ul class="list-unstyled">
+                                            ${course.features
+                                                .map(
+                                                    (feature) => `
+                                                <li class="mb-2">
+                                                    <i class="fas fa-arrow-right text-warning me-2"></i>
+                                                    <span class="text-light">${feature}</span>
+                                                </li>
+                                            `,
+                                                )
+                                                .join("")}
+                                        </ul>
+                                        ${
+                                            course.note
+                                                ? `
+                                            <div class="warning-box mt-4">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                <strong>${course.note}</strong>
+                                            </div>
+                                        `
+                                                : ""
+                                        }
+                                    </div>
+                                    
+                                    <div class="col-md-5">
+                                        <h5 class="text-white mb-3"><i class="fas fa-star text-warning me-2"></i>실제 수강생 후기</h5>
+                                        <div class="review-carousel">
+                                            ${course.reviews
+                                                .map(
+                                                    (review) => `
+                                                <div class="review-item">
+                                                    <div class="review-text">"${review}"</div>
+                                                    <div class="review-author">- 실제 수강생</div>
+                                                </div>
+                                            `,
+                                                )
+                                                .join("")}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Guarantee -->
+                                <div class="guarantee-box">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <div>
+                                        <h6>60일 내 100% 환불 보장</h6>
+                                        <p>만족하지 않으시면 조건 없이 전액 환불해드립니다</p>
+                                    </div>
+                                </div>
+
+                                <!-- CTA -->
+                                <div class="text-center mt-4">
+                                    <a href="${course.link}" target="_blank" class="btn btn-premium btn-lg mb-3" style="width: 100%; max-width: 400px;">
+                                        <i class="fas fa-shopping-cart me-2"></i>K4에서 지금 바로 구매하기
+                                    </a>
+                                    <p class="text-muted small">
+                                        <i class="fas fa-external-link-alt me-1"></i>
+                                        안전한 K4 플랫폼으로 이동합니다
+                                    </p>
+                                </div>
+
+                                <!-- Cross-sell -->
+                                <div class="text-center mt-4">
+                                    <small class="text-muted">다른 강의도 궁금하다면?</small><br>
+                                    <div class="mt-2">
+                                        ${courseId !== "lego" ? '<button class="btn btn-outline-light btn-sm me-2 mb-2" onclick="openCourseLanding(\'lego\')">레고리셀 (초급) 보기</button>' : ""}
+                                        ${courseId !== "luxury" ? '<button class="btn btn-outline-light btn-sm me-2 mb-2" onclick="openCourseLanding(\'luxury\')">명품리셀 (중급) 보기</button>' : ""}
+                                        ${courseId !== "ebook1" ? '<button class="btn btn-outline-light btn-sm me-2 mb-2" onclick="openCourseLanding(\'ebook1\')">전자책자동화 1탄 보기</button>' : ""}
+                                        ${courseId !== "ebook2" ? '<button class="btn btn-outline-light btn-sm mb-2" onclick="openCourseLanding(\'ebook2\')">전자책자동화 2탄 보기</button>' : ""}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+                // Show landing page
+                document.getElementById("courseLandings").innerHTML =
+                    landingHTML;
+                document.getElementById("courseLandings").style.display =
+                    "block";
+                document.body.style.overflow = "hidden";
+
+                // Scroll to top
+                window.scrollTo(0, 0);
+            }
+
+            // Close landing page
+            function closeLanding() {
+                document.getElementById("courseLandings").style.display =
+                    "none";
+                document.body.style.overflow = "auto";
+            }
+
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+                anchor.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(
+                        this.getAttribute("href"),
+                    );
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                        });
+                    }
+                });
+            });
+
+            // 24-hour repeating countdown timer
+            function updateCountdown() {
+                const now = new Date();
+                const endOfDay = new Date(now);
+                endOfDay.setHours(23, 59, 59, 999);
+
+                const timeLeft = endOfDay.getTime() - now.getTime();
+
+                const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+                const minutes = Math.floor(
+                    (timeLeft % (1000 * 60 * 60)) / (1000 * 60),
+                );
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                // Update timer displays if they exist
+                const timerElements = document.querySelectorAll(".timer");
+                timerElements.forEach((timer) => {
+                    timer.innerHTML = `
+                    <span class="hours">${hours.toString().padStart(2, "0")}</span>:
+                    <span class="minutes">${minutes.toString().padStart(2, "0")}</span>:
+                    <span class="seconds">${seconds.toString().padStart(2, "0")}</span>
+                `;
+                });
+            }
+
+            // Update countdown every second
+            setInterval(updateCountdown, 1000);
+            updateCountdown(); // Initial call
+
+            // Initialize page
+            document.addEventListener("DOMContentLoaded", function () {
+                console.log("MCSELLER 페이지가 로드되었습니다.");
+
+                // Close landing on Escape key
+                document.addEventListener("keydown", function (e) {
+                    if (e.key === "Escape") {
+                        closeLanding();
+                    }
+                });
+            });
+        </script>
+    </body>
 </html>

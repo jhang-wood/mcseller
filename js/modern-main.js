@@ -258,7 +258,7 @@ class ModernPlatform {
                             <span class="discount-percent">${Math.round((1 - course.price/course.originalPrice) * 100)}% OFF</span>
                         </div>
                         
-                        <a href="product-detail.html?id=${course.id}" class="btn btn-premium w-100">
+                        <a href="register.html" class="btn btn-premium w-100">
                             <i class="fas fa-play me-2"></i>수강 신청하기
                         </a>
                     </div>
