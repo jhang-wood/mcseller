@@ -1568,7 +1568,7 @@
                         </div>
                         
                         <!-- 로그인 버튼 (로그아웃 상태) -->
-                        <div id="login-info" class="d-flex gap-2">
+                        <div id="login-info" class="d-flex gap-2" style="display: none;">
                             <a href="auth.html" class="btn btn-outline-light btn-sm">
                                 <i class="fas fa-sign-in-alt me-1"></i>로그인
                             </a>
@@ -2923,6 +2923,7 @@
                     // 로그인된 상태
                     if (userInfo) {
                         userInfo.style.display = 'block';
+                        userInfo.style.visibility = 'visible';
                         
                         if (userTypeIndicator && userPageLink) {
                             if (user.isAdmin) {
@@ -2936,10 +2937,19 @@
                             }
                         }
                     }
+                    if (loginInfo) {
+                        loginInfo.style.display = 'none';
+                        loginInfo.style.visibility = 'hidden';
+                    }
                 } else {
                     // 로그아웃된 상태
+                    if (userInfo) {
+                        userInfo.style.display = 'none';
+                        userInfo.style.visibility = 'hidden';
+                    }
                     if (loginInfo) {
                         loginInfo.style.display = 'flex';
+                        loginInfo.style.visibility = 'visible';
                     }
                 }
             }

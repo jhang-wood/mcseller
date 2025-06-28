@@ -123,6 +123,9 @@ async function loadSectionData(sectionName) {
         case 'reviews':
             await loadReviewsGrid();
             break;
+        case 'contents':
+            await loadContentsData();
+            break;
         case 'analytics':
             await loadAnalyticsData();
             break;
@@ -848,6 +851,273 @@ document.addEventListener('DOMContentLoaded', function() {
     // CSV 파일 가져오기
     document.getElementById('importCsv')?.addEventListener('click', importProductsCSV);
 });
+
+// ===== 콘텐츠 관리 함수들 =====
+
+// 콘텐츠 관리 로드
+async function loadContentsData() {
+    await loadEbooksList();
+    await loadCoursesList();
+}
+
+// 전자책 목록 로드
+async function loadEbooksList() {
+    const container = document.getElementById('ebooks-list');
+    if (!container) return;
+
+    // 테스트용 전자책 데이터 (실제로는 DB에서 가져옴)
+    const ebooks = [
+        {
+            id: 'ebook1',
+            title: '온라인 수익화 전략서 1탄',
+            chapters: 3,
+            status: 'active',
+            created: '2025-06-28'
+        },
+        {
+            id: 'ebook2',
+            title: '실전 수익화 가이드북 2탄',
+            chapters: 2,
+            status: 'active',
+            created: '2025-06-28'
+        }
+    ];
+
+    container.innerHTML = ebooks.map(ebook => `
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h5 class="card-title">${ebook.title}</h5>
+                        <p class="card-text text-muted">
+                            <i class="fas fa-file-alt me-2"></i>${ebook.chapters}개 챕터
+                            <span class="mx-2">•</span>
+                            <span class="badge bg-${ebook.status === 'active' ? 'success' : 'secondary'}">${ebook.status === 'active' ? '활성' : '비활성'}</span>
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <button class="btn btn-outline-primary btn-sm me-2" onclick="editEbook('${ebook.id}')">
+                            <i class="fas fa-edit"></i> 편집
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="manageEbookChapters('${ebook.id}')">
+                            <i class="fas fa-list"></i> 챕터 관리
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// 강의 목록 로드
+async function loadCoursesList() {
+    const container = document.getElementById('courses-list');
+    if (!container) return;
+
+    // 테스트용 강의 데이터
+    const courses = [
+        {
+            id: 'ai-master',
+            title: 'AI 마스터 실전 과정',
+            lessons: 4,
+            duration: '2시간 30분',
+            status: 'active',
+            created: '2025-06-28'
+        }
+    ];
+
+    container.innerHTML = courses.map(course => `
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h5 class="card-title">${course.title}</h5>
+                        <p class="card-text text-muted">
+                            <i class="fas fa-play-circle me-2"></i>${course.lessons}개 강의
+                            <span class="mx-2">•</span>
+                            <i class="fas fa-clock me-1"></i>${course.duration}
+                            <span class="mx-2">•</span>
+                            <span class="badge bg-${course.status === 'active' ? 'success' : 'secondary'}">${course.status === 'active' ? '활성' : '비활성'}</span>
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <button class="btn btn-outline-primary btn-sm me-2" onclick="editCourse('${course.id}')">
+                            <i class="fas fa-edit"></i> 편집
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="manageLessons('${course.id}')">
+                            <i class="fas fa-list"></i> 강의 관리
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// 새 전자책 추가
+function addEbook() {
+    const title = prompt('전자책 제목을 입력하세요:');
+    if (!title) return;
+
+    const ebookId = 'ebook' + Date.now();
+    
+    // 여기서 실제로는 DB에 저장
+    alert(`전자책 "${title}"이 추가되었습니다.\nID: ${ebookId}`);
+    loadEbooksList();
+}
+
+// 새 강의 추가
+function addCourse() {
+    const title = prompt('강의 제목을 입력하세요:');
+    if (!title) return;
+
+    const courseId = 'course' + Date.now();
+    
+    // 여기서 실제로는 DB에 저장
+    alert(`강의 "${title}"이 추가되었습니다.\nID: ${courseId}`);
+    loadCoursesList();
+}
+
+// 전자책 편집
+function editEbook(ebookId) {
+    // 전자책 편집 모달을 여는 함수
+    showEbookEditModal(ebookId);
+}
+
+// 강의 편집
+function editCourse(courseId) {
+    // 강의 편집 모달을 여는 함수
+    showCourseEditModal(courseId);
+}
+
+// 전자책 챕터 관리
+function manageEbookChapters(ebookId) {
+    // 챕터 관리 모달을 여는 함수
+    showChapterManageModal(ebookId);
+}
+
+// 강의 레슨 관리
+function manageLessons(courseId) {
+    // 레슨 관리 모달을 여는 함수
+    showLessonManageModal(courseId);
+}
+
+// 전자책 편집 모달 표시
+function showEbookEditModal(ebookId) {
+    const modalHtml = `
+        <div class="modal fade" id="ebookEditModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">전자책 편집</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="ebookEditForm">
+                            <div class="mb-3">
+                                <label class="form-label">제목</label>
+                                <input type="text" class="form-control" id="ebookTitle" value="온라인 수익화 전략서 1탁">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">설명</label>
+                                <textarea class="form-control" id="ebookDescription" rows="3">전자책 설명을 입력하세요</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">상태</label>
+                                <select class="form-select" id="ebookStatus">
+                                    <option value="active">활성</option>
+                                    <option value="inactive">비활성</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-primary" onclick="saveEbookChanges('${ebookId}')">저장</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // 기존 모달 제거 후 새로 추가
+    document.getElementById('ebookEditModal')?.remove();
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    const modal = new bootstrap.Modal(document.getElementById('ebookEditModal'));
+    modal.show();
+}
+
+// 강의 편집 모달 표시
+function showCourseEditModal(courseId) {
+    const modalHtml = `
+        <div class="modal fade" id="courseEditModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">강의 편집</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="courseEditForm">
+                            <div class="mb-3">
+                                <label class="form-label">강의 제목</label>
+                                <input type="text" class="form-control" id="courseTitle" value="AI 마스터 실전 과정">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">강의 설명</label>
+                                <textarea class="form-control" id="courseDescription" rows="3">강의 설명을 입력하세요</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">상태</label>
+                                <select class="form-select" id="courseStatus">
+                                    <option value="active">활성</option>
+                                    <option value="inactive">비활성</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-primary" onclick="saveCourseChanges('${courseId}')">저장</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('courseEditModal')?.remove();
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    const modal = new bootstrap.Modal(document.getElementById('courseEditModal'));
+    modal.show();
+}
+
+// 전자책 변경사항 저장
+function saveEbookChanges(ebookId) {
+    const title = document.getElementById('ebookTitle').value;
+    const description = document.getElementById('ebookDescription').value;
+    const status = document.getElementById('ebookStatus').value;
+    
+    // 여기서 실제로는 DB에 저장
+    alert(`전자책이 업데이트되었습니다:\n제목: ${title}\n상태: ${status}`);
+    
+    bootstrap.Modal.getInstance(document.getElementById('ebookEditModal')).hide();
+    loadEbooksList();
+}
+
+// 강의 변경사항 저장
+function saveCourseChanges(courseId) {
+    const title = document.getElementById('courseTitle').value;
+    const description = document.getElementById('courseDescription').value;
+    const status = document.getElementById('courseStatus').value;
+    
+    // 여기서 실제로는 DB에 저장
+    alert(`강의가 업데이트되었습니다:\n제목: ${title}\n상태: ${status}`);
+    
+    bootstrap.Modal.getInstance(document.getElementById('courseEditModal')).hide();
+    loadCoursesList();
+}
 
 // 새 상품 저장
 async function saveNewProduct() {
