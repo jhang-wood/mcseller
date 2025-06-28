@@ -113,6 +113,12 @@ async function checkAdminRole(userId) {
 
 // 사용자 인증 확인
 async function getCurrentUser() {
+    // 테스트 사용자 확인
+    const testUser = localStorage.getItem('testUser');
+    if (testUser) {
+        return JSON.parse(testUser);
+    }
+    
     try {
         const { data: { user }, error } = await supabaseClient.auth.getUser();
         
@@ -130,6 +136,13 @@ async function getCurrentUser() {
 
 // 로그아웃
 async function signOut() {
+    // 테스트 사용자 로그아웃
+    if (localStorage.getItem('testUser')) {
+        localStorage.removeItem('testUser');
+        showToast('성공적으로 로그아웃되었습니다.', 'success');
+        return true;
+    }
+    
     try {
         const { error } = await supabaseClient.auth.signOut();
         

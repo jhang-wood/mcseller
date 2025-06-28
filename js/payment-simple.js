@@ -85,7 +85,7 @@ async function loadUserInfo() {
         return;
     }
     
-    // 임시 적립금 (실제로는 DB에서)
+    // 임시 적립금
     userPoints = 5000;
     document.getElementById('user-points').textContent = userPoints.toLocaleString();
 }

@@ -141,6 +141,12 @@ Changelog:
   * Added discount code and reward point usage in payment flow
   * Simplified payment process - no user registration required, direct to payment
   * System automatically scales for new products when landing pages are added
+- June 28, 2025. User experience optimization:
+  * Removed register.html - streamlined direct landing→payment flow
+  * Added mypage.html for simple content access after purchase
+  * Implemented test account system: user@test.com/123456, admin@test.com/admin123
+  * Updated index.html navigation: "사전예약 신청하기" → ai-master-landing.html
+  * Created conversion-optimized payment page with countdown timer, stock counter, recommendations
 ```
 
 ## User Preferences

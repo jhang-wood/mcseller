@@ -1,9 +1,16 @@
+// 테스트 계정 정보
+const TEST_ACCOUNTS = {
+    user: { email: 'user@test.com', password: '123456', isAdmin: false },
+    admin: { email: 'admin@test.com', password: 'admin123', isAdmin: true }
+};
+
 // 인증 페이지 JavaScript
 document.addEventListener('DOMContentLoaded', function() {
     initializeAuthPage();
     setupFormEvents();
     setupSocialAuth();
     checkExistingSession();
+    showTestAccounts();
 });
 
 // 인증 페이지 초기화
@@ -158,15 +165,26 @@ async function handleLogin(e) {
     submitBtn.disabled = true;
     
     try {
-        // 관리자 계정 체크 (임시 설정)
-        if (email === 'mcseller.admin@gmail.com' && password === 'MCsellerAdmin2025!') {
-            // 관리자 로그인 성공 시 관리자 페이지로 리다이렉트
-            localStorage.setItem('adminUser', 'true');
-            localStorage.setItem('adminEmail', email);
-            showToast('관리자로 로그인되었습니다!', 'success');
+        // 테스트 계정 확인
+        const testAccount = Object.values(TEST_ACCOUNTS).find(account => 
+            account.email === email && account.password === password
+        );
+        
+        if (testAccount) {
+            localStorage.setItem('testUser', JSON.stringify({
+                email: testAccount.email,
+                isAdmin: testAccount.isAdmin,
+                loginTime: new Date().toISOString()
+            }));
+            
+            showToast(testAccount.isAdmin ? '관리자로 로그인되었습니다!' : '로그인 성공!', 'success');
             
             setTimeout(() => {
-                window.location.href = 'admin.html';
+                if (testAccount.isAdmin) {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'mypage.html';
+                }
             }, 1000);
             return;
         }
@@ -593,3 +611,21 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// 테스트 계정 정보 표시
+function showTestAccounts() {
+    const testInfoHtml = `
+        <div class="alert alert-info mt-4">
+            <h6><i class="fas fa-info-circle"></i> 테스트 계정</h6>
+            <p class="mb-2"><strong>일반 사용자:</strong> user@test.com / 123456</p>
+            <p class="mb-0"><strong>관리자:</strong> admin@test.com / admin123</p>
+        </div>
+    `;
+    
+    const forms = document.querySelectorAll('.auth-form');
+    forms.forEach(form => {
+        if (!form.querySelector('.alert-info')) {
+            form.insertAdjacentHTML('beforeend', testInfoHtml);
+        }
+    });
+}
