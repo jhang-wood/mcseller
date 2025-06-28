@@ -1,0 +1,36 @@
+You are Replit AI.
+
+Generate a complete, production-level static web project for an online lecture & ebook sales platform according to ALL requirements below, with no omissions, no summaries, and every user detail faithfully included. Do not omit or paraphrase any user-provided specification.
+
+**Key instructions:**
+
+- **Hosting:** Cloudflare Pages (static hosting)
+- **Frontend:** HTML, CSS, JavaScript (jQuery)
+- **External services:** Supabase (Database & Auth), TossPay (payment), Kakao Chatbot (support)
+- **ALL user-visible UI, error messages, alerts, labels, help, reviews, etc. must be in 100% Korean ONLY (no English text for end-users, regardless of locale).**
+- **English may be used ONLY in code comments, variable/function names, and this prompt.**
+- If code exceeds the output/token limit, split into chunks and always end with:
+// 💬 남은 코드도 출력할까요?
+so the developer can immediately request the next part.
+
+**Business Flow & Features:**
+1. Admin can register/edit unlimited lectures (YouTube embed) and ebooks (responsive), upload images, set price, toggle type (lecture/ebook), activate/deactivate, and manage products via a sheet-style UI (sortable/filterable, supports CSV/XLS upload/download).
+2. Users can sign up (email/Kakao/Google via Supabase Auth), log in, purchase any product with TossPay (no approval), and instantly receive access to a hidden /products/{uuid}.html page (access is verified with Supabase AccessRights).
+3. After payment, grant immediate viewing rights for the purchased content, auto-redirect to content page, and show a Korean alert/toast. Block access to product page if user lacks rights (even by URL), showing a Korean warning and redirecting to home.
+4. Product types:
+   - **Lecture:** YouTube embed, 목차 (ul/li), 진도바 (progress bar), Korean subtitles toggle, real-time reviews.
+   - **Ebook:** Responsive scroll/slide, font/spacing controls, images, reviews.
+5. Reviews:
+   - On each product page, show all Korean reviews extracted by OCR from uploaded images (#1 for ebook, #2 for lecture), insert as default testimonials on first deploy.
+   - Users can write/update/delete their own reviews (text + ★1~5), admin can pin/best. All in Korean.
+6. Kakao Chatbot:
+   - Floating widget at bottom-right on every page, for FAQ and live support (Kakao i 오픈빌더, Korean script only).
+7. FAQ, 이용약관, 개인정보처리방침:
+   - Rendered as Korean static content (footer or modal).
+
+**Technical Stack & Structure:**
+- **Cloudflare Pages** for static hosting (GitHub connected).
+- **Supabase** for database/auth/REST (Postgres free tier, enable RLS).
+- **TossPay** for payment (JavaScript SDK, per-product clientKey/orderId).
+- **Handsontable CDN** for admin sheet UI.
+- **Chart.js** for admin stats (매출/후기 graphs).
