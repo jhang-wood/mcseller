@@ -2913,24 +2913,34 @@
                 const userPageLink = document.getElementById('user-page-link');
                 const userTypeIndicator = document.getElementById('user-type-indicator');
                 
+                console.log('UI 업데이트:', user);
+                
+                // 먼저 모든 요소 숨기기
+                if (userInfo) userInfo.style.display = 'none';
+                if (loginInfo) loginInfo.style.display = 'none';
+                
                 if (user) {
                     // 로그인된 상태
-                    userInfo.style.display = 'block';
-                    loginInfo.style.display = 'none';
-                    
-                    if (user.isAdmin) {
-                        userTypeIndicator.textContent = '관리자';
-                        userPageLink.href = 'admin.html';
-                        userPageLink.title = '관리자페이지';
-                    } else {
-                        userTypeIndicator.textContent = '회원';
-                        userPageLink.href = 'mypage.html';
-                        userPageLink.title = '마이페이지';
+                    if (userInfo) {
+                        userInfo.style.display = 'block';
+                        
+                        if (userTypeIndicator && userPageLink) {
+                            if (user.isAdmin) {
+                                userTypeIndicator.textContent = '관리자';
+                                userPageLink.href = 'admin.html';
+                                userPageLink.title = '관리자페이지';
+                            } else {
+                                userTypeIndicator.textContent = '회원';
+                                userPageLink.href = 'mypage.html';
+                                userPageLink.title = '마이페이지';
+                            }
+                        }
                     }
                 } else {
                     // 로그아웃된 상태
-                    userInfo.style.display = 'none';
-                    loginInfo.style.display = 'flex';
+                    if (loginInfo) {
+                        loginInfo.style.display = 'flex';
+                    }
                 }
             }
 
@@ -2993,26 +3003,30 @@
                     });
                 });
                 
-                // 초기 로그인 상태 확인 및 UI 업데이트
-                checkAndUpdateUI();
+                // 초기 상태 설정 (안전하게)
+                setTimeout(() => {
+                    checkAndUpdateUI();
+                }, 100);
                 
-                // 로그아웃 버튼 이벤트
-                document.getElementById('logout-link').addEventListener('click', async function(e) {
-                    e.preventDefault();
-                    
-                    // 테스트 사용자 로그아웃
-                    if (localStorage.getItem('testUser')) {
-                        localStorage.removeItem('testUser');
-                        updateNavigationUI(null);
-                        showToast('로그아웃되었습니다.', 'success');
-                        return;
-                    }
-                    
-                    // Supabase 로그아웃
-                    if (window.signOut) {
-                        const success = await window.signOut();
-                        if (success) {
+                // 로그아웃 버튼 이벤트 (동적으로 추가)
+                document.addEventListener('click', async function(e) {
+                    if (e.target.id === 'logout-link' || e.target.closest('#logout-link')) {
+                        e.preventDefault();
+                        
+                        // 테스트 사용자 로그아웃
+                        if (localStorage.getItem('testUser')) {
+                            localStorage.removeItem('testUser');
                             updateNavigationUI(null);
+                            showToast('로그아웃되었습니다.', 'success');
+                            return;
+                        }
+                        
+                        // Supabase 로그아웃
+                        if (window.signOut) {
+                            const success = await window.signOut();
+                            if (success) {
+                                updateNavigationUI(null);
+                            }
                         }
                     }
                 });
@@ -3020,10 +3034,22 @@
                 // 로그인 상태 확인 및 UI 업데이트 함수
                 async function checkAndUpdateUI() {
                     try {
+                        console.log('UI 확인 시작');
+                        
+                        // 요소 존재 확인
+                        const userInfo = document.getElementById('user-info');
+                        const loginInfo = document.getElementById('login-info');
+                        
+                        if (!userInfo || !loginInfo) {
+                            console.log('UI 요소를 찾을 수 없음');
+                            return;
+                        }
+                        
                         // 테스트 사용자 우선 확인
                         const testUser = localStorage.getItem('testUser');
                         if (testUser) {
                             const user = JSON.parse(testUser);
+                            console.log('테스트 사용자 발견:', user);
                             updateNavigationUI(user);
                             return;
                         }
@@ -3032,12 +3058,14 @@
                         if (window.getCurrentUser) {
                             const user = await window.getCurrentUser();
                             if (user) {
+                                console.log('Supabase 사용자 발견:', user);
                                 updateNavigationUI({ ...user, isAdmin: false });
                                 return;
                             }
                         }
                         
                         // 로그인된 사용자가 없음
+                        console.log('로그인된 사용자 없음');
                         updateNavigationUI(null);
                     } catch (error) {
                         console.error('UI 업데이트 오류:', error);
@@ -3046,7 +3074,9 @@
                 }
                 
                 // 페이지 포커스시 UI 재확인
-                window.addEventListener('focus', checkAndUpdateUI);
+                window.addEventListener('focus', () => {
+                    setTimeout(checkAndUpdateUI, 100);
+                });
             });
             
             // Toast 메시지 표시 함수 (간단한 버전)
