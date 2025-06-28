@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한국 온라인 교육 플랫폼</title>
+    <meta name="description" content="최고의 온라인 강의와 전자책을 만나보세요">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/style.css" rel="stylesheet">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- TossPay -->
+    <script src="https://js.tosspayments.com/v1/payment"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html">
+                <i class="fas fa-graduation-cap me-2"></i>교육플랫폼
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#lectures">강의</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#ebooks">전자책</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#reviews">후기</a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav" id="auth-nav">
+                    <li class="nav-item" id="login-nav">
+                        <a class="nav-link" href="auth.html">로그인</a>
+                    </li>
+                    <li class="nav-item dropdown d-none" id="user-nav">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <span id="user-name">사용자</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" id="my-content">내 강의/책</a></li>
+                            <li><a class="dropdown-item" href="admin.html" id="admin-link" style="display: none;">관리자</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logout-btn">로그아웃</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center min-vh-100">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold text-white mb-4">
+                        최고의 온라인 교육을<br>
+                        <span class="text-warning">경험하세요</span>
+                    </h1>
+                    <p class="lead text-white-50 mb-4">
+                        전문가들이 제작한 고품질 강의와 전자책으로 
+                        여러분의 실력을 한 단계 업그레이드하세요.
+                    </p>
+                    <div class="d-flex gap-3">
+                        <a href="#lectures" class="btn btn-warning btn-lg px-4">
+                            <i class="fas fa-play me-2"></i>강의 보기
+                        </a>
+                        <a href="#ebooks" class="btn btn-outline-light btn-lg px-4">
+                            <i class="fas fa-book me-2"></i>전자책 보기
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <img src="https://pixabay.com/get/g42ba3e2309e1612ae1232a3959391f291835f3fc8413de15dedb1d7ed2a783dff204279d9e67bec9bfb22eb0ff94334c02f4ca31b0019dd85275ba56c7152f3d_1280.jpg" 
+                         alt="온라인 교육" class="img-fluid rounded shadow-lg">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col-12">
+                    <h2 class="display-5 fw-bold mb-3">왜 우리 플랫폼인가요?</h2>
+                    <p class="lead text-muted">최고의 학습 경험을 위한 완벽한 환경</p>
+                </div>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-video fa-3x text-primary"></i>
+                        </div>
+                        <h4>고품질 비디오 강의</h4>
+                        <p class="text-muted">HD 화질의 전문 강의를 언제 어디서나 시청하세요</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="feature-card text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-book-reader fa-3x text-success"></i>
+                        </div>
+                        <h4>인터랙티브 전자책</h4>
+                        <p class="text-muted">최적화된 읽기 환경으로 편안한 학습 경험</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="feature-card text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-headset fa-3x text-warning"></i>
+                        </div>
+                        <h4>24/7 고객지원</h4>
+                        <p class="text-muted">카카오톡 챗봇으로 언제든 도움을 받으세요</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lectures Section -->
+    <section id="lectures" class="py-5">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-12 text-center">
+                    <h2 class="display-5 fw-bold mb-3">인기 강의</h2>
+                    <p class="lead text-muted">전문가들의 노하우를 담은 최고의 강의</p>
+                </div>
+            </div>
+            
+            <div class="row g-4" id="lectures-container">
+                <!-- 강의 목록이 동적으로 로드됩니다 -->
+                <div class="col-12 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">로딩중...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ebooks Section -->
+    <section id="ebooks" class="py-5 bg-light">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-12 text-center">
+                    <h2 class="display-5 fw-bold mb-3">추천 전자책</h2>
+                    <p class="lead text-muted">깊이 있는 지식을 담은 전문 서적</p>
+                </div>
+            </div>
+            
+            <div class="row g-4" id="ebooks-container">
+                <!-- 전자책 목록이 동적으로 로드됩니다 -->
+                <div class="col-12 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">로딩중...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reviews Section -->
+    <section id="reviews" class="py-5">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-12 text-center">
+                    <h2 class="display-5 fw-bold mb-3">수강생 후기</h2>
+                    <p class="lead text-muted">실제 수강생들의 생생한 후기</p>
+                </div>
+            </div>
+            
+            <div class="row g-4" id="reviews-container">
+                <!-- 후기가 동적으로 로드됩니다 -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-graduation-cap me-2"></i>교육플랫폼
+                    </h5>
+                    <p class="text-muted">
+                        최고의 온라인 교육 콘텐츠를 제공하는 플랫폼입니다.
+                    </p>
+                </div>
+                
+                <div class="col-md-3">
+                    <h6 class="fw-bold mb-3">바로가기</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#lectures" class="text-muted text-decoration-none">강의</a></li>
+                        <li><a href="#ebooks" class="text-muted text-decoration-none">전자책</a></li>
+                        <li><a href="#reviews" class="text-muted text-decoration-none">후기</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-3">
+                    <h6 class="fw-bold mb-3">고객지원</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-muted text-decoration-none" data-bs-toggle="modal" data-bs-target="#faqModal">자주 묻는 질문</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none" data-bs-toggle="modal" data-bs-target="#termsModal">이용약관</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none" data-bs-toggle="modal" data-bs-target="#privacyModal">개인정보처리방침</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <hr class="my-4">
+            
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0 text-muted">&copy; 2025 교육플랫폼. 모든 권리 보유.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-muted me-3"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="text-muted me-3"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-muted"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <!-- FAQ Modal -->
+    <div class="modal fade" id="faqModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">자주 묻는 질문</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    결제 후 언제부터 강의를 볼 수 있나요?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    결제 완료 즉시 강의 및 전자책을 이용하실 수 있습니다. 결제 후 자동으로 콘텐츠 페이지로 이동됩니다.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    환불이 가능한가요?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    구매 후 7일 이내, 콘텐츠 이용률이 10% 미만인 경우 환불이 가능합니다.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    모바일에서도 이용할 수 있나요?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    네, 모든 기기에서 최적화된 환경으로 강의와 전자책을 이용하실 수 있습니다.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terms Modal -->
+    <div class="modal fade" id="termsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">이용약관</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>제1조 (목적)</h6>
+                    <p>이 약관은 교육플랫폼에서 제공하는 온라인 교육 서비스의 이용조건 및 절차에 관한 사항을 규정함을 목적으로 합니다.</p>
+                    
+                    <h6>제2조 (정의)</h6>
+                    <p>이 약관에서 사용하는 용어의 정의는 다음과 같습니다:</p>
+                    <ul>
+                        <li>"서비스"란 회사가 제공하는 모든 온라인 교육 콘텐츠를 의미합니다.</li>
+                        <li>"회원"이란 회사와 서비스 이용계약을 체결한 자를 의미합니다.</li>
+                    </ul>
+                    
+                    <h6>제3조 (서비스의 제공)</h6>
+                    <p>회사는 다음과 같은 서비스를 제공합니다:</p>
+                    <ul>
+                        <li>온라인 강의 서비스</li>
+                        <li>전자책 서비스</li>
+                        <li>학습 관리 서비스</li>
+                        <li>고객 지원 서비스</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Modal -->
+    <div class="modal fade" id="privacyModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">개인정보처리방침</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>1. 개인정보의 처리목적</h6>
+                    <p>교육플랫폼은 다음의 목적을 위하여 개인정보를 처리합니다:</p>
+                    <ul>
+                        <li>서비스 제공 및 계약의 이행</li>
+                        <li>회원 관리 및 본인 확인</li>
+                        <li>결제 및 환불 처리</li>
+                        <li>고객 문의 및 불만 처리</li>
+                    </ul>
+                    
+                    <h6>2. 개인정보의 처리 및 보유기간</h6>
+                    <p>개인정보는 수집·이용에 관한 동의일로부터 개인정보의 수집·이용목적을 달성할 때까지 보유·이용됩니다.</p>
+                    
+                    <h6>3. 개인정보의 제3자 제공</h6>
+                    <p>회사는 이용자의 개인정보를 원칙적으로 외부에 제공하지 않습니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kakao Chat Widget -->
+    <div id="kakao-chat-widget">
+        <!-- 카카오톡 채널 채팅 버튼 -->
+        <div id="chat-button" class="chat-button">
+            <i class="fas fa-comment"></i>
+            <span>문의하기</span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    
+    <!-- Data Scripts -->
+    <script src="data/products.js"></script>
+    <script src="data/reviews-lecture.js"></script>
+    <script src="data/reviews-ebook.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    
+    <script>
+        // Kakao SDK 초기화 (실제 앱키 필요)
+        // Kakao.init('YOUR_KAKAO_APP_KEY');
+        
+        // 채팅 버튼 클릭 이벤트
+        document.getElementById('chat-button').addEventListener('click', function() {
+            // 카카오톡 채널 채팅 연결 (실제 채널 ID 필요)
+            alert('고객지원 채팅이 곧 연결됩니다. 카카오톡을 확인해 주세요.');
+            // Kakao.Channel.chat({ channelPublicId: '_your_channel_id' });
+        });
+    </script>
+</body>
+</html>

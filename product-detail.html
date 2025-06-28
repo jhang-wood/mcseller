@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상품 상세 - 교육플랫폼</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/product.css" rel="stylesheet">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- TossPay -->
+    <script src="https://js.tosspayments.com/v1/payment"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html">
+                <i class="fas fa-graduation-cap me-2"></i>교육플랫폼
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#lectures">강의</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#ebooks">전자책</a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav" id="auth-nav">
+                    <li class="nav-item" id="login-nav">
+                        <a class="nav-link" href="auth.html">로그인</a>
+                    </li>
+                    <li class="nav-item dropdown d-none" id="user-nav">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <span id="user-name">사용자</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" id="my-content">내 강의/책</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logout-btn">로그아웃</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Product Detail Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <!-- Product Info -->
+                <div class="col-lg-8">
+                    <div id="product-loading" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">로딩중...</span>
+                        </div>
+                        <p class="mt-3">상품 정보를 불러오는 중...</p>
+                    </div>
+
+                    <div id="product-content" class="d-none">
+                        <!-- Product Header -->
+                        <div class="product-header mb-4">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <img id="product-image" src="" alt="" class="img-fluid rounded shadow">
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="product-info">
+                                        <span id="product-category" class="badge bg-primary mb-2"></span>
+                                        <h1 id="product-title" class="h3 fw-bold mb-3"></h1>
+                                        <p id="product-description" class="text-muted mb-4"></p>
+                                        
+                                        <div class="price-section mb-4">
+                                            <span class="h4 text-primary fw-bold" id="product-price"></span>
+                                        </div>
+                                        
+                                        <div class="rating-section mb-4">
+                                            <div class="d-flex align-items-center">
+                                                <div class="stars me-2" id="product-rating">
+                                                    <!-- 별점이 여기에 표시됩니다 -->
+                                                </div>
+                                                <span class="text-muted">(<span id="review-count">0</span>개 후기)</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="action-buttons">
+                                            <button class="btn btn-primary btn-lg w-100 mb-2" id="purchase-btn">
+                                                <i class="fas fa-shopping-cart me-2"></i>지금 구매하기
+                                            </button>
+                                            <button class="btn btn-outline-secondary w-100" id="preview-btn">
+                                                <i class="fas fa-eye me-2"></i>미리보기
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product Details Tabs -->
+                        <div class="product-tabs">
+                            <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" 
+                                            data-bs-target="#overview" type="button" role="tab">
+                                        개요
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation" id="curriculum-tab-li" style="display: none;">
+                                    <button class="nav-link" id="curriculum-tab" data-bs-toggle="tab" 
+                                            data-bs-target="#curriculum" type="button" role="tab">
+                                        커리큘럼
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" 
+                                            data-bs-target="#reviews" type="button" role="tab">
+                                        후기
+                                    </button>
+                                </li>
+                            </ul>
+                            
+                            <div class="tab-content" id="productTabsContent">
+                                <!-- Overview Tab -->
+                                <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                                    <div class="py-4">
+                                        <div id="product-overview">
+                                            <!-- 상품 상세 설명이 여기에 표시됩니다 -->
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Curriculum Tab (강의용) -->
+                                <div class="tab-pane fade" id="curriculum" role="tabpanel">
+                                    <div class="py-4">
+                                        <div id="lecture-curriculum">
+                                            <!-- 강의 목차가 여기에 표시됩니다 -->
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Reviews Tab -->
+                                <div class="tab-pane fade" id="reviews" role="tabpanel">
+                                    <div class="py-4">
+                                        <div id="reviews-section">
+                                            <!-- 후기가 여기에 표시됩니다 -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Purchase Panel -->
+                <div class="col-lg-4">
+                    <div class="purchase-panel sticky-top">
+                        <div class="card shadow">
+                            <div class="card-body">
+                                <div id="purchase-info" class="d-none">
+                                    <div class="text-center mb-3">
+                                        <img id="panel-image" src="" alt="" class="img-fluid rounded mb-3" style="max-height: 150px;">
+                                        <h6 id="panel-title" class="fw-bold"></h6>
+                                        <span class="h5 text-primary fw-bold" id="panel-price"></span>
+                                    </div>
+                                    
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-primary btn-lg" id="buy-now-btn">
+                                            <i class="fas fa-credit-card me-2"></i>즉시 구매
+                                        </button>
+                                        <button class="btn btn-outline-primary" id="add-cart-btn">
+                                            <i class="fas fa-shopping-cart me-2"></i>장바구니
+                                        </button>
+                                    </div>
+                                    
+                                    <hr>
+                                    
+                                    <div class="features">
+                                        <h6 class="fw-bold mb-3">포함 내용</h6>
+                                        <ul class="list-unstyled">
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                평생 이용 가능
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                모바일/PC 지원
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                수료증 발급
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                24/7 고객지원
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Related Products -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h3 class="fw-bold mb-4">관련 상품</h3>
+            <div class="row g-4" id="related-products">
+                <!-- 관련 상품이 여기에 표시됩니다 -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Payment Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">결제하기</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="payment-summary mb-4">
+                        <h6 class="fw-bold">주문 요약</h6>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span id="payment-product-title"></span>
+                            <span id="payment-product-price"></span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between fw-bold">
+                            <span>총 결제금액</span>
+                            <span class="text-primary" id="payment-total"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-methods">
+                        <h6 class="fw-bold mb-3">결제 방법</h6>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary payment-method" data-method="card">
+                                <i class="fas fa-credit-card me-2"></i>신용카드
+                            </button>
+                            <button class="btn btn-outline-primary payment-method" data-method="transfer">
+                                <i class="fas fa-university me-2"></i>계좌이체
+                            </button>
+                            <button class="btn btn-outline-primary payment-method" data-method="phone">
+                                <i class="fas fa-mobile-alt me-2"></i>휴대폰
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="confirm-payment">결제하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div class="modal fade" id="reviewModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">후기 작성</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="reviewForm">
+                        <div class="mb-3">
+                            <label class="form-label">평점</label>
+                            <div class="rating-input">
+                                <input type="radio" id="star5" name="rating" value="5">
+                                <label for="star5" title="5점"><i class="fas fa-star"></i></label>
+                                <input type="radio" id="star4" name="rating" value="4">
+                                <label for="star4" title="4점"><i class="fas fa-star"></i></label>
+                                <input type="radio" id="star3" name="rating" value="3">
+                                <label for="star3" title="3점"><i class="fas fa-star"></i></label>
+                                <input type="radio" id="star2" name="rating" value="2">
+                                <label for="star2" title="2점"><i class="fas fa-star"></i></label>
+                                <input type="radio" id="star1" name="rating" value="1">
+                                <label for="star1" title="1점"><i class="fas fa-star"></i></label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="reviewText" class="form-label">후기 내용</label>
+                            <textarea class="form-control" id="reviewText" rows="4" 
+                                      placeholder="솔직한 후기를 남겨주세요" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="submit-review">후기 등록</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kakao Chat Widget -->
+    <div id="kakao-chat-widget">
+        <div id="chat-button" class="chat-button">
+            <i class="fas fa-comment"></i>
+            <span>문의하기</span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script src="js/supabase-client.js"></script>
+    <script src="js/product.js"></script>
+    <script src="js/payment.js"></script>
+    
+    <script>
+        // URL에서 상품 ID 추출
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+        
+        if (!productId) {
+            window.location.href = 'index.html';
+        }
+        
+        // 채팅 버튼 클릭 이벤트
+        document.getElementById('chat-button').addEventListener('click', function() {
+            alert('고객지원 채팅이 곧 연결됩니다. 카카오톡을 확인해 주세요.');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 / 회원가입 - 교육플랫폼</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/style.css" rel="stylesheet">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="auth-page">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html">
+                <i class="fas fa-graduation-cap me-2"></i>교육플랫폼
+            </a>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row min-vh-100">
+            <!-- Left Side - Image -->
+            <div class="col-lg-6 d-none d-lg-block p-0">
+                <div class="auth-image-section">
+                    <img src="https://pixabay.com/get/g6bb9746dfecf2914ab0cf48dd8bded4344b307079528ba10348763fbeef12214b77b9b90a3a17495dbb701469f1169f5f1a9bb4e76ba93462a6edaa3e7c1aaca_1280.jpg" 
+                         alt="온라인 교육" class="img-fluid h-100 w-100 object-fit-cover">
+                    <div class="auth-overlay">
+                        <div class="overlay-content">
+                            <h2 class="text-white fw-bold mb-3">지금 시작하세요!</h2>
+                            <p class="text-white-50 lead">
+                                수많은 전문가들의 지식과<br>
+                                노하우를 경험해보세요
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - Auth Form -->
+            <div class="col-lg-6 d-flex align-items-center">
+                <div class="container py-5">
+                    <div class="row justify-content-center">
+                        <div class="col-md-8 col-lg-6">
+                            <!-- 로그인 폼 -->
+                            <div id="login-form" class="auth-form">
+                                <div class="text-center mb-4">
+                                    <h3 class="fw-bold">로그인</h3>
+                                    <p class="text-muted">계정에 로그인하여 학습을 계속하세요</p>
+                                </div>
+
+                                <form id="loginForm">
+                                    <div class="mb-3">
+                                        <label for="loginEmail" class="form-label">이메일</label>
+                                        <input type="email" class="form-control form-control-lg" 
+                                               id="loginEmail" required>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="loginPassword" class="form-label">비밀번호</label>
+                                        <input type="password" class="form-control form-control-lg" 
+                                               id="loginPassword" required>
+                                    </div>
+                                    
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="rememberMe">
+                                        <label class="form-check-label" for="rememberMe">
+                                            로그인 상태 유지
+                                        </label>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                                        <i class="fas fa-sign-in-alt me-2"></i>로그인
+                                    </button>
+                                </form>
+
+                                <div class="divider mb-3">
+                                    <span>또는</span>
+                                </div>
+
+                                <!-- 소셜 로그인 -->
+                                <div class="d-grid gap-2 mb-4">
+                                    <button class="btn btn-outline-warning btn-lg" id="kakao-login">
+                                        <i class="fas fa-comment me-2"></i>카카오로 로그인
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-lg" id="google-login">
+                                        <i class="fab fa-google me-2"></i>구글로 로그인
+                                    </button>
+                                </div>
+
+                                <div class="text-center">
+                                    <p class="mb-0">
+                                        계정이 없으신가요? 
+                                        <a href="#" class="text-primary" id="show-signup">회원가입</a>
+                                    </p>
+                                    <a href="#" class="text-muted small" id="forgot-password">비밀번호를 잊으셨나요?</a>
+                                </div>
+                            </div>
+
+                            <!-- 회원가입 폼 -->
+                            <div id="signup-form" class="auth-form d-none">
+                                <div class="text-center mb-4">
+                                    <h3 class="fw-bold">회원가입</h3>
+                                    <p class="text-muted">새 계정을 만들어 학습을 시작하세요</p>
+                                </div>
+
+                                <form id="signupForm">
+                                    <div class="mb-3">
+                                        <label for="signupName" class="form-label">이름</label>
+                                        <input type="text" class="form-control form-control-lg" 
+                                               id="signupName" required>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="signupEmail" class="form-label">이메일</label>
+                                        <input type="email" class="form-control form-control-lg" 
+                                               id="signupEmail" required>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="signupPassword" class="form-label">비밀번호</label>
+                                        <input type="password" class="form-control form-control-lg" 
+                                               id="signupPassword" required minlength="6">
+                                        <div class="form-text">최소 6자 이상 입력해주세요</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="confirmPassword" class="form-label">비밀번호 확인</label>
+                                        <input type="password" class="form-control form-control-lg" 
+                                               id="confirmPassword" required>
+                                    </div>
+                                    
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="agreeTerms" required>
+                                        <label class="form-check-label" for="agreeTerms">
+                                            <a href="#" class="text-primary">이용약관</a> 및 
+                                            <a href="#" class="text-primary">개인정보처리방침</a>에 동의합니다
+                                        </label>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                                        <i class="fas fa-user-plus me-2"></i>회원가입
+                                    </button>
+                                </form>
+
+                                <div class="divider mb-3">
+                                    <span>또는</span>
+                                </div>
+
+                                <!-- 소셜 회원가입 -->
+                                <div class="d-grid gap-2 mb-4">
+                                    <button class="btn btn-outline-warning btn-lg" id="kakao-signup">
+                                        <i class="fas fa-comment me-2"></i>카카오로 가입
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-lg" id="google-signup">
+                                        <i class="fab fa-google me-2"></i>구글로 가입
+                                    </button>
+                                </div>
+
+                                <div class="text-center">
+                                    <p class="mb-0">
+                                        이미 계정이 있으신가요? 
+                                        <a href="#" class="text-primary" id="show-login">로그인</a>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- 비밀번호 재설정 폼 -->
+                            <div id="reset-form" class="auth-form d-none">
+                                <div class="text-center mb-4">
+                                    <h3 class="fw-bold">비밀번호 재설정</h3>
+                                    <p class="text-muted">이메일을 입력하시면 재설정 링크를 보내드립니다</p>
+                                </div>
+
+                                <form id="resetForm">
+                                    <div class="mb-3">
+                                        <label for="resetEmail" class="form-label">이메일</label>
+                                        <input type="email" class="form-control form-control-lg" 
+                                               id="resetEmail" required>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                                        <i class="fas fa-paper-plane me-2"></i>재설정 링크 전송
+                                    </button>
+                                </form>
+
+                                <div class="text-center">
+                                    <a href="#" class="text-primary" id="back-to-login">로그인으로 돌아가기</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="authToast" class="toast" role="alert">
+            <div class="toast-header">
+                <strong class="me-auto">알림</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toast-message">
+                <!-- 메시지가 여기에 표시됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script src="js/supabase-client.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

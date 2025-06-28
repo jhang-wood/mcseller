@@ -1,0 +1,136 @@
+# 한국 온라인 교육 플랫폼
+
+## Overview
+
+This is a Korean online education platform that enables users to purchase and access lectures and ebooks. The platform features admin capabilities for content management, user authentication via Supabase, payment processing through TossPay, and customer support via Kakao chat integration.
+
+## System Architecture
+
+### Frontend Architecture
+- **Technology Stack**: Static HTML, CSS, JavaScript (ES6+), Bootstrap 5
+- **Hosting**: Cloudflare Pages (static hosting)
+- **Libraries**: jQuery, Chart.js, Handsontable, Font Awesome
+- **Language**: All user-facing content in Korean
+
+### Backend Services
+- **Database & Auth**: Supabase (PostgreSQL with Row Level Security)
+- **Payment Processing**: TossPay integration
+- **File Storage**: Supabase Storage for images and content
+- **Customer Support**: Kakao Chatbot widget
+
+### Content Delivery
+- **Videos**: YouTube embed integration
+- **Ebooks**: Custom reader with responsive design
+- **Images**: CDN delivery via Supabase Storage
+
+## Key Components
+
+### 1. Authentication System
+- **Provider**: Supabase Auth
+- **Methods**: Email/password, Google OAuth, Kakao OAuth
+- **Features**: Session management, role-based access control
+- **Security**: Row Level Security (RLS) enabled
+
+### 2. Product Management
+- **Admin Interface**: Handsontable for spreadsheet-like product management
+- **Product Types**: Lectures (YouTube videos) and Ebooks (HTML/PDF)
+- **Features**: Price setting, activation/deactivation, image uploads
+- **Content Access**: UUID-based protected URLs
+
+### 3. Payment System
+- **Provider**: TossPay (Korean payment gateway)
+- **Methods**: Credit cards, bank transfers, mobile payments
+- **Flow**: Immediate access upon successful payment
+- **Security**: Order validation and user verification
+
+### 4. Content Viewers
+- **Video Player**: Custom YouTube player with Korean subtitles, progress tracking
+- **Ebook Reader**: Responsive reader with font controls, bookmarks, progress tracking
+- **Features**: User preferences, reading/viewing progress persistence
+
+### 5. Review System
+- **Data Source**: OCR-extracted reviews from uploaded images
+- **Features**: 5-star ratings, verified purchase badges, admin moderation
+- **Display**: Product-specific reviews with helpful voting
+
+## Data Flow
+
+### User Registration & Authentication
+1. User signs up via Supabase Auth
+2. User profile created in `users` table
+3. Session maintained across pages
+4. Role-based access control enforced
+
+### Product Purchase Flow
+1. User browses products on main page
+2. Clicks product → redirected to product detail page
+3. Initiates purchase → TossPay payment widget
+4. Payment success → order record created
+5. Immediate content access granted
+6. User redirected to content viewer
+
+### Content Access Control
+1. Check user authentication status
+2. Verify purchase record in database
+3. Grant/deny access to protected content
+4. Track viewing progress and preferences
+
+### Admin Management
+1. Admin authentication with elevated permissions
+2. Product CRUD operations via Handsontable interface
+3. Order and user management dashboard
+4. Analytics and reporting with Chart.js
+
+## External Dependencies
+
+### Required Services
+- **Supabase**: Database, authentication, storage
+- **TossPay**: Payment processing
+- **YouTube**: Video hosting and embedding
+- **Kakao**: Customer support chatbot
+
+### CDN Dependencies
+- Bootstrap 5.3.0
+- Font Awesome 6.4.0
+- Chart.js (latest)
+- Handsontable 13.1.0
+- Supabase JavaScript client 2.x
+
+### Development Dependencies
+- Express.js (for development server)
+- Multer (file uploads)
+- Helmet (security headers)
+- CORS middleware
+
+## Deployment Strategy
+
+### Static Hosting
+- **Platform**: Cloudflare Pages
+- **Source**: GitHub repository
+- **Build**: No build process required (static files)
+- **Environment**: Production and staging environments
+
+### Database Setup
+- **Provider**: Supabase free tier
+- **Schema**: PostgreSQL with RLS policies
+- **Backup**: Automatic Supabase backups
+- **Migration**: SQL scripts for schema updates
+
+### Security Considerations
+- Row Level Security (RLS) enabled on all tables
+- API keys stored as environment variables
+- HTTPS enforced via Cloudflare
+- Rate limiting on API endpoints
+
+## Changelog
+
+```
+Changelog:
+- June 28, 2025. Initial setup
+```
+
+## User Preferences
+
+```
+Preferred communication style: Simple, everyday language.
+```

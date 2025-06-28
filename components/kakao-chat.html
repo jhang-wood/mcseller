@@ -1,0 +1,625 @@
+<!-- 카카오톡 채널 채팅 위젯 -->
+<div id="kakao-chat-widget" class="kakao-chat-widget">
+    <!-- 채팅 버튼 -->
+    <div id="chat-button" class="chat-button">
+        <div class="chat-icon">
+            <i class="fas fa-comment"></i>
+        </div>
+        <span class="chat-text">문의하기</span>
+        <div class="chat-notification" id="chat-notification" style="display: none;">
+            <span class="notification-count">1</span>
+        </div>
+    </div>
+
+    <!-- 채팅 창 (토글 가능) -->
+    <div id="chat-window" class="chat-window d-none">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <div class="chat-avatar">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="chat-title">
+                    <h6 class="mb-0">교육플랫폼 고객지원</h6>
+                    <small class="text-muted">평균 응답시간: 5분</small>
+                </div>
+            </div>
+            <button type="button" class="btn-close-chat" id="close-chat">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="chat-body">
+            <div class="chat-messages" id="chat-messages">
+                <!-- 초기 안내 메시지 -->
+                <div class="message bot-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            <p>안녕하세요! 교육플랫폼 고객지원팀입니다. 🎓</p>
+                            <p>궁금한 점이 있으시면 언제든 문의해 주세요.</p>
+                        </div>
+                        <div class="message-time">
+                            <small class="text-muted">지금</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 자주 묻는 질문 -->
+                <div class="message bot-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            <p>자주 묻는 질문:</p>
+                            <div class="quick-replies">
+                                <button class="quick-reply-btn" data-message="결제 문의">
+                                    💳 결제 문의
+                                </button>
+                                <button class="quick-reply-btn" data-message="강의 시청 문제">
+                                    🎥 시청 문제
+                                </button>
+                                <button class="quick-reply-btn" data-message="환불 요청">
+                                    💰 환불 요청
+                                </button>
+                                <button class="quick-reply-btn" data-message="계정 문의">
+                                    👤 계정 문의
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 메시지 입력 -->
+            <div class="chat-input">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="chat-message-input" 
+                           placeholder="메시지를 입력하세요..." maxlength="500">
+                    <button class="btn btn-primary" type="button" id="send-message">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="chat-features">
+                    <small class="text-muted">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        개인정보는 암호화되어 안전하게 보호됩니다
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 연결 상태 -->
+        <div class="chat-status" id="chat-status">
+            <div class="status-indicator online">
+                <span class="status-dot"></span>
+                <small>상담사 연결 가능</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- 카카오톡으로 연결 옵션 -->
+    <div class="kakao-connect-option d-none" id="kakao-connect">
+        <div class="connect-header">
+            <h6>카카오톡으로 상담받기</h6>
+            <p class="text-muted small">더 편리한 상담을 위해 카카오톡 채널로 이동하세요</p>
+        </div>
+        <div class="connect-buttons">
+            <button class="btn btn-warning btn-sm w-100 mb-2" id="connect-kakao">
+                <i class="fas fa-comment me-2"></i>카카오톡 채널 연결
+            </button>
+            <button class="btn btn-outline-secondary btn-sm w-100" id="continue-web">
+                웹에서 계속하기
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 채팅 위젯 스타일 -->
+<style>
+.kakao-chat-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.chat-button {
+    background: linear-gradient(135deg, #fee500 0%, #fdd835 100%);
+    color: #3c1e1e;
+    border: none;
+    padding: 15px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    min-width: 60px;
+    justify-content: center;
+}
+
+.chat-button:hover {
+    background: linear-gradient(135deg, #fdd835 0%, #fbc02d 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+}
+
+.chat-icon {
+    font-size: 18px;
+    animation: pulse 2s infinite;
+}
+
+.chat-text {
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.chat-notification {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff4757;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    animation: bounce 1s infinite;
+}
+
+.chat-window {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 350px;
+    height: 500px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+}
+
+.chat-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.chat-header-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chat-avatar {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.btn-close-chat {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 3px;
+    transition: background 0.2s;
+}
+
+.btn-close-chat:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.chat-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.message {
+    display: flex;
+    gap: 10px;
+    max-width: 85%;
+}
+
+.bot-message {
+    align-self: flex-start;
+}
+
+.user-message {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.message-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #6c757d;
+    flex-shrink: 0;
+}
+
+.user-message .message-avatar {
+    background: #007bff;
+    color: white;
+}
+
+.message-content {
+    flex: 1;
+}
+
+.message-bubble {
+    background: #f8f9fa;
+    padding: 12px 15px;
+    border-radius: 15px;
+    margin-bottom: 5px;
+}
+
+.user-message .message-bubble {
+    background: #007bff;
+    color: white;
+}
+
+.message-bubble p {
+    margin: 0;
+    line-height: 1.4;
+}
+
+.message-time {
+    text-align: right;
+}
+
+.user-message .message-time {
+    text-align: left;
+}
+
+.quick-replies {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.quick-reply-btn {
+    background: white;
+    border: 1px solid #dee2e6;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 13px;
+    text-align: left;
+}
+
+.quick-reply-btn:hover {
+    background: #f8f9fa;
+    border-color: #007bff;
+    color: #007bff;
+}
+
+.chat-input {
+    padding: 15px 20px;
+    border-top: 1px solid #e9ecef;
+    background: #f8f9fa;
+}
+
+.chat-input .form-control {
+    border-radius: 20px;
+    border: 1px solid #dee2e6;
+    padding: 10px 15px;
+}
+
+.chat-input .btn {
+    border-radius: 20px;
+    padding: 10px 15px;
+}
+
+.chat-features {
+    margin-top: 8px;
+    text-align: center;
+}
+
+.chat-status {
+    padding: 10px 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #28a745;
+    animation: pulse 2s infinite;
+}
+
+.kakao-connect-option {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 280px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    border: 1px solid #e9ecef;
+}
+
+.connect-header h6 {
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .kakao-chat-widget {
+        bottom: 15px;
+        right: 15px;
+    }
+    
+    .chat-button {
+        padding: 12px;
+        border-radius: 50%;
+        min-width: 50px;
+    }
+    
+    .chat-text {
+        display: none;
+    }
+    
+    .chat-window {
+        width: calc(100vw - 30px);
+        height: 70vh;
+        bottom: 70px;
+        right: -15px;
+    }
+    
+    .kakao-connect-option {
+        width: calc(100vw - 30px);
+        right: -15px;
+    }
+}
+
+/* 애니메이션 */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+/* 스크롤바 스타일링 */
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+</style>
+
+<!-- 채팅 위젯 JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatButton = document.getElementById('chat-button');
+    const chatWindow = document.getElementById('chat-window');
+    const closeChatBtn = document.getElementById('close-chat');
+    const messageInput = document.getElementById('chat-message-input');
+    const sendBtn = document.getElementById('send-message');
+    const messagesContainer = document.getElementById('chat-messages');
+    const quickReplyBtns = document.querySelectorAll('.quick-reply-btn');
+    const connectKakaoBtn = document.getElementById('connect-kakao');
+    const continueWebBtn = document.getElementById('continue-web');
+    
+    let isOpen = false;
+    let messageCount = 0;
+    
+    // 채팅 창 토글
+    chatButton.addEventListener('click', function() {
+        toggleChat();
+    });
+    
+    closeChatBtn.addEventListener('click', function() {
+        toggleChat();
+    });
+    
+    function toggleChat() {
+        isOpen = !isOpen;
+        chatWindow.classList.toggle('d-none', !isOpen);
+        
+        if (isOpen) {
+            messageInput.focus();
+            // 읽지 않은 메시지 알림 제거
+            document.getElementById('chat-notification').style.display = 'none';
+        }
+    }
+    
+    // 메시지 전송
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+    
+    function sendMessage() {
+        const message = messageInput.value.trim();
+        if (!message) return;
+        
+        // 사용자 메시지 추가
+        addMessage(message, 'user');
+        messageInput.value = '';
+        
+        // 봇 응답 시뮬레이션
+        setTimeout(() => {
+            addBotResponse(message);
+        }, 1000);
+    }
+    
+    // 빠른 답변 버튼
+    quickReplyBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const message = this.dataset.message;
+            messageInput.value = message;
+            sendMessage();
+        });
+    });
+    
+    function addMessage(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}-message`;
+        
+        const currentTime = new Date().toLocaleTimeString('ko-KR', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        messageDiv.innerHTML = `
+            <div class="message-avatar">
+                ${sender === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>'}
+            </div>
+            <div class="message-content">
+                <div class="message-bubble">
+                    <p>${text}</p>
+                </div>
+                <div class="message-time">
+                    <small class="text-muted">${currentTime}</small>
+                </div>
+            </div>
+        `;
+        
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        messageCount++;
+    }
+    
+    function addBotResponse(userMessage) {
+        let response = '';
+        
+        // 간단한 봇 응답 로직
+        if (userMessage.includes('결제') || userMessage.includes('💳')) {
+            response = '결제 관련 문의해 주셔서 감사합니다. 결제는 토스페이를 통해 안전하게 처리되며, 카드, 계좌이체, 휴대폰 결제가 가능합니다. 결제 중 문제가 있으시면 구체적인 상황을 알려주세요.';
+        } else if (userMessage.includes('강의') || userMessage.includes('시청') || userMessage.includes('🎥')) {
+            response = '강의 시청 관련 문의입니다. 인터넷 연결 상태를 확인해 주시고, 브라우저를 최신 버전으로 업데이트해 보세요. 계속 문제가 발생하면 사용하시는 기기와 브라우저 정보를 알려주시면 더 자세히 도와드리겠습니다.';
+        } else if (userMessage.includes('환불') || userMessage.includes('💰')) {
+            response = '환불 요청을 접수해 드리겠습니다. 구매 후 7일 이내, 콘텐츠 이용률 10% 미만인 경우 환불이 가능합니다. 주문번호와 환불 사유를 알려주시면 빠르게 처리해 드리겠습니다.';
+        } else if (userMessage.includes('계정') || userMessage.includes('로그인') || userMessage.includes('👤')) {
+            response = '계정 관련 문의입니다. 로그인에 문제가 있으시면 비밀번호 재설정을 시도해 보시고, 가입하신 이메일 주소로 재설정 링크를 확인해 주세요. 계정 복구가 필요하시면 가입 시 사용한 이메일을 알려주세요.';
+        } else if (userMessage.includes('안녕') || userMessage.includes('hello')) {
+            response = '안녕하세요! 교육플랫폼 고객지원팀입니다. 무엇을 도와드릴까요? 궁금한 점이 있으시면 언제든 말씀해 주세요. 😊';
+        } else {
+            response = '문의해 주셔서 감사합니다. 더 정확한 답변을 위해 상담사와 연결해 드리겠습니다. 잠시만 기다려 주세요.';
+            
+            // 카카오톡 연결 옵션 표시
+            setTimeout(() => {
+                showKakaoConnectOption();
+            }, 2000);
+        }
+        
+        addMessage(response, 'bot');
+    }
+    
+    function showKakaoConnectOption() {
+        const kakaoConnect = document.getElementById('kakao-connect');
+        kakaoConnect.classList.remove('d-none');
+        
+        setTimeout(() => {
+            kakaoConnect.classList.add('d-none');
+        }, 10000); // 10초 후 자동 숨김
+    }
+    
+    // 카카오톡 연결
+    connectKakaoBtn?.addEventListener('click', function() {
+        // 실제 카카오톡 채널로 연결하는 로직
+        // window.open('https://pf.kakao.com/_your_channel_id/chat', '_blank');
+        alert('카카오톡 채널로 연결됩니다. 카카오톡 앱을 확인해 주세요.');
+        document.getElementById('kakao-connect').classList.add('d-none');
+    });
+    
+    continueWebBtn?.addEventListener('click', function() {
+        document.getElementById('kakao-connect').classList.add('d-none');
+        addMessage('웹에서 계속 상담 도와드리겠습니다. 구체적인 문의사항을 말씀해 주세요.', 'bot');
+    });
+    
+    // 새 메시지 알림 (시뮬레이션)
+    function showNotification() {
+        if (!isOpen) {
+            document.getElementById('chat-notification').style.display = 'flex';
+        }
+    }
+    
+    // 페이지 로드 후 환영 메시지 알림
+    setTimeout(() => {
+        if (!isOpen) {
+            showNotification();
+        }
+    }, 5000);
+});
+</script>
