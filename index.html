@@ -2885,10 +2885,53 @@
                 offset: 100,
             });
 
-            // 부드러운 스크롤 기능
+            // 부드러운 스크롤 기능 및 로그인 체크
             document.addEventListener('DOMContentLoaded', function() {
-                // 모든 앵커 링크에 부드러운 스크롤 적용
-                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                // 로그인 상태 확인 함수
+                async function checkLoginStatus() {
+                    // 테스트 사용자 확인
+                    const testUser = localStorage.getItem('testUser');
+                    if (testUser) {
+                        return true;
+                    }
+                    
+                    // Supabase 사용자 확인 (getCurrentUser 함수 사용)
+                    if (window.getCurrentUser) {
+                        try {
+                            const user = await window.getCurrentUser();
+                            return user !== null;
+                        } catch (error) {
+                            return false;
+                        }
+                    }
+                    return false;
+                }
+
+                // "지금 시작하기" 버튼들에 특별 처리
+                document.querySelectorAll('a[href="#courses"]').forEach(anchor => {
+                    anchor.addEventListener('click', async function (e) {
+                        e.preventDefault();
+                        
+                        const isLoggedIn = await checkLoginStatus();
+                        
+                        if (isLoggedIn) {
+                            // 로그인된 경우 courses 섹션으로 스크롤
+                            const target = document.querySelector('#courses');
+                            if (target) {
+                                target.scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'start'
+                                });
+                            }
+                        } else {
+                            // 로그인되지 않은 경우 로그인 페이지로 이동
+                            window.location.href = 'auth.html';
+                        }
+                    });
+                });
+
+                // 다른 앵커 링크들에는 일반 부드러운 스크롤 적용
+                document.querySelectorAll('a[href^="#"]:not([href="#courses"])').forEach(anchor => {
                     anchor.addEventListener('click', function (e) {
                         e.preventDefault();
                         const target = document.querySelector(this.getAttribute('href'));
