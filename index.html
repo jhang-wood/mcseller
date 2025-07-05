@@ -982,6 +982,31 @@
                 font-weight: 700;
             }
 
+            .ai-free-badge {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 5px;
+                padding: 20px;
+                background: linear-gradient(45deg, #28a745, #20c997);
+                border-radius: 15px;
+                margin: 20px auto;
+                max-width: 300px;
+            }
+
+            .ai-free-text {
+                font-size: 2rem;
+                font-weight: bold;
+                color: white;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            }
+
+            .ai-value-text {
+                font-size: 1rem;
+                color: #e8f5e8;
+                text-decoration: line-through;
+            }
+
             .ai-guarantee p {
                 margin: 0;
                 color: var(--text-muted);
@@ -1547,7 +1572,7 @@
                             >
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#ai-master">AI 마스터</a>
+                            <a class="nav-link" href="#ai-master">무료강의</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#faq">FAQ</a>
@@ -1555,51 +1580,98 @@
                     </ul>
                     <div class="d-flex gap-3 align-items-center ms-auto">
                         <!-- 로그인 버튼 (로그아웃 상태) -->
-                        <div id="login-info" style="display: none;">
-                            <a href="auth.html" class="btn btn-outline-light btn-sm">
+                        <div id="login-info" style="display: none">
+                            <a
+                                href="auth.html"
+                                class="btn btn-outline-light btn-sm"
+                            >
                                 <i class="fas fa-sign-in-alt me-1"></i>로그인
                             </a>
                         </div>
-                        
+
                         <!-- 프로필 드롭다운 (로그인 상태) -->
-                        <div id="profile-dropdown" class="dropdown" style="display: none;">
-                            <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user me-2"></i><span id="profile-text">프로필</span>
+                        <div
+                            id="profile-dropdown"
+                            class="dropdown"
+                            style="display: none"
+                        >
+                            <button
+                                class="btn btn-outline-light btn-sm dropdown-toggle"
+                                type="button"
+                                id="profileDropdown"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                            >
+                                <i class="fas fa-user me-2"></i
+                                ><span id="profile-text">프로필</span>
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                                <li><h6 class="dropdown-header" id="user-email-display">사용자 정보</h6></li>
-                                <li><hr class="dropdown-divider"></li>
+                            <ul
+                                class="dropdown-menu dropdown-menu-end"
+                                aria-labelledby="profileDropdown"
+                            >
                                 <li>
-                                    <a class="dropdown-item" href="#" id="profile-mypage-link">
-                                        <i class="fas fa-user me-2"></i>마이페이지
+                                    <h6
+                                        class="dropdown-header"
+                                        id="user-email-display"
+                                    >
+                                        사용자 정보
+                                    </h6>
+                                </li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <a
+                                        class="dropdown-item"
+                                        href="#"
+                                        id="profile-mypage-link"
+                                    >
+                                        <i class="fas fa-user me-2"></i
+                                        >마이페이지
                                     </a>
                                 </li>
                                 <li>
                                     <div class="dropdown-item-text">
                                         <small class="text-muted">
-                                            <i class="fas fa-coins me-2"></i>적립금: <span id="user-points-display">5,000원</span>
+                                            <i class="fas fa-coins me-2"></i
+                                            >적립금:
+                                            <span id="user-points-display"
+                                                >5,000원</span
+                                            >
                                         </small>
                                     </div>
                                 </li>
                                 <li>
                                     <div class="dropdown-item-text">
                                         <small class="text-muted">
-                                            <i class="fas fa-ticket-alt me-2"></i>보유 쿠폰: <span id="user-coupons-display">0개</span>
+                                            <i
+                                                class="fas fa-ticket-alt me-2"
+                                            ></i
+                                            >보유 쿠폰:
+                                            <span id="user-coupons-display"
+                                                >0개</span
+                                            >
                                         </small>
                                     </div>
                                 </li>
-                                <li><hr class="dropdown-divider"></li>
+                                <li><hr class="dropdown-divider" /></li>
                                 <li>
-                                    <a class="dropdown-item" href="#" id="profile-logout-link">
-                                        <i class="fas fa-sign-out-alt me-2"></i>로그아웃
+                                    <a
+                                        class="dropdown-item"
+                                        href="#"
+                                        id="profile-logout-link"
+                                    >
+                                        <i class="fas fa-sign-out-alt me-2"></i
+                                        >로그아웃
                                     </a>
                                 </li>
                             </ul>
                         </div>
-                        
+
                         <!-- 지금 시작하기 버튼 (로그아웃 상태에서만) -->
-                        <div id="start-button" style="display: none;">
-                            <a href="ai-master-landing.html" class="btn btn-premium">
+                        <div id="start-button" style="display: none">
+                            <a
+                                href="#courses"
+                                class="btn btn-premium"
+                            >
                                 <i class="fas fa-rocket me-2"></i>지금 시작하기
                             </a>
                         </div>
@@ -1630,12 +1702,14 @@
                                 <span class="text-gradient"
                                     >진짜 수익화 가능한</span
                                 ><br />
-                                온라인 부업을 찾고 있나요?
+                                온라인 부업 필요하세요?
                             </h1>
 
                             <p class="hero-subtitle mb-4">
-                                <strong>K4 플랫폼 전자책 부문 1위</strong>,
-                                프리랜서 마켓 5점 후기 200개 이상<br />
+                                <strong
+                                    >K사 플랫폼 전자책 한 분야 판매량
+                                    1위</strong
+                                >, 프리랜서 마켓 5점 후기 200개 이상<br />
                                 <span class="text-warning fw-bold"
                                     >2달내 첫 수익 90% 달성</span
                                 >
@@ -1997,8 +2071,10 @@
                             <div class="achievement-icon">
                                 <i class="fas fa-won-sign"></i>
                             </div>
-                            <div class="achievement-number">6천만원</div>
-                            <div class="achievement-label">6개월 누적 수익</div>
+                            <div class="achievement-number">2천만원</div>
+                            <div class="achievement-label">
+                                6개월 수강생 평균 수익
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2455,49 +2531,38 @@
                             >
                                 <div class="ai-pricing-header">
                                     <div class="ai-best-choice">
-                                        ✨ BEST CHOICE
+                                        🎯 무료 특강
                                     </div>
                                     <h3 class="ai-course-title">
-                                        토큰 1원도 낭비하지 않는<br />
-                                        초가성비 AI 마스터 과정
+                                        코드 없이 AI로 만드는<br />
+                                        초고속 수익화 시스템
                                     </h3>
                                     <p class="ai-course-subtitle">
-                                        모든 도구, 매출, 그리고 자료 및 방법론을
-                                        하나도 남기지 않고 담았습니다.
+                                        2가지 핵심 실습으로 바로 실행 가능한 
+                                        실전 AI 활용법을 무료로 공개합니다.
                                     </p>
                                 </div>
 
                                 <div class="ai-pricing-section">
-                                    <div class="ai-price-comparison">
-                                        <span class="ai-original-price"
-                                            >₩1,500,000원</span
-                                        >
-                                        <span class="ai-discounted-price"
-                                            >490,000원</span
-                                        >
-                                        <span class="ai-discount-badge"
-                                            >얼리버드 특가 -67% (₩1,010,000원
-                                            할인)</span
-                                        >
+                                    <div class="text-center mb-4">
+                                        <div class="ai-free-badge">
+                                            <span class="ai-free-text">완전 무료</span>
+                                            <span class="ai-value-text">₩150,000 상당</span>
+                                        </div>
                                     </div>
 
                                     <div class="text-center mb-4">
-                                        <div
-                                            class="badge bg-warning text-dark fs-6 fw-bold"
-                                        >
-                                            <i class="fas fa-fire me-2"></i>7월
-                                            정식 런칭 시 ₩1,500,000원으로 정상
-                                            복귀!
+                                        <div class="badge bg-success text-white fs-6 fw-bold">
+                                            <i class="fas fa-gift me-2"></i>한정 무료 공개! 
+                                            지금이 마지막 기회입니다!
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="ai-timer-section">
                                     <div class="ai-timer-title">
-                                        <i
-                                            class="fas fa-hourglass-half me-2"
-                                        ></i
-                                        >특가 종료까지
+                                        <i class="fas fa-clock me-2"></i>
+                                        무료 신청 마감까지
                                     </div>
                                     <div class="ai-timer" id="ai-countdown">
                                         00:00:00
@@ -2506,47 +2571,41 @@
 
                                 <div class="ai-special-notice">
                                     <h6>
-                                        <i class="fas fa-info-circle me-2"></i
-                                        >특별 혜택
+                                        <i class="fas fa-star me-2"></i>
+                                        무료강의 특별 혜택
                                     </h6>
                                     <p>
-                                        <strong
-                                            >극초창기 자동화 기능구현 SaaS 개발
-                                            + 구독제 시스템</strong
-                                        >으로 자동수익 창출!<br />
-                                        8월 정식 런칭 예정 / 7월 사전예약 한정
-                                        특가<br />
-                                        이렇게까지 자세하고 쉽게 알려주는 강의는
-                                        처음일 거라고 확신합니다.
+                                        <strong>실전 중심! 바로 따라할 수 있는 2가지 핵심 실습</strong><br />
+                                        ✅ 코드 한 줄 없이 AI로 EXE 파일 제작<br />
+                                        ✅ 초고속 웹사이트 제작 & 수익화 전략<br />
+                                        한정 무료 공개! 기회는 지금뿐입니다!
                                     </p>
                                 </div>
 
                                 <div class="ai-features-grid">
                                     <div class="ai-feature-group">
                                         <h5>
-                                            <i
-                                                class="fas fa-robot text-primary me-2"
-                                            ></i
-                                            >AI 자동화 모듈
+                                            <i class="fas fa-desktop text-primary me-2"></i>
+                                            초고속 자동화 EXE 파일 만들기
                                         </h5>
                                         <ul>
-                                            <li>3개월 무료 크레딧 제공 도구</li>
-                                            <li>실전 SaaS 구독 자동 공정</li>
-                                            <li>1:1 멘토링 기간</li>
+                                            <li>AI를 활용해 코드 없이 EXE 파일 빠른 제작</li>
+                                            <li>구글폼 신청자 요청 기반 실제 제작 실습</li>
+                                            <li>DB 서버 연동 및 권한 제어 → SaaS 확장</li>
+                                            <li><strong>크몽 판매, 월 구독 SaaS로 전환 가능</strong></li>
                                         </ul>
                                     </div>
 
                                     <div class="ai-feature-group">
                                         <h5>
-                                            <i
-                                                class="fas fa-chart-line text-success me-2"
-                                            ></i
-                                            >특별 혜택
+                                            <i class="fas fa-globe text-success me-2"></i>
+                                            초고속 고퀄 웹사이트 제작법
                                         </h5>
                                         <ul>
-                                            <li>월상 업데이트</li>
-                                            <li>60일 환불 보장</li>
-                                            <li>문의 공개 지원</li>
+                                            <li>바이브 코딩 한계 극복 (토큰 낭비 방지)</li>
+                                            <li>초보자도 빠르게 결과물 완성하는 실용법</li>
+                                            <li>코드·용어 최소화, 본질만 전달</li>
+                                            <li><strong>수익화 전략 중심 (n8n 자동화 예시)</strong></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -2556,21 +2615,21 @@
                                         class="ai-cta-button"
                                         onclick="handleAiMasterSignup()"
                                     >
-                                        <i class="fas fa-rocket me-2"></i>지금
-                                        사전예약 신청하기
+                                        <i class="fas fa-play me-2"></i>무료강의 
+                                        지금 신청하기
                                     </button>
                                     <p class="text-muted mt-3">
-                                        <small>27자리</small>
+                                        <small>⚡ 기회는 지금뿐입니다!</small>
                                     </p>
                                 </div>
 
                                 <div class="ai-guarantee">
-                                    <i class="fas fa-shield-alt"></i>
+                                    <i class="fas fa-gift"></i>
                                     <div>
-                                        <h6>100% 환불 보장</h6>
+                                        <h6>완전 무료 제공</h6>
                                         <p>
-                                            60일 내 만족하지 않으시면 전액
-                                            환불해드립니다
+                                            실전 중심의 고품질 강의를 
+                                            무료로 제공합니다
                                         </p>
                                     </div>
                                 </div>
@@ -2594,7 +2653,7 @@
                     <div class="col-lg-8" data-aos="zoom-in">
                         <h2 class="fw-bold mb-4" style="color: #111">
                             더 이상 헤매지 마세요.<br />
-                            검증된 수익화 전략으로 시작하세요!
+                            검증된 수익화 전 Q�으로 시작하세요!
                         </h2>
 
                         <p class="mb-5" style="color: #333; font-size: 1.1rem">
@@ -2748,7 +2807,7 @@
                                 >
                                     <div class="accordion-body">
                                         2달내 첫 수익 90%는 실제 수강생들의 성과
-                                        통계입니다. 개인차는 있지만, 체계적으로
+                                        �계입니다. 개인차는 있지만, 체계적으로
                                         따라하신 분들은 대부분 첫 달부터 수익을
                                         얻고 계십니다. 단, 개인의 노력과 상황에
                                         따라 차이가 있을 수 있습니다.
@@ -2857,7 +2916,7 @@
                                 >
                             </li>
                             <li>
-                                <a href="#ai-master">AI 마스터 (사전예약)</a>
+                                <a href="#ai-master">무료강의 신청</a>
                             </li>
                         </ul>
                     </div>
@@ -2933,64 +2992,75 @@
 
             // 네비게이션 UI 업데이트 함수
             function updateNavigationUI(user) {
-                const loginInfo = document.getElementById('login-info');
-                const profileDropdown = document.getElementById('profile-dropdown');
-                const startButton = document.getElementById('start-button');
-                const profileText = document.getElementById('profile-text');
-                const userEmailDisplay = document.getElementById('user-email-display');
-                const profileMypageLink = document.getElementById('profile-mypage-link');
-                const profileLogoutLink = document.getElementById('profile-logout-link');
-                
-                console.log('UI 업데이트:', user);
-                
+                const loginInfo = document.getElementById("login-info");
+                const profileDropdown =
+                    document.getElementById("profile-dropdown");
+                const startButton = document.getElementById("start-button");
+                const profileText = document.getElementById("profile-text");
+                const userEmailDisplay =
+                    document.getElementById("user-email-display");
+                const profileMypageLink = document.getElementById(
+                    "profile-mypage-link",
+                );
+                const profileLogoutLink = document.getElementById(
+                    "profile-logout-link",
+                );
+
+                console.log("UI 업데이트:", user);
+
                 // 모든 요소 초기화
-                if (loginInfo) loginInfo.style.display = 'none';
-                if (profileDropdown) profileDropdown.style.display = 'none';
-                if (startButton) startButton.style.display = 'none';
-                
+                if (loginInfo) loginInfo.style.display = "none";
+                if (profileDropdown) profileDropdown.style.display = "none";
+                if (startButton) startButton.style.display = "none";
+
                 if (user) {
                     // 로그인된 상태 - 프로필 드롭다운 표시
                     if (profileDropdown) {
-                        profileDropdown.style.display = 'block';
-                        
+                        profileDropdown.style.display = "block";
+
                         // 프로필 텍스트 설정
                         if (profileText) {
-                            profileText.textContent = user.isAdmin ? '관리자' : '회원';
+                            profileText.textContent = user.isAdmin
+                                ? "관리자"
+                                : "회원";
                         }
-                        
+
                         // 사용자 이메일 표시
                         if (userEmailDisplay) {
-                            userEmailDisplay.textContent = user.email || 'user@test.com';
+                            userEmailDisplay.textContent =
+                                user.email || "user@test.com";
                         }
-                        
+
                         // 마이페이지 링크 설정
                         if (profileMypageLink) {
                             if (user.isAdmin) {
-                                profileMypageLink.href = 'admin.html';
-                                profileMypageLink.innerHTML = '<i class="fas fa-cog me-2"></i>관리자페이지';
+                                profileMypageLink.href = "admin.html";
+                                profileMypageLink.innerHTML =
+                                    '<i class="fas fa-cog me-2"></i>관리자페이지';
                             } else {
-                                profileMypageLink.href = 'mypage.html';
-                                profileMypageLink.innerHTML = '<i class="fas fa-user me-2"></i>마이페이지';
+                                profileMypageLink.href = "mypage.html";
+                                profileMypageLink.innerHTML =
+                                    '<i class="fas fa-user me-2"></i>마이페이지';
                             }
                         }
                     }
                 } else {
                     // 로그아웃된 상태 - 로그인 버튼과 시작하기 버튼 표시
-                    if (loginInfo) loginInfo.style.display = 'block';
-                    if (startButton) startButton.style.display = 'block';
+                    if (loginInfo) loginInfo.style.display = "block";
+                    if (startButton) startButton.style.display = "block";
                 }
             }
 
             // 부드러운 스크롤 기능 및 로그인 체크
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener("DOMContentLoaded", function () {
                 // 로그인 상태 확인 함수
                 async function checkLoginStatus() {
                     // 테스트 사용자 확인
-                    const testUser = localStorage.getItem('testUser');
+                    const testUser = localStorage.getItem("testUser");
                     if (testUser) {
                         return true;
                     }
-                    
+
                     // Supabase 사용자 확인 (getCurrentUser 함수 사용)
                     if (window.getCurrentUser) {
                         try {
@@ -3004,61 +3074,71 @@
                 }
 
                 // "지금 시작하기" 버튼들에 특별 처리
-                document.querySelectorAll('a[href="#courses"]').forEach(anchor => {
-                    anchor.addEventListener('click', async function (e) {
-                        e.preventDefault();
-                        
-                        const isLoggedIn = await checkLoginStatus();
-                        
-                        if (isLoggedIn) {
-                            // 로그인된 경우 courses 섹션으로 스크롤
-                            const target = document.querySelector('#courses');
-                            if (target) {
-                                target.scrollIntoView({
-                                    behavior: 'smooth',
-                                    block: 'start'
-                                });
+                document
+                    .querySelectorAll('a[href="#courses"]')
+                    .forEach((anchor) => {
+                        anchor.addEventListener("click", async function (e) {
+                            e.preventDefault();
+
+                            const isLoggedIn = await checkLoginStatus();
+
+                            if (isLoggedIn) {
+                                // 로그인된 경우 courses 섹션으로 스크롤
+                                const target =
+                                    document.querySelector("#courses");
+                                if (target) {
+                                    target.scrollIntoView({
+                                        behavior: "smooth",
+                                        block: "start",
+                                    });
+                                }
+                            } else {
+                                // 로그인되지 않은 경우 로그인 페이지로 이동
+                                window.location.href = "auth.html";
                             }
-                        } else {
-                            // 로그인되지 않은 경우 로그인 페이지로 이동
-                            window.location.href = 'auth.html';
-                        }
+                        });
                     });
-                });
 
                 // 다른 앵커 링크들에는 일반 부드러운 스크롤 적용
-                document.querySelectorAll('a[href^="#"]:not([href="#courses"])').forEach(anchor => {
-                    anchor.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        const target = document.querySelector(this.getAttribute('href'));
-                        if (target) {
-                            target.scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'start'
-                            });
-                        }
+                document
+                    .querySelectorAll('a[href^="#"]:not([href="#courses"])')
+                    .forEach((anchor) => {
+                        anchor.addEventListener("click", function (e) {
+                            e.preventDefault();
+                            const target = document.querySelector(
+                                this.getAttribute("href"),
+                            );
+                            if (target) {
+                                target.scrollIntoView({
+                                    behavior: "smooth",
+                                    block: "start",
+                                });
+                            }
+                        });
                     });
-                });
-                
+
                 // 초기 상태 설정 (안전하게)
                 setTimeout(() => {
                     checkAndUpdateUI();
                 }, 100);
-                
+
                 // 프로필 드롭다운 이벤트 리스너
-                document.addEventListener('click', async function(e) {
+                document.addEventListener("click", async function (e) {
                     // 로그아웃 처리
-                    if (e.target.id === 'profile-logout-link' || e.target.closest('#profile-logout-link')) {
+                    if (
+                        e.target.id === "profile-logout-link" ||
+                        e.target.closest("#profile-logout-link")
+                    ) {
                         e.preventDefault();
-                        
+
                         // 테스트 사용자 로그아웃
-                        if (localStorage.getItem('testUser')) {
-                            localStorage.removeItem('testUser');
+                        if (localStorage.getItem("testUser")) {
+                            localStorage.removeItem("testUser");
                             updateNavigationUI(null);
-                            showToast('로그아웃되었습니다.', 'success');
+                            showToast("로그아웃되었습니다.", "success");
                             return;
                         }
-                        
+
                         // Supabase 로그아웃
                         if (window.signOut) {
                             const success = await window.signOut();
@@ -3067,72 +3147,81 @@
                             }
                         }
                     }
-                    
+
                     // 마이페이지/관리자페이지 링크 처리
-                    if (e.target.id === 'profile-mypage-link' || e.target.closest('#profile-mypage-link')) {
+                    if (
+                        e.target.id === "profile-mypage-link" ||
+                        e.target.closest("#profile-mypage-link")
+                    ) {
                         e.preventDefault();
-                        const link = e.target.closest('#profile-mypage-link');
+                        const link = e.target.closest("#profile-mypage-link");
                         if (link && link.href) {
                             window.location.href = link.href;
                         }
                     }
                 });
-                
+
                 // 로그인 상태 확인 및 UI 업데이트 함수
                 async function checkAndUpdateUI() {
                     try {
-                        console.log('UI 확인 시작');
-                        
+                        console.log("UI 확인 시작");
+
                         // 요소 존재 확인
-                        const loginInfo = document.getElementById('login-info');
-                        const profileDropdown = document.getElementById('profile-dropdown');
-                        const startButton = document.getElementById('start-button');
-                        
+                        const loginInfo = document.getElementById("login-info");
+                        const profileDropdown =
+                            document.getElementById("profile-dropdown");
+                        const startButton =
+                            document.getElementById("start-button");
+
                         if (!loginInfo || !profileDropdown || !startButton) {
-                            console.log('UI 요소를 찾을 수 없음');
+                            console.log("UI 요소를 찾을 수 없음");
                             return;
                         }
-                        
+
                         // 테스트 사용자 우선 확인
-                        const testUser = localStorage.getItem('testUser');
+                        const testUser = localStorage.getItem("testUser");
                         if (testUser) {
                             const user = JSON.parse(testUser);
-                            console.log('테스트 사용자 발견:', user);
+                            console.log("테스트 사용자 발견:", user);
                             updateNavigationUI(user);
                             return;
                         }
-                        
+
                         // Supabase 사용자 확인
                         if (window.getCurrentUser) {
                             const user = await window.getCurrentUser();
                             if (user) {
-                                console.log('Supabase 사용자 발견:', user);
+                                console.log("Supabase 사용자 발견:", user);
                                 updateNavigationUI({ ...user, isAdmin: false });
                                 return;
                             }
                         }
-                        
+
                         // 로그인된 사용자가 없음
-                        console.log('로그인된 사용자 없음');
+                        console.log("로그인된 사용자 없음");
                         updateNavigationUI(null);
                     } catch (error) {
-                        console.error('UI 업데이트 오류:', error);
+                        console.error("UI 업데이트 오류:", error);
                         updateNavigationUI(null);
                     }
                 }
-                
+
                 // 페이지 포커스시 UI 재확인
-                window.addEventListener('focus', () => {
+                window.addEventListener("focus", () => {
                     setTimeout(checkAndUpdateUI, 100);
                 });
             });
-            
+
             // Toast 메시지 표시 함수 (간단한 버전)
-            function showToast(message, type = 'info') {
+            function showToast(message, type = "info") {
                 // 간단한 알림 표시
-                const alertClass = type === 'success' ? 'alert-success' : 
-                                 type === 'error' ? 'alert-danger' : 'alert-info';
-                
+                const alertClass =
+                    type === "success"
+                        ? "alert-success"
+                        : type === "error"
+                          ? "alert-danger"
+                          : "alert-info";
+
                 const toastHtml = `
                     <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
                          style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
@@ -3140,12 +3229,12 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 `;
-                
-                document.body.insertAdjacentHTML('beforeend', toastHtml);
-                
+
+                document.body.insertAdjacentHTML("beforeend", toastHtml);
+
                 // 3초 후 자동 제거
                 setTimeout(() => {
-                    const alert = document.querySelector('.alert:last-of-type');
+                    const alert = document.querySelector(".alert:last-of-type");
                     if (alert) {
                         alert.remove();
                     }
@@ -3244,7 +3333,7 @@
                         "총 380만원 상당의 자료 제공",
                     ],
                     reviews: [
-                        "4개월간 6천만원 벌어들이는 진정한 디지털노마드로 성장했어요",
+                        "수강생 6개월 평균 수익 2천만원을 달성한 진정한 디지털노마드로 성장했어요",
                         "자동화 수익 X 3배 더 강력해진 고수익 비밀을 알게 되었습니다",
                         "이 가격에 다시 보시기 힘드실 거예요. 정말 마지막 기회같아요",
                         "7월 15일-20일 사이 자료 발송되는데 정말 기대됩니다",
@@ -3398,9 +3487,11 @@
                 document.body.style.overflow = "auto";
             }
 
-            // AI Master signup handler
+            // 무료강의 신청 처리
             function handleAiMasterSignup() {
-                window.location.href = 'ai-master-landing.html';
+                // TODO: 실제 무료강의 신청 URL로 변경하세요
+                const freeCoursePage = "https://example.com/free-course";
+                window.open(freeCoursePage, "_blank");
             }
 
             // Smooth scrolling for navigation links

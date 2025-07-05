@@ -153,6 +153,13 @@ Changelog:
   * Created video-viewer.html with lesson progress tracking and structured course content
   * Added dynamic navigation based on user role (member/admin) with compact user info display
   * Enhanced mypage.html with test content and proper access control
+- June 28, 2025. Major platform restructure - AI Master to Free Course conversion:
+  * Updated revenue statistics: "6천만원" → "2천만원", "6개월 누적 수익" → "수강생 6개월 평균 수익"
+  * Removed ai-master-landing.html and all related links completely
+  * Converted AI Master paid course section to free course registration system
+  * Updated course curriculum to focus on 2 core modules: EXE file automation and website creation
+  * Redesigned UI with profile dropdown replacing "지금 시작하기" button for logged-in users
+  * Added external URL redirect for free course registration (configurable in handleAiMasterSignup function)
 ```
 
 ## User Preferences
