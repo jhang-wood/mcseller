@@ -1,0 +1,315 @@
+/* MCSELLER Mobile Optimization CSS */
+
+/* 모바일 기본 설정 */
+@media screen and (max-width: 768px) {
+    /* 터치 최적화 */
+    * {
+        -webkit-tap-highlight-color: rgba(255, 153, 0, 0.3);
+        -webkit-touch-callout: none;
+    }
+    
+    /* 스크롤 개선 */
+    html {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+    
+    /* 폰트 크기 조정 */
+    body {
+        font-size: 16px; /* iOS 줌 방지 */
+        line-height: 1.6;
+    }
+    
+    /* 버튼 터치 영역 확대 */
+    .btn {
+        min-height: 48px;
+        padding: 12px 20px;
+        font-size: 16px;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+    }
+    
+    .btn:active {
+        transform: scale(0.95);
+        box-shadow: 0 2px 8px rgba(255, 153, 0, 0.3);
+    }
+    
+    /* 카드 스타일 모바일 최적화 */
+    .card {
+        border-radius: 16px;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease;
+    }
+    
+    .card:active {
+        transform: scale(0.98);
+    }
+    
+    /* 네비게이션 최적화 */
+    .navbar-nav {
+        padding: 1rem 0;
+    }
+    
+    .nav-link {
+        padding: 12px 16px;
+        font-size: 16px;
+        border-radius: 8px;
+        margin: 4px 0;
+    }
+    
+    /* 입력 필드 최적화 */
+    .form-control {
+        font-size: 16px; /* iOS 줌 방지 */
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 2px solid rgba(255, 153, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #ff9900;
+        box-shadow: 0 0 0 0.2rem rgba(255, 153, 0, 0.25);
+        transform: translateY(-2px);
+    }
+    
+    /* 모달 최적화 */
+    .modal-dialog {
+        margin: 1rem;
+        max-width: calc(100vw - 2rem);
+    }
+    
+    .modal-content {
+        border-radius: 16px;
+    }
+    
+    /* 텍스트 크기 조정 */
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.75rem; }
+    h3 { font-size: 1.5rem; }
+    h4 { font-size: 1.25rem; }
+    h5 { font-size: 1.125rem; }
+    h6 { font-size: 1rem; }
+    
+    /* 간격 조정 */
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .row > * {
+        margin-bottom: 1rem;
+    }
+    
+    /* 이미지 최적화 */
+    img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+    
+    /* 테이블 스크롤 */
+    .table-responsive {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* 토스트 알림 위치 조정 */
+    .toast-container {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        left: 1rem;
+        z-index: 1060;
+    }
+    
+    .toast {
+        border-radius: 12px;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* 작은 모바일 기기 (iPhone SE 등) */
+@media screen and (max-width: 400px) {
+    .container-fluid {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+    
+    .btn {
+        font-size: 14px;
+        padding: 10px 16px;
+    }
+    
+    h1 { font-size: 1.75rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.25rem; }
+}
+
+/* 큰 모바일 기기 및 태블릿 */
+@media screen and (min-width: 576px) and (max-width: 991px) {
+    .container {
+        max-width: 100%;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+    
+    .card {
+        margin-bottom: 2rem;
+    }
+    
+    .btn-lg {
+        min-height: 52px;
+        font-size: 18px;
+    }
+}
+
+/* 햄버거 메뉴 개선 */
+@media screen and (max-width: 991px) {
+    .navbar-toggler {
+        border: none;
+        padding: 8px 12px;
+        border-radius: 8px;
+        background: rgba(255, 153, 0, 0.1);
+    }
+    
+    .navbar-toggler:focus {
+        box-shadow: 0 0 0 0.2rem rgba(255, 153, 0, 0.25);
+    }
+    
+    .navbar-collapse {
+        background: rgba(17, 17, 17, 0.95);
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+    }
+}
+
+/* 스와이프 제스처 지원 */
+.swipeable {
+    touch-action: pan-x;
+    user-select: none;
+}
+
+/* 풀스크린 비디오 플레이어 최적화 */
+.video-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 비율 */
+    height: 0;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+}
+
+/* 모바일 전용 유틸리티 클래스 */
+.mobile-only {
+    display: none;
+}
+
+.desktop-only {
+    display: block;
+}
+
+@media screen and (max-width: 768px) {
+    .mobile-only {
+        display: block;
+    }
+    
+    .desktop-only {
+        display: none;
+    }
+    
+    .mobile-center {
+        text-align: center;
+    }
+    
+    .mobile-full-width {
+        width: 100%;
+    }
+    
+    .mobile-hide {
+        display: none !important;
+    }
+}
+
+/* 다크 모드 지원 */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bs-body-bg: #111111;
+        --bs-body-color: #e0e0e0;
+    }
+}
+
+/* 접근성 개선 */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* 고해상도 디스플레이 최적화 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .btn {
+        border-width: 0.5px;
+    }
+    
+    .card {
+        border-width: 0.5px;
+    }
+}
+
+/* iOS Safari 특별 최적화 */
+@supports (-webkit-touch-callout: none) {
+    .btn {
+        -webkit-appearance: none;
+        -webkit-border-radius: 12px;
+    }
+    
+    .form-control {
+        -webkit-appearance: none;
+        -webkit-border-radius: 12px;
+    }
+}
+
+/* 모바일 드래그 앤 드롭 방지 */
+img, .card, .btn {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+}
+
+/* 모바일 컨텍스트 메뉴 방지 */
+.no-context-menu {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* 진동 피드백 지원 클래스 */
+.vibrate-light {
+    /* JavaScript에서 navigator.vibrate(50) 호출 */
+}
+
+.vibrate-medium {
+    /* JavaScript에서 navigator.vibrate(100) 호출 */
+}
+
+.vibrate-strong {
+    /* JavaScript에서 navigator.vibrate([100, 30, 100]) 호출 */
+}

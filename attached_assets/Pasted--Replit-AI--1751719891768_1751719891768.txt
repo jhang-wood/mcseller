@@ -1,0 +1,115 @@
+알겠습니다. 회원가입은 되지만 로그인이 실패하는 문제와 함께 요청하신 모든 사항을 파악했습니다. Replit AI가 이 모든 문제를 한 번에 해결하고, 실제 서비스 가능한 수준의 로그인 시스템을 구현할 수 있도록 매우 상세하고 체계적인 작업 지시서를 작성해 드리겠습니다.
+
+[Replit AI 작업 지시서]
+
+1. @Context (작업 맥락):
+
+    작업 대상 파일:
+
+        js/auth.js (로그인 및 인증 로직을 포함한 핵심 스크립트)
+
+        로그인이 이루어지는 HTML 파일 (예: login.html, index.html 등)
+
+    관련 함수/클래스:
+
+        로그인을 처리하는 함수 (이름이 handleLogin, signIn 등으로 추정)
+
+        supabase.auth.signInWithPassword (이메일 로그인용 Supabase 함수)
+
+        supabase.auth.signInWithOAuth (소셜 로그인용 Supabase 함수)
+
+    기술 스택: JavaScript (ES6+), Supabase v2, HTML5, Kakao Login for JavaScript
+
+2. @Problem (문제 정의):
+
+    이메일/비밀번호로 로그인 시도 시, js/auth.js의 198번째 줄 근처에서 Supabase API 호출이 실패하며 '서비스 연결 오류'가 발생합니다.
+
+    로그인 페이지에 하드코딩된 테스트 계정 정보(ID/PW)가 불필요하게 노출되고 있습니다.
+
+    로그인 성공 후 세션 관리가 불안정하여 사용자가 홈페이지를 원활히 사용할 수 없으며, 카카오 로그인이 테스트 단계를 넘어 실제 서비스용으로 완벽하게 구현되어야 합니다.
+
+3. @Instructions (단계별 상세 지시):
+
+    로그인 페이지 UI 정리:
+
+        로그인 폼이 있는 HTML 파일을 찾으세요.
+
+        이미지에 보이는 '테스트 계정' 정보가 담긴 div 또는 p 태그 블록을 찾아서 완전히 삭제하세요. (`` 주석 처리도 좋습니다.)
+
+    이메일/비밀번호 로그인 기능 수정 (js/auth.js):
+
+        로그인을 처리하는 함수(예: handleLogin)를 찾으세요. 해당 함수를 async/await를 사용하도록 수정하여 비동기 로직을 명확하게 만드세요.
+
+        함수 전체를 try...catch 블록으로 감싸 견고한 오류 처리를 구현하세요.
+
+        try 블록 내에서, supabase.auth.signInWithPassword()를 사용하여 로그인을 시도하세요. 이메일과 비밀번호 입력 필드의 value를 정확하게 가져오는지 다시 한번 확인하세요.
+        JavaScript
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,       // email 입력 필드의 값
+        password: password  // password 입력 필드의 값
+    });
+
+    매우 중요: 오류 메시지를 분기 처리하세요.
+
+        if (error) 블록 안에서, error.message에 "Invalid login credentials"가 포함되어 있는지 확인하세요.
+
+        포함되어 있다면, alert('아이디 또는 비밀번호가 일치하지 않습니다.'); 와 같이 사용자 친화적인 메시지를 표시하세요.
+
+        그 외의 다른 오류가 발생하면, alert('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'); 메시지를 표시하세요.
+
+    로그인 성공 시(else 블록), window.location.href = '/main.html'; 과 같이 사용자를 홈페이지의 메인 페이지로 즉시 리디렉션시키세요.
+
+프로덕션용 카카오 로그인 기능 완성:
+
+    HTML 파일 <head>에 카카오 SDK가 포함되어 있는지 확인하고, 없다면 추가하세요.
+
+    js/auth.js에서 카카오 로그인 처리 함수(예: handleKakaoLogin)를 찾거나 만드세요.
+
+    함수 내에서 Kakao.init('YOUR_KAKAO_JAVASCRIPT_KEY'); 를 사용하여 실제 발급받은 프로덕션용 JavaScript 키로 초기화해야 합니다. (AI가 작업 시에는 플레이스홀더로 두고, 주석으로 키를 넣으라고 안내)
+
+    supabase.auth.signInWithOAuth({ provider: 'kakao' }) 를 호출하여 Supabase와 연동된 카카오 로그인을 실행하세요.
+
+    이 과정 역시 try...catch로 감싸고, 오류 발생 시 alert('카카오 로그인에 실패했습니다.'); 메시지를 표시하세요.
+
+완벽한 세션 관리 기능 구현:
+
+    사용자가 로그인 후 어떤 페이지로 이동하더라도 로그인 상태가 유지되어야 합니다.
+
+    js/auth.js 또는 별도의 클라이언트 스크립트 최상단에, 페이지 로드 시 사용자의 인증 상태를 확인하는 로직을 추가하세요.
+
+    supabase.auth.onAuthStateChange를 사용하여 인증 상태 변경을 감지하고, 세션(로그인 정보) 유무에 따라 UI를 동적으로 변경하거나 페이지를 리디렉션하는 로직을 구현하세요.
+    JavaScript
+
+        // 예시: 로그인 페이지가 아닌 다른 페이지에서의 로직
+        document.addEventListener('DOMContentLoaded', () => {
+          supabase.auth.onAuthStateChange((_event, session) => {
+            if (!session) {
+              // 세션이 없으면(로그아웃 상태) 로그인 페이지로 보냄
+              alert('로그인이 필요합니다.');
+              window.location.href = '/login.html';
+            }
+          });
+        });
+
+4. @Constraints (준수해야 할 제약 조건):
+
+    이 지시서에 명시된 파일 외에는 절대 수정하지 마세요.
+
+    기존 코드의 스타일과 포맷(들여쓰기, 변수명 등)을 반드시 유지하세요.
+
+    새로운 라이브러리를 설치하거나 CDN을 추가하지 마세요. (단, 카카오 SDK는 예외)
+
+    Supabase URL/Key 및 Kakao API Key를 코드에 직접 하드코딩하지 마세요. 플레이스홀더(YOUR_..._KEY)를 사용하고, 사용자가 직접 입력하도록 주석을 남겨주세요.
+
+5. @Verification (결과 확인 방법):
+
+    UI 확인: 로그인 페이지를 열었을 때, '테스트 계정' 정보가 담긴 파란색 박스가 완전히 사라져야 합니다.
+
+    로그인 실패 테스트: 존재하지 않는 ID나 틀린 비밀번호로 로그인 시, "아이디 또는 비밀번호가 일치하지 않습니다." 라는 경고창이 떠야 합니다. '서비스 연결 오류'가 더 이상 나타나면 안 됩니다.
+
+    로그인 성공 테스트: 올바른 ID와 비밀번호로 로그인 시, 즉시 메인 홈페이지로 이동해야 합니다.
+
+    카카오 로그인 테스트: 카카오 로그인 버튼을 클릭하여 실제 카카오 계정으로 로그인 후, 메인 홈페이지로 성공적으로 이동해야 합니다.
+
+    세션 유지 테스트: 로그인 후 메인 페이지에서 새로고침을 해도 로그인 페이지로 튕겨 나가지 않고, 로그인 상태가 유지되어야 합니다.

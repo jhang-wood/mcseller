@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>오프라인 - MCSELLER</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
+    
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #111111 0%, #23272f 100%);
+            --accent-gradient: linear-gradient(90deg, #ff9900, #ffe259);
+            --text-light: #e0e0e0;
+            --text-muted: #b5b5b5;
+        }
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: var(--primary-gradient);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .offline-container {
+            text-align: center;
+            padding: 3rem;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 153, 0, 0.2);
+        }
+        
+        .offline-icon {
+            font-size: 4rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn-primary {
+            background: var(--accent-gradient);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 153, 0, 0.3);
+        }
+        
+        .cached-content {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border-left: 4px solid #ff9900;
+        }
+        
+        .cached-content h6 {
+            color: #ff9900;
+            margin-bottom: 1rem;
+        }
+        
+        .cached-link {
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            display: block;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 153, 0, 0.1);
+        }
+        
+        .cached-link:hover {
+            background: rgba(255, 153, 0, 0.1);
+            color: #ff9900;
+            text-decoration: none;
+        }
+        
+        .network-status {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .network-offline {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            color: #dc3545;
+        }
+        
+        .network-online {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-icon">
+            <i class="fas fa-wifi-slash"></i>
+        </div>
+        
+        <h2 class="mb-3">인터넷 연결이 끊어졌습니다</h2>
+        <p class="text-muted mb-4">
+            현재 오프라인 상태입니다. 인터넷 연결을 확인한 후 다시 시도해주세요.
+        </p>
+        
+        <button class="btn btn-primary mb-3" onclick="window.location.reload()">
+            <i class="fas fa-sync-alt me-2"></i>다시 시도
+        </button>
+        
+        <div class="network-status" id="networkStatus">
+            <i class="fas fa-circle me-2"></i>
+            <span id="networkText">연결 상태 확인 중...</span>
+        </div>
+        
+        <div class="cached-content">
+            <h6><i class="fas fa-archive me-2"></i>오프라인에서도 이용 가능</h6>
+            <a href="/index.html" class="cached-link">
+                <i class="fas fa-home me-2"></i>메인 페이지 (캐시됨)
+            </a>
+            <a href="/mypage.html" class="cached-link">
+                <i class="fas fa-user me-2"></i>내 강의실 (캐시됨)
+            </a>
+            <a href="/auth.html" class="cached-link">
+                <i class="fas fa-sign-in-alt me-2"></i>로그인 페이지 (캐시됨)
+            </a>
+        </div>
+        
+        <div class="mt-4">
+            <small class="text-muted">
+                일부 기능은 인터넷 연결이 필요할 수 있습니다.
+            </small>
+        </div>
+    </div>
+
+    <script>
+        // 네트워크 상태 모니터링
+        function updateNetworkStatus() {
+            const statusElement = document.getElementById('networkStatus');
+            const textElement = document.getElementById('networkText');
+            
+            if (navigator.onLine) {
+                statusElement.className = 'network-status network-online';
+                textElement.textContent = '인터넷 연결됨 - 새로고침 가능';
+                
+                // 자동 새로고침 (3초 후)
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000);
+            } else {
+                statusElement.className = 'network-status network-offline';
+                textElement.textContent = '오프라인 상태';
+            }
+        }
+        
+        // 네트워크 상태 변경 감지
+        window.addEventListener('online', updateNetworkStatus);
+        window.addEventListener('offline', updateNetworkStatus);
+        
+        // 초기 상태 확인
+        updateNetworkStatus();
+        
+        // 주기적으로 연결 상태 확인 (10초마다)
+        setInterval(updateNetworkStatus, 10000);
+    </script>
+</body>
+</html>

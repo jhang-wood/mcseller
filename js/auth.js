@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', function() {
     setupFormEvents();
     setupSocialAuth();
     checkExistingSession();
-    showTestAccounts();
 });
 
 // 인증 페이지 초기화
@@ -204,7 +203,13 @@ async function handleLogin(e) {
         });
         
         if (error) {
-            throw error;
+            console.error('Supabase 로그인 오류:', error);
+            if (error.message.includes('Invalid login credentials') || error.message.includes('Invalid')) {
+                showToast('아이디 또는 비밀번호가 일치하지 않습니다.', 'error');
+            } else {
+                showToast('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
+            }
+            return;
         }
         
         if (data.user) {
@@ -684,22 +689,13 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// 테스트 계정 정보 표시
+// 테스트 계정 정보는 개발 환경에서만 콘솔에 표시
 function showTestAccounts() {
-    const testInfoHtml = `
-        <div class="alert alert-info mt-4">
-            <h6><i class="fas fa-info-circle"></i> 테스트 계정</h6>
-            <p class="mb-2"><strong>일반 사용자:</strong> user@test.com / 123456</p>
-            <p class="mb-0"><strong>관리자:</strong> admin@test.com / admin123</p>
-        </div>
-    `;
-    
-    const forms = document.querySelectorAll('.auth-form');
-    forms.forEach(form => {
-        if (!form.querySelector('.alert-info')) {
-            form.insertAdjacentHTML('beforeend', testInfoHtml);
-        }
-    });
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.includes('replit')) {
+        console.log('개발 환경 - 테스트 계정 정보:');
+        console.log('일반 사용자: user@test.com / 123456');
+        console.log('관리자: admin@test.com / admin123');
+    }
 }
 
 // Toast 메시지 표시 함수

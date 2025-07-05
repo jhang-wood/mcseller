@@ -17,6 +17,27 @@
 
         <title>MCSELLER - 온라인 수익화 전문 교육 플랫폼</title>
 
+        <!-- PWA Meta Tags -->
+        <meta name="theme-color" content="#ff9900" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="MCSELLER" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="application-name" content="MCSELLER" />
+        
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json" />
+        
+        <!-- Apple Touch Icons -->
+        <link rel="apple-touch-icon" href="https://via.placeholder.com/180x180/ff9900/ffffff?text=MC" />
+        <link rel="apple-touch-icon" sizes="152x152" href="https://via.placeholder.com/152x152/ff9900/ffffff?text=MC" />
+        <link rel="apple-touch-icon" sizes="180x180" href="https://via.placeholder.com/180x180/ff9900/ffffff?text=MC" />
+        <link rel="apple-touch-icon" sizes="167x167" href="https://via.placeholder.com/167x167/ff9900/ffffff?text=MC" />
+        
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" sizes="32x32" href="https://via.placeholder.com/32x32/ff9900/ffffff?text=MC" />
+        <link rel="icon" type="image/png" sizes="16x16" href="https://via.placeholder.com/16x16/ff9900/ffffff?text=MC" />
+
         <!-- Meta Tags for SEO -->
 
         <meta
@@ -72,6 +93,9 @@
             href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
             rel="stylesheet"
         />
+        
+        <!-- Mobile Optimization CSS -->
+        <link rel="stylesheet" href="css/mobile.css" />
 
         <link
             href="https://unpkg.com/aos@2.3.1/dist/aos.css"
@@ -3905,6 +3929,14 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+        
+        <!-- Supabase -->
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        
+        <!-- MCSELLER Scripts -->
+        <script src="js/supabase-client.js"></script>
+        <script src="js/mobile-utils.js"></script>
+        <script src="js/modern-main.js"></script>
 
         <script>
             // Initialize AOS
@@ -4823,6 +4855,73 @@
                         this.style.transform = "translateY(0) scale(1)";
                     });
                 });
+            });
+        </script>
+
+        <!-- PWA Service Worker Registration -->
+        <script>
+            // Service Worker 등록
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(registration => {
+                            console.log('Service Worker 등록 성공:', registration.scope);
+                            
+                            // 업데이트 확인
+                            registration.addEventListener('updatefound', () => {
+                                const newWorker = registration.installing;
+                                newWorker.addEventListener('statechange', () => {
+                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                        // 새 버전 사용 가능 알림
+                                        if (confirm('새 버전이 사용 가능합니다. 업데이트하시겠습니까?')) {
+                                            window.location.reload();
+                                        }
+                                    }
+                                });
+                            });
+                        })
+                        .catch(error => {
+                            console.log('Service Worker 등록 실패:', error);
+                        });
+                });
+            }
+
+            // App Install 프롬프트
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                
+                // 설치 버튼 표시
+                const installButton = document.createElement('button');
+                installButton.innerHTML = '<i class="fas fa-download me-2"></i>앱 설치';
+                installButton.className = 'btn btn-outline-warning btn-sm position-fixed';
+                installButton.style.cssText = 'bottom: 20px; right: 20px; z-index: 1000; border-radius: 25px;';
+                
+                installButton.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log('PWA 설치:', outcome);
+                        deferredPrompt = null;
+                        installButton.remove();
+                    }
+                });
+                
+                document.body.appendChild(installButton);
+                
+                // 5초 후 자동 숨김
+                setTimeout(() => {
+                    if (installButton.parentNode) {
+                        installButton.style.opacity = '0.7';
+                    }
+                }, 5000);
+            });
+
+            // 설치 완료 이벤트
+            window.addEventListener('appinstalled', () => {
+                console.log('MCSELLER 앱이 설치되었습니다!');
+                deferredPrompt = null;
             });
         </script>
     </body>

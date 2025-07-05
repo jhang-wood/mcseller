@@ -1,0 +1,62 @@
+{
+  "name": "MCSELLER - 온라인 교육 플랫폼",
+  "short_name": "MCSELLER",
+  "description": "실무 중심 온라인 교육으로 2달내 첫 수익 90% 달성하는 플랫폼",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#ff9900",
+  "orientation": "portrait-primary",
+  "categories": ["education", "business", "productivity"],
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192/ff9900/ffffff?text=MC",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512/ff9900/ffffff?text=MC",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "scope": "/",
+  "id": "mcseller-education-platform",
+  "screenshots": [
+    {
+      "src": "https://via.placeholder.com/540x720/111111/ff9900?text=MCSELLER",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "내 강의실",
+      "short_name": "강의실",
+      "description": "구매한 강의 및 콘텐츠 바로가기",
+      "url": "/mypage.html",
+      "icons": [
+        {
+          "src": "https://via.placeholder.com/96x96/ff9900/ffffff?text=📚",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "로그인",
+      "short_name": "로그인",
+      "description": "계정에 로그인하기",
+      "url": "/auth.html",
+      "icons": [
+        {
+          "src": "https://via.placeholder.com/96x96/ff9900/ffffff?text=🔑",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}
