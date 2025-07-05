@@ -11,7 +11,6 @@ class MobileUtils {
         this.setupMobileOptimizations();
         this.setupTouchHandlers();
         this.setupOrientationChange();
-        this.setupVibration();
         this.setupPullToRefresh();
         this.setupMobileNavigation();
     }

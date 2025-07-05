@@ -1,347 +1,303 @@
-// 테스트 계정 정보
-const TEST_ACCOUNTS = {
-    user: { email: 'user@test.com', password: '123456', isAdmin: false },
-    admin: { email: 'admin@test.com', password: 'admin123', isAdmin: true }
-};
+// MCSELLER 인증 시스템 (프로덕션 준비 버전)
 
-// 인증 페이지 JavaScript
-document.addEventListener('DOMContentLoaded', function() {
-    initializeAuthPage();
-    setupFormEvents();
-    setupSocialAuth();
-    checkExistingSession();
-});
-
-// 인증 페이지 초기화
+// 페이지 초기화
 function initializeAuthPage() {
-    // URL 파라미터 확인
-    const urlParams = new URLSearchParams(window.location.search);
-    const mode = urlParams.get('mode');
-    
-    if (mode === 'signup') {
-        showSignupForm();
-    } else if (mode === 'reset') {
-        showResetForm();
-    } else {
-        showLoginForm();
-    }
-    
-    // 폼 전환 이벤트 설정
+    setupFormEvents();
+    checkExistingSession();
     setupFormSwitching();
+    setupSocialAuth();
 }
 
 // 기존 세션 확인
 async function checkExistingSession() {
-    if (!window.supabaseClient) return;
-    
-    try {
-        const user = await getCurrentUser();
-        if (user) {
-            // 이미 로그인된 경우 메인 페이지로 리다이렉트
-            const returnUrl = new URLSearchParams(window.location.search).get('return') || 'index.html';
-            window.location.href = returnUrl;
+    if (window.location.hostname === "localhost" || 
+        window.location.hostname === "127.0.0.1" || 
+        window.location.hostname.includes("replit")) {
+        console.log("개발 환경에서 실행 중입니다.");
+        
+        // 테스트 사용자 확인
+        const testUser = localStorage.getItem('testUser');
+        if (testUser) {
+            console.log("테스트 사용자 발견:", JSON.parse(testUser));
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+            return;
+        } else {
+            console.log("테스트 모드: 로그아웃 상태");
         }
-    } catch (error) {
-        console.error('세션 확인 오류:', error);
+    }
+
+    if (window.supabaseClient) {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            window.location.href = 'index.html';
+        }
     }
 }
 
 // 폼 이벤트 설정
 function setupFormEvents() {
-    // 로그인 폼
     const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const resetForm = document.getElementById('resetForm');
+
     if (loginForm) {
         loginForm.addEventListener('submit', handleLogin);
     }
-    
-    // 회원가입 폼
-    const signupForm = document.getElementById('signupForm');
     if (signupForm) {
         signupForm.addEventListener('submit', handleSignup);
     }
-    
-    // 비밀번호 재설정 폼
-    const resetForm = document.getElementById('resetForm');
     if (resetForm) {
         resetForm.addEventListener('submit', handlePasswordReset);
     }
-    
+
     // 비밀번호 확인 검증
     const confirmPassword = document.getElementById('confirmPassword');
-    const signupPassword = document.getElementById('signupPassword');
-    
-    if (confirmPassword && signupPassword) {
-        confirmPassword.addEventListener('input', function() {
-            validatePasswordMatch();
-        });
-        
-        signupPassword.addEventListener('input', function() {
-            validatePasswordMatch();
-        });
+    if (confirmPassword) {
+        confirmPassword.addEventListener('input', validatePasswordMatch);
     }
+
+    // 이메일 자동완성
+    const emailInputs = document.querySelectorAll('input[type="email"]');
+    emailInputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            validateEmail(this);
+        });
+    });
+
+    // 비밀번호 강도 표시
+    const passwordInputs = document.querySelectorAll('input[type="password"]');
+    passwordInputs.forEach(input => {
+        if (input.id === 'signupPassword') {
+            input.addEventListener('input', function() {
+                showPasswordStrength(this);
+            });
+        }
+    });
 }
 
 // 폼 전환 설정
 function setupFormSwitching() {
-    // 회원가입 표시
-    document.getElementById('show-signup')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        showSignupForm();
+    // 회원가입으로 전환
+    document.querySelectorAll('[data-form="signup"]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSignupForm();
+        });
     });
-    
-    // 로그인 표시
-    document.getElementById('show-login')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        showLoginForm();
+
+    // 로그인으로 전환
+    document.querySelectorAll('[data-form="login"]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showLoginForm();
+        });
     });
-    
-    // 비밀번호 재설정 표시
-    document.getElementById('forgot-password')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        showResetForm();
-    });
-    
-    // 로그인으로 돌아가기
-    document.getElementById('back-to-login')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        showLoginForm();
+
+    // 비밀번호 재설정으로 전환
+    document.querySelectorAll('[data-form="reset"]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showResetForm();
+        });
     });
 }
 
 // 로그인 폼 표시
 function showLoginForm() {
-    document.getElementById('login-form')?.classList.remove('d-none');
-    document.getElementById('signup-form')?.classList.add('d-none');
-    document.getElementById('reset-form')?.classList.add('d-none');
-    
-    // URL 업데이트
-    const url = new URL(window.location);
-    url.searchParams.delete('mode');
-    window.history.replaceState({}, '', url);
+    document.getElementById('loginCard').style.display = 'block';
+    document.getElementById('signupCard').style.display = 'none';
+    document.getElementById('resetCard').style.display = 'none';
 }
 
 // 회원가입 폼 표시
 function showSignupForm() {
-    document.getElementById('login-form')?.classList.add('d-none');
-    document.getElementById('signup-form')?.classList.remove('d-none');
-    document.getElementById('reset-form')?.classList.add('d-none');
-    
-    // URL 업데이트
-    const url = new URL(window.location);
-    url.searchParams.set('mode', 'signup');
-    window.history.replaceState({}, '', url);
+    document.getElementById('loginCard').style.display = 'none';
+    document.getElementById('signupCard').style.display = 'block';
+    document.getElementById('resetCard').style.display = 'none';
 }
 
 // 비밀번호 재설정 폼 표시
 function showResetForm() {
-    document.getElementById('login-form')?.classList.add('d-none');
-    document.getElementById('signup-form')?.classList.add('d-none');
-    document.getElementById('reset-form')?.classList.remove('d-none');
-    
-    // URL 업데이트
-    const url = new URL(window.location);
-    url.searchParams.set('mode', 'reset');
-    window.history.replaceState({}, '', url);
+    document.getElementById('loginCard').style.display = 'none';
+    document.getElementById('signupCard').style.display = 'none';
+    document.getElementById('resetCard').style.display = 'block';
 }
 
-// 로그인 처리
+// 로그인 처리 (프로덕션 버전)
 async function handleLogin(e) {
     e.preventDefault();
-    
+
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
     const rememberMe = document.getElementById('rememberMe').checked;
-    
+
     if (!email || !password) {
         showToast('이메일과 비밀번호를 입력해주세요.', 'warning');
         return;
     }
-    
-    // 로딩 상태 표시
+
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>로그인 중...';
     submitBtn.disabled = true;
-    
+
     try {
-        console.log('로그인 처리');
+        console.log("로그인 처리");
         
-        // 테스트 계정 확인
-        const testAccount = Object.values(TEST_ACCOUNTS).find(account => 
-            account.email === email && account.password === password
-        );
-        
-        console.log('테스트 계정 확인:', email, password, testAccount);
-        
-        if (testAccount) {
-            console.log('테스트 계정 로그인 성공');
-            localStorage.setItem('testUser', JSON.stringify({
-                email: testAccount.email,
-                isAdmin: testAccount.isAdmin,
-                loginTime: new Date().toISOString()
-            }));
+        // 개발 환경에서만 테스트 계정 확인
+        if (window.location.hostname === "localhost" || 
+            window.location.hostname === "127.0.0.1" || 
+            window.location.hostname.includes("replit")) {
             
-            showToast(testAccount.isAdmin ? '관리자로 로그인되었습니다!' : '로그인 성공!', 'success');
+            const TEST_ACCOUNTS = {
+                user: { email: 'user@test.com', password: '123456', isAdmin: false },
+                admin: { email: 'admin@test.com', password: 'admin123', isAdmin: true }
+            };
             
-            setTimeout(() => {
-                if (testAccount.isAdmin) {
-                    window.location.href = 'admin.html';
-                } else {
-                    window.location.href = 'mypage.html';
-                }
-            }, 1000);
-            return;
+            const testAccount = Object.values(TEST_ACCOUNTS).find(
+                account => account.email === email && account.password === password
+            );
+
+            console.log("테스트 계정 확인:", email, password, testAccount);
+
+            if (testAccount) {
+                console.log("테스트 계정 로그인 성공");
+                localStorage.setItem('testUser', JSON.stringify({
+                    email: testAccount.email,
+                    isAdmin: testAccount.isAdmin,
+                    loginTime: new Date().toISOString()
+                }));
+
+                showToast(testAccount.isAdmin ? "관리자로 로그인되었습니다!" : "로그인 성공!", "success");
+
+                setTimeout(() => {
+                    if (testAccount.isAdmin) {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'mypage.html';
+                    }
+                }, 1000);
+                return;
+            }
         }
-        
+
+        // 프로덕션 환경에서는 Supabase 로그인만 사용
         if (!window.supabaseClient) {
             throw new Error('서비스 연결 오류');
         }
-        
+
         const { data, error } = await supabaseClient.auth.signInWithPassword({
             email: email,
             password: password
         });
-        
+
         if (error) {
             console.error('Supabase 로그인 오류:', error);
-            if (error.message.includes('Invalid login credentials') || error.message.includes('Invalid')) {
+            if (error.message.includes('Invalid login credentials') || 
+                error.message.includes('Invalid')) {
                 showToast('아이디 또는 비밀번호가 일치하지 않습니다.', 'error');
             } else {
                 showToast('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
             }
             return;
         }
-        
+
         if (data.user) {
-            // 사용자 정보 저장 (remember me 옵션 적용)
             if (rememberMe) {
-                localStorage.setItem('rememberUser', 'true');
+                localStorage.setItem('rememberEmail', email);
+            } else {
+                localStorage.removeItem('rememberEmail');
             }
-            
+
             showToast('성공적으로 로그인되었습니다!', 'success');
-            
-            // 리다이렉트
+
             setTimeout(() => {
-                const returnUrl = new URLSearchParams(window.location.search).get('return') || 'index.html';
-                window.location.href = returnUrl;
-            }, 1000);
+                window.location.href = 'index.html';
+            }, 1500);
         }
-        
+
     } catch (error) {
         console.error('로그인 오류:', error);
-        handleSupabaseError(error, '로그인');
+        showToast('로그인 중 오류가 발생했습니다.', 'error');
     } finally {
-        // 로딩 상태 해제
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
     }
 }
 
-// 회원가입 처리
+// 회원가입 처리 (프로덕션 버전)
 async function handleSignup(e) {
     e.preventDefault();
-    
+
     const name = document.getElementById('signupName').value.trim();
     const email = document.getElementById('signupEmail').value.trim();
     const password = document.getElementById('signupPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
     const agreeTerms = document.getElementById('agreeTerms').checked;
-    
-    // 유효성 검사
+
     if (!name || !email || !password || !confirmPassword) {
         showToast('모든 필드를 입력해주세요.', 'warning');
         return;
     }
-    
+
     if (password !== confirmPassword) {
         showToast('비밀번호가 일치하지 않습니다.', 'warning');
         return;
     }
-    
-    if (password.length < 6) {
-        showToast('비밀번호는 최소 6자 이상이어야 합니다.', 'warning');
-        return;
-    }
-    
+
     if (!agreeTerms) {
         showToast('이용약관에 동의해주세요.', 'warning');
         return;
     }
-    
-    // 로딩 상태 표시
+
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>가입 중...';
     submitBtn.disabled = true;
-    
+
     try {
-        // 개발 환경에서는 테스트 모드 사용
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.includes('replit')) {
-            console.log('테스트 모드: 회원가입 처리');
-            showToast('테스트 모드에서 회원가입이 완료되었습니다.', 'success');
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1500);
-            return;
-        }
-        
         if (!window.supabaseClient) {
             throw new Error('서비스 연결 오류');
         }
-        
-        // Supabase 회원가입
+
         const { data, error } = await supabaseClient.auth.signUp({
             email: email,
             password: password,
             options: {
                 data: {
-                    name: name
+                    name: name,
+                    created_at: new Date().toISOString()
                 }
             }
         });
-        
+
         if (error) {
-            console.error('회원가입 오류:', error);
-            showToast('회원가입에 실패했습니다: ' + error.message, 'error');
-            return;
+            throw error;
         }
-        
+
         if (data.user) {
-            // 사용자 정보를 users 테이블에 저장
-            try {
-                const { error: insertError } = await supabaseClient
-                    .from('users')
-                    .insert([
-                        {
-                            id: data.user.id,
-                            email: email,
-                            name: name,
-                            role: 'user',
-                            created_at: new Date().toISOString()
-                        }
-                    ]);
-                
-                if (insertError) {
-                    console.error('사용자 정보 저장 오류:', insertError);
-                }
-            } catch (dbError) {
-                console.error('데이터베이스 오류:', dbError);
+            if (data.user.email_confirmed_at) {
+                showToast('회원가입이 완료되었습니다!', 'success');
+                setTimeout(() => {
+                    showLoginForm();
+                }, 2000);
+            } else {
+                showToast('이메일 인증 링크를 확인해주세요.', 'info');
             }
-            
-            showToast('회원가입 성공! 이메일을 확인하여 계정을 활성화해주세요.', 'success');
-            
-            // 로그인 폼으로 전환
-            setTimeout(() => {
-                showLoginForm();
-                document.getElementById('loginEmail').value = email;
-            }, 2000);
         }
-        
+
     } catch (error) {
         console.error('회원가입 오류:', error);
-        handleSupabaseError(error, '회원가입');
+        if (error.message.includes('User already registered')) {
+            showToast('이미 가입된 이메일입니다.', 'error');
+        } else if (error.message.includes('Password')) {
+            showToast('비밀번호는 최소 6자 이상이어야 합니다.', 'error');
+        } else {
+            showToast('회원가입 중 오류가 발생했습니다.', 'error');
+        }
     } finally {
-        // 로딩 상태 해제
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
     }
@@ -350,45 +306,42 @@ async function handleSignup(e) {
 // 비밀번호 재설정 처리
 async function handlePasswordReset(e) {
     e.preventDefault();
-    
+
     const email = document.getElementById('resetEmail').value.trim();
-    
+
     if (!email) {
         showToast('이메일을 입력해주세요.', 'warning');
         return;
     }
-    
-    // 로딩 상태 표시
+
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>전송 중...';
     submitBtn.disabled = true;
-    
+
     try {
         if (!window.supabaseClient) {
             throw new Error('서비스 연결 오류');
         }
-        
+
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
             redirectTo: `${window.location.origin}/reset-password.html`
         });
-        
+
         if (error) {
             throw error;
         }
-        
+
         showToast('비밀번호 재설정 링크가 이메일로 전송되었습니다.', 'success');
-        
-        // 로그인 폼으로 전환
+
         setTimeout(() => {
             showLoginForm();
         }, 3000);
-        
+
     } catch (error) {
         console.error('비밀번호 재설정 오류:', error);
-        handleSupabaseError(error, '비밀번호 재설정');
+        showToast('비밀번호 재설정 중 오류가 발생했습니다.', 'error');
     } finally {
-        // 로딩 상태 해제
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
     }
@@ -399,10 +352,11 @@ function validatePasswordMatch() {
     const password = document.getElementById('signupPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
     const confirmInput = document.getElementById('confirmPassword');
-    
+
     if (confirmPassword && password !== confirmPassword) {
         confirmInput.classList.add('is-invalid');
-        if (!confirmInput.nextElementSibling || !confirmInput.nextElementSibling.classList.contains('invalid-feedback')) {
+        if (!confirmInput.nextElementSibling || 
+            !confirmInput.nextElementSibling.classList.contains('invalid-feedback')) {
             const feedback = document.createElement('div');
             feedback.className = 'invalid-feedback';
             feedback.textContent = '비밀번호가 일치하지 않습니다.';
@@ -410,79 +364,30 @@ function validatePasswordMatch() {
         }
     } else {
         confirmInput.classList.remove('is-invalid');
-        const feedback = confirmInput.parentNode.querySelector('.invalid-feedback');
-        if (feedback) {
+        const feedback = confirmInput.nextElementSibling;
+        if (feedback && feedback.classList.contains('invalid-feedback')) {
             feedback.remove();
         }
     }
 }
 
-// 소셜 인증 설정
+// 소셜 로그인 설정
 function setupSocialAuth() {
     // 카카오 로그인
     document.getElementById('kakao-login')?.addEventListener('click', handleKakaoLogin);
     document.getElementById('kakao-signup')?.addEventListener('click', handleKakaoLogin);
-    
-    // 구글 로그인
-    document.getElementById('google-login')?.addEventListener('click', handleGoogleLogin);
-    document.getElementById('google-signup')?.addEventListener('click', handleGoogleLogin);
 }
 
-// 카카오 로그인 처리
+// 카카오 로그인 처리 (프로덕션 준비)
 async function handleKakaoLogin() {
     try {
-        if (!window.supabaseClient) {
-            throw new Error('서비스 연결 오류');
-        }
-        
-        const { data, error } = await supabaseClient.auth.signInWithOAuth({
-            provider: 'kakao',
-            options: {
-                redirectTo: `${window.location.origin}/auth-callback.html`
-            }
-        });
-        
-        if (error) {
-            throw error;
-        }
-        
-    } catch (error) {
-        console.error('카카오 로그인 오류:', error);
-        showToast('카카오 로그인을 사용할 수 없습니다.', 'error');
-    }
-}
-
-// 구글 로그인 처리
-async function handleGoogleLogin() {
-    try {
-        if (!window.supabaseClient) {
-            throw new Error('서비스 연결 오류');
-        }
-        
-        const { data, error } = await supabaseClient.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: `${window.location.origin}/auth-callback.html`
-            }
-        });
-        
-        if (error) {
-            throw error;
-        }
-        
-    } catch (error) {
-        console.error('구글 로그인 오류:', error);
-        showToast('구글 로그인을 사용할 수 없습니다.', 'error');
-    }
-}
-
-// 카카오 로그인 처리
-async function handleKakaoLogin() {
-    try {
-        // 개발 환경에서는 테스트 모드 사용
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.includes('replit')) {
-            console.log('테스트 모드: 카카오 로그인 처리');
-            showToast('테스트 모드에서 카카오 로그인이 완료되었습니다.', 'success');
+        // 개발 환경에서는 테스트 모드 지원
+        if ((window.location.hostname === "localhost" || 
+             window.location.hostname === "127.0.0.1" || 
+             window.location.hostname.includes("replit")) &&
+            !window.Kakao) {
+            console.log("테스트 모드: 카카오 로그인 처리");
+            showToast("테스트 모드에서 카카오 로그인이 완료되었습니다.", "success");
             localStorage.setItem('testUser', JSON.stringify({
                 email: 'kakao@test.com',
                 isAdmin: false,
@@ -494,22 +399,11 @@ async function handleKakaoLogin() {
             return;
         }
 
-        // Kakao SDK 초기화 확인
-        if (typeof Kakao === 'undefined') {
-            throw new Error('카카오 SDK가 로드되지 않았습니다.');
-        }
-
-        if (!Kakao.isInitialized()) {
-            // TODO: 실제 카카오 JavaScript 키로 교체해주세요
-            // Kakao.init('YOUR_KAKAO_JAVASCRIPT_KEY');
-            throw new Error('카카오 앱 키를 설정해주세요.');
-        }
-
         if (!window.supabaseClient) {
             throw new Error('서비스 연결 오류');
         }
 
-        // Supabase를 통한 카카오 로그인
+        // 프로덕션에서는 Supabase OAuth 사용
         const { data, error } = await supabaseClient.auth.signInWithOAuth({
             provider: 'kakao',
             options: {
@@ -520,44 +414,20 @@ async function handleKakaoLogin() {
         if (error) {
             throw error;
         }
-
     } catch (error) {
         console.error('카카오 로그인 오류:', error);
-        showToast('카카오 로그인에 실패했습니다: ' + error.message, 'error');
+        showToast('카카오 로그인을 사용할 수 없습니다.', 'error');
     }
 }
 
-// 입력 필드 이벤트 처리
-document.addEventListener('DOMContentLoaded', function() {
-    // 이메일 형식 검증
-    const emailInputs = document.querySelectorAll('input[type="email"]');
-    emailInputs.forEach(input => {
-        input.addEventListener('blur', function() {
-            validateEmail(this);
-        });
-    });
-    
-    // 비밀번호 강도 표시
-    const passwordInputs = document.querySelectorAll('input[type="password"]');
-    passwordInputs.forEach(input => {
-        if (input.id === 'signupPassword') {
-            input.addEventListener('input', function() {
-                showPasswordStrength(this);
-            });
-        }
-    });
-});
-
-// 이메일 유효성 검사
+// 이메일 형식 검증
 function validateEmail(input) {
-    const email = input.value.trim();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const email = input.value;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     
-    if (email && !emailRegex.test(email)) {
-        input.classList.add('is-invalid');
-        showFieldError(input, '유효한 이메일 주소를 입력해주세요.');
+    if (email && !emailPattern.test(email)) {
+        showFieldError(input, '올바른 이메일 형식을 입력해주세요.');
     } else {
-        input.classList.remove('is-invalid');
         removeFieldError(input);
     }
 }
@@ -565,56 +435,40 @@ function validateEmail(input) {
 // 비밀번호 강도 표시
 function showPasswordStrength(input) {
     const password = input.value;
+    const strengthBar = createPasswordStrengthBar(input);
+    
     let strength = 0;
-    let message = '';
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+    const strengthTexts = ['매우 약함', '약함', '보통', '강함', '매우 강함'];
+    const strengthColors = ['#dc3545', '#fd7e14', '#ffc107', '#28a745', '#20c997'];
     
-    if (password.length >= 6) strength++;
-    if (password.match(/[a-z]/)) strength++;
-    if (password.match(/[A-Z]/)) strength++;
-    if (password.match(/[0-9]/)) strength++;
-    if (password.match(/[^a-zA-Z0-9]/)) strength++;
-    
-    removeFieldError(input);
-    
-    const strengthBar = input.parentNode.querySelector('.password-strength') || 
-                       createPasswordStrengthBar(input);
-    
-    switch (strength) {
-        case 0:
-        case 1:
-            strengthBar.className = 'password-strength weak';
-            message = '약함';
-            break;
-        case 2:
-        case 3:
-            strengthBar.className = 'password-strength medium';
-            message = '보통';
-            break;
-        case 4:
-        case 5:
-            strengthBar.className = 'password-strength strong';
-            message = '강함';
-            break;
-    }
-    
-    strengthBar.querySelector('.strength-text').textContent = message;
+    strengthBar.style.width = `${(strength / 5) * 100}%`;
+    strengthBar.style.backgroundColor = strengthColors[strength - 1] || '#dee2e6';
+    strengthBar.textContent = password ? strengthTexts[strength - 1] || '매우 약함' : '';
 }
 
 // 비밀번호 강도 바 생성
 function createPasswordStrengthBar(input) {
-    const strengthBar = document.createElement('div');
-    strengthBar.className = 'password-strength';
-    strengthBar.innerHTML = `
-        <div class="strength-bar"></div>
-        <small class="strength-text"></small>
-    `;
-    
-    input.parentNode.appendChild(strengthBar);
+    let strengthBar = input.parentNode.querySelector('.password-strength');
+    if (!strengthBar) {
+        strengthBar = document.createElement('div');
+        strengthBar.className = 'password-strength mt-1 p-1 text-center small';
+        strengthBar.style.height = '20px';
+        strengthBar.style.borderRadius = '3px';
+        strengthBar.style.transition = 'all 0.3s ease';
+        input.parentNode.appendChild(strengthBar);
+    }
     return strengthBar;
 }
 
 // 필드 오류 표시
 function showFieldError(input, message) {
+    input.classList.add('is-invalid');
     removeFieldError(input);
     
     const feedback = document.createElement('div');
@@ -625,122 +479,52 @@ function showFieldError(input, message) {
 
 // 필드 오류 제거
 function removeFieldError(input) {
+    input.classList.remove('is-invalid');
     const feedback = input.parentNode.querySelector('.invalid-feedback');
     if (feedback) {
         feedback.remove();
     }
 }
 
-// 키보드 이벤트 처리
-document.addEventListener('keydown', function(e) {
-    // Enter 키로 다음 필드로 이동
-    if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
-        e.preventDefault();
-        
-        const form = e.target.closest('form');
-        const inputs = form.querySelectorAll('input, button');
-        const currentIndex = Array.from(inputs).indexOf(e.target);
-        const nextInput = inputs[currentIndex + 1];
-        
-        if (nextInput) {
-            if (nextInput.tagName === 'BUTTON') {
-                nextInput.click();
-            } else {
-                nextInput.focus();
-            }
-        }
-    }
-});
-
-// CSS 스타일 추가
-const style = document.createElement('style');
-style.textContent = `
-    .password-strength {
-        margin-top: 0.5rem;
-    }
-    
-    .strength-bar {
-        height: 4px;
-        border-radius: 2px;
-        background-color: #dee2e6;
-        margin-bottom: 0.25rem;
-        transition: all 0.3s ease;
-    }
-    
-    .password-strength.weak .strength-bar {
-        background-color: #dc3545;
-        width: 33%;
-    }
-    
-    .password-strength.medium .strength-bar {
-        background-color: #ffc107;
-        width: 66%;
-    }
-    
-    .password-strength.strong .strength-bar {
-        background-color: #198754;
-        width: 100%;
-    }
-    
-    .strength-text {
-        font-size: 0.75rem;
-        color: #6c757d;
-    }
-`;
-document.head.appendChild(style);
-
-// 테스트 계정 정보는 개발 환경에서만 콘솔에 표시
-function showTestAccounts() {
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.includes('replit')) {
-        console.log('개발 환경 - 테스트 계정 정보:');
-        console.log('일반 사용자: user@test.com / 123456');
-        console.log('관리자: admin@test.com / admin123');
-    }
-}
-
-// Toast 메시지 표시 함수
+// 토스트 메시지 표시
 function showToast(message, type = 'info') {
-    // 기존 toast 제거
-    const existingToast = document.querySelector('.toast-container');
-    if (existingToast) {
-        existingToast.remove();
-    }
+    const toastContainer = document.getElementById('toastContainer') || createToastContainer();
     
-    // Toast 컨테이너 생성
-    const toastContainer = document.createElement('div');
-    toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
-    toastContainer.style.zIndex = '9999';
-    
-    // Toast 메시지 생성
-    const toastId = 'toast-' + Date.now();
-    const toastClass = type === 'success' ? 'text-bg-success' : 
-                     type === 'error' ? 'text-bg-danger' : 
-                     type === 'warning' ? 'text-bg-warning' : 'text-bg-info';
-    
-    toastContainer.innerHTML = `
-        <div id="${toastId}" class="toast ${toastClass}" role="alert">
-            <div class="d-flex">
-                <div class="toast-body text-white">
-                    ${message}
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : type === 'warning' ? 'warning' : type === 'success' ? 'success' : 'info'} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-${type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : type === 'success' ? 'check-circle' : 'info-circle'} me-2"></i>
+                ${message}
             </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
         </div>
     `;
     
-    document.body.appendChild(toastContainer);
+    toastContainer.appendChild(toast);
     
-    // Bootstrap Toast 초기화 및 표시
-    const toastElement = document.getElementById(toastId);
-    const toast = new bootstrap.Toast(toastElement, {
-        autohide: true,
-        delay: 3000
-    });
+    const bsToast = new bootstrap.Toast(toast, { delay: 4000 });
+    bsToast.show();
     
-    toast.show();
-    
-    // Toast가 숨겨진 후 컨테이너 제거
-    toastElement.addEventListener('hidden.bs.toast', () => {
-        toastContainer.remove();
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
     });
 }
+
+// 토스트 컨테이너 생성
+function createToastContainer() {
+    const container = document.createElement('div');
+    container.id = 'toastContainer';
+    container.className = 'toast-container position-fixed top-0 end-0 p-3';
+    container.style.zIndex = '1055';
+    document.body.appendChild(container);
+    return container;
+}
+
+// 페이지 로드 시 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('MCSELLER 인증 페이지가 로드되었습니다.');
+    initializeAuthPage();
+});

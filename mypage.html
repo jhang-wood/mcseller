@@ -105,14 +105,21 @@
     <script src="js/mobile-utils.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            // 로그인 확인 (테스트 계정 지원)
+            // 로그인 확인 (프로덕션 버전)
             let user = null;
             
-            // 테스트 사용자 확인
-            const testUser = localStorage.getItem('testUser');
-            if (testUser) {
-                user = JSON.parse(testUser);
-            } else if (window.getCurrentUser) {
+            // 개발 환경에서만 테스트 사용자 확인
+            if (window.location.hostname === "localhost" || 
+                window.location.hostname === "127.0.0.1" || 
+                window.location.hostname.includes("replit")) {
+                const testUser = localStorage.getItem('testUser');
+                if (testUser) {
+                    user = JSON.parse(testUser);
+                }
+            }
+            
+            // 프로덕션에서는 Supabase 사용자 확인
+            if (!user && window.getCurrentUser) {
                 user = await getCurrentUser();
             }
             
@@ -130,12 +137,15 @@
             }
             
             // 사용자 정보 표시
-            document.getElementById('user-email').textContent = user.email || 'user@test.com';
+            document.getElementById('user-email').textContent = user.email;
         });
 
         async function logout() {
-            // 테스트 사용자 로그아웃
-            if (localStorage.getItem('testUser')) {
+            // 개발 환경에서만 테스트 사용자 로그아웃
+            if ((window.location.hostname === "localhost" || 
+                 window.location.hostname === "127.0.0.1" || 
+                 window.location.hostname.includes("replit")) && 
+                localStorage.getItem('testUser')) {
                 localStorage.removeItem('testUser');
                 window.location.href = 'index.html';
                 return;
