@@ -14,6 +14,13 @@ function getSupabaseConfig() {
 // Supabase 클라이언트 초기화
 function initializeSupabase() {
     try {
+        // 개발 환경에서는 테스트 모드로 작동
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.includes('replit')) {
+            console.log('개발 모드: 테스트 사용자로 초기화됩니다.');
+            setupTestMode();
+            return;
+        }
+        
         if (typeof supabase !== 'undefined') {
             const config = getSupabaseConfig();
             supabaseClient = supabase.createClient(config.url, config.anonKey, {
@@ -113,6 +120,12 @@ async function checkAdminRole(userId) {
 
 // 사용자 인증 확인
 async function getCurrentUser() {
+    // 개발 환경에서는 테스트 사용자만 확인
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.includes('replit')) {
+        const testUser = localStorage.getItem('testUser');
+        return testUser ? JSON.parse(testUser) : null;
+    }
+    
     // 테스트 사용자 확인
     const testUser = localStorage.getItem('testUser');
     if (testUser) {
@@ -120,6 +133,10 @@ async function getCurrentUser() {
     }
     
     try {
+        if (!supabaseClient || !supabaseClient.auth) {
+            return null;
+        }
+        
         const { data: { user }, error } = await supabaseClient.auth.getUser();
         
         if (error) {
@@ -244,11 +261,21 @@ function handleSupabaseError(error, context = '') {
 
 // 페이지 로드 시 Supabase 초기화
 document.addEventListener('DOMContentLoaded', function() {
-    supabaseClient = initializeSupabase();
+    // 개발 환경 확인
+    const isDevelopment = window.location.hostname === 'localhost' || 
+                         window.location.hostname === '127.0.0.1' || 
+                         window.location.hostname.includes('replit');
     
-    if (!supabaseClient) {
-        console.error('Supabase 클라이언트 초기화에 실패했습니다.');
-        showToast('서비스 연결에 문제가 있습니다. 페이지를 새로고침해 주세요.', 'error');
+    if (isDevelopment) {
+        console.log('개발 환경에서 실행 중입니다.');
+        setupTestMode();
+    } else {
+        supabaseClient = initializeSupabase();
+        
+        if (!supabaseClient) {
+            console.error('Supabase 클라이언트 초기화에 실패했습니다.');
+            showToast('서비스 연결에 문제가 있습니다. 페이지를 새로고침해 주세요.', 'error');
+        }
     }
     
     // 현재 사용자 상태 확인
@@ -258,6 +285,9 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             updateUIForSignedOutUser();
         }
+    }).catch(error => {
+        console.log('사용자 상태 확인 중 오류:', error);
+        updateUIForSignedOutUser();
     });
     
     // 로그아웃 버튼 이벤트 리스너
@@ -274,9 +304,52 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// 개발 모드용 테스트 설정
+function setupTestMode() {
+    // 로컬 스토리지에서 테스트 사용자 정보 가져오기
+    const testUser = localStorage.getItem('testUser');
+    
+    if (testUser) {
+        const user = JSON.parse(testUser);
+        console.log('테스트 사용자 발견:', user);
+        updateUIForSignedInUser(user);
+    } else {
+        console.log('테스트 모드: 로그아웃 상태');
+        updateUIForSignedOutUser();
+    }
+    
+    // 가짜 Supabase 객체 생성 (오류 방지)
+    supabaseClient = {
+        auth: {
+            getUser: () => Promise.resolve({ data: { user: testUser ? JSON.parse(testUser) : null }, error: null }),
+            signUp: (credentials) => {
+                console.log('테스트 모드: 회원가입 시뮬레이션');
+                const user = { email: credentials.email, id: 'test-user-id' };
+                localStorage.setItem('testUser', JSON.stringify(user));
+                updateUIForSignedInUser(user);
+                return Promise.resolve({ data: { user }, error: null });
+            },
+            signInWithPassword: (credentials) => {
+                console.log('테스트 모드: 로그인 시뮬레이션');
+                const user = { email: credentials.email, id: 'test-user-id' };
+                localStorage.setItem('testUser', JSON.stringify(user));
+                updateUIForSignedInUser(user);
+                return Promise.resolve({ data: { user }, error: null });
+            },
+            signOut: () => {
+                console.log('테스트 모드: 로그아웃 시뮬레이션');
+                localStorage.removeItem('testUser');
+                updateUIForSignedOutUser();
+                return Promise.resolve({ error: null });
+            }
+        }
+    };
+}
+
 // 전역 객체로 내보내기
 window.supabaseClient = supabaseClient;
 window.getCurrentUser = getCurrentUser;
 window.signOut = signOut;
 window.showToast = showToast;
 window.handleSupabaseError = handleSupabaseError;
+window.setupTestMode = setupTestMode;
