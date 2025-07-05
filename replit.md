@@ -160,6 +160,11 @@ Changelog:
   * Updated course curriculum to focus on 2 core modules: EXE file automation and website creation
   * Redesigned UI with profile dropdown replacing "지금 시작하기" button for logged-in users
   * Added external URL redirect for free course registration (configurable in handleAiMasterSignup function)
+- July 5, 2025. Content updates and development optimization:
+  * Changed all "60일 내 100% 환불보장" → "추가 환불보증제도 60일 내 100% 조건부 환불보장"
+  * Implemented Express.js development server with no-cache headers for immediate HTML text updates
+  * Added cache prevention meta tags to all major HTML files (index, auth, mypage, admin)
+  * Fixed dynamic content overwrite issue with protected achievement numbers using MutationObserver
 ```
 
 ## User Preferences
