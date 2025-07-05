@@ -54,6 +54,14 @@ function handleAuthStateChange(event, session) {
     console.log('인증 상태 변경:', event, session);
     
     switch (event) {
+        case 'INITIAL_SESSION':
+            // 초기 세션 상태 확인 (AuthSessionMissingError 방지)
+            if (session) {
+                updateUIForSignedInUser(session.user);
+            } else {
+                updateUIForSignedOutUser();
+            }
+            break;
         case 'SIGNED_IN':
             updateUIForSignedInUser(session.user);
             break;
@@ -278,17 +286,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // 현재 사용자 상태 확인
-    getCurrentUser().then(user => {
-        if (user) {
-            updateUIForSignedInUser(user);
-        } else {
+    // 현재 사용자 상태 확인 (onAuthStateChange로 대체)
+    if (isDevelopment) {
+        // 개발 환경에서는 직접 확인
+        getCurrentUser().then(user => {
+            if (user) {
+                updateUIForSignedInUser(user);
+            } else {
+                updateUIForSignedOutUser();
+            }
+        }).catch(error => {
+            console.log('사용자 상태 확인 중 오류:', error);
             updateUIForSignedOutUser();
-        }
-    }).catch(error => {
-        console.log('사용자 상태 확인 중 오류:', error);
-        updateUIForSignedOutUser();
-    });
+        });
+    }
+    // 프로덕션 환경에서는 onAuthStateChange가 자동으로 처리
     
     // 로그아웃 버튼 이벤트 리스너
     const logoutBtns = document.querySelectorAll('#logout-btn, #admin-logout');

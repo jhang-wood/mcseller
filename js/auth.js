@@ -296,28 +296,34 @@ async function handleSignup(e) {
         });
         
         if (error) {
-            throw error;
+            console.error('회원가입 오류:', error);
+            showToast('회원가입에 실패했습니다: ' + error.message, 'error');
+            return;
         }
         
         if (data.user) {
             // 사용자 정보를 users 테이블에 저장
-            const { error: insertError } = await supabaseClient
-                .from('users')
-                .insert([
-                    {
-                        id: data.user.id,
-                        email: email,
-                        name: name,
-                        role: 'user',
-                        created_at: new Date().toISOString()
-                    }
-                ]);
-            
-            if (insertError) {
-                console.error('사용자 정보 저장 오류:', insertError);
+            try {
+                const { error: insertError } = await supabaseClient
+                    .from('users')
+                    .insert([
+                        {
+                            id: data.user.id,
+                            email: email,
+                            name: name,
+                            role: 'user',
+                            created_at: new Date().toISOString()
+                        }
+                    ]);
+                
+                if (insertError) {
+                    console.error('사용자 정보 저장 오류:', insertError);
+                }
+            } catch (dbError) {
+                console.error('데이터베이스 오류:', dbError);
             }
             
-            showToast('회원가입이 완료되었습니다! 이메일을 확인해주세요.', 'success');
+            showToast('회원가입 성공! 이메일을 확인하여 계정을 활성화해주세요.', 'success');
             
             // 로그인 폼으로 전환
             setTimeout(() => {
@@ -462,6 +468,57 @@ async function handleGoogleLogin() {
     } catch (error) {
         console.error('구글 로그인 오류:', error);
         showToast('구글 로그인을 사용할 수 없습니다.', 'error');
+    }
+}
+
+// 카카오 로그인 처리
+async function handleKakaoLogin() {
+    try {
+        // 개발 환경에서는 테스트 모드 사용
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.includes('replit')) {
+            console.log('테스트 모드: 카카오 로그인 처리');
+            showToast('테스트 모드에서 카카오 로그인이 완료되었습니다.', 'success');
+            localStorage.setItem('testUser', JSON.stringify({
+                email: 'kakao@test.com',
+                isAdmin: false,
+                loginTime: new Date().toISOString()
+            }));
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+            return;
+        }
+
+        // Kakao SDK 초기화 확인
+        if (typeof Kakao === 'undefined') {
+            throw new Error('카카오 SDK가 로드되지 않았습니다.');
+        }
+
+        if (!Kakao.isInitialized()) {
+            // TODO: 실제 카카오 JavaScript 키로 교체해주세요
+            // Kakao.init('YOUR_KAKAO_JAVASCRIPT_KEY');
+            throw new Error('카카오 앱 키를 설정해주세요.');
+        }
+
+        if (!window.supabaseClient) {
+            throw new Error('서비스 연결 오류');
+        }
+
+        // Supabase를 통한 카카오 로그인
+        const { data, error } = await supabaseClient.auth.signInWithOAuth({
+            provider: 'kakao',
+            options: {
+                redirectTo: `${window.location.origin}/auth-callback.html`
+            }
+        });
+
+        if (error) {
+            throw error;
+        }
+
+    } catch (error) {
+        console.error('카카오 로그인 오류:', error);
+        showToast('카카오 로그인에 실패했습니다: ' + error.message, 'error');
     }
 }
 

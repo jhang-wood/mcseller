@@ -26,6 +26,11 @@
 
         <!-- Supabase -->
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        
+        <!-- Kakao SDK -->
+        <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.1/kakao.min.js" 
+                integrity="sha384-kDljxUXHaJ9xAb2AzRd59KxjrFjzHa5TAoFQ6GbYTCAG0bjM55XohjjDT7tDDC01" 
+                crossorigin="anonymous"></script>
 
         <style>
             /* MCSELLER Auth Theme */
@@ -819,20 +824,12 @@
                                             <button
                                                 class="btn btn-outline-warning btn-lg"
                                                 id="kakao-login"
+                                                onclick="handleKakaoLogin()"
                                             >
                                                 <i
                                                     class="fas fa-comment me-2"
                                                 ></i
                                                 >카카오로 로그인
-                                            </button>
-                                            <button
-                                                class="btn btn-outline-secondary btn-lg"
-                                                id="google-login"
-                                            >
-                                                <i
-                                                    class="fab fa-google me-2"
-                                                ></i
-                                                >구글로 로그인
                                             </button>
                                         </div>
 
@@ -974,20 +971,12 @@
                                             <button
                                                 class="btn btn-outline-warning btn-lg"
                                                 id="kakao-signup"
+                                                onclick="handleKakaoLogin()"
                                             >
                                                 <i
                                                     class="fas fa-comment me-2"
                                                 ></i
                                                 >카카오로 가입
-                                            </button>
-                                            <button
-                                                class="btn btn-outline-danger btn-lg"
-                                                id="google-signup"
-                                            >
-                                                <i
-                                                    class="fab fa-google me-2"
-                                                ></i
-                                                >구글로 가입
                                             </button>
                                         </div>
 
@@ -1338,14 +1327,12 @@
                         console.log("비밀번호 재설정 처리");
                     });
 
-                // Social login handlers with enhanced feedback
-                const socialButtons = [
+                // Kakao login handlers with enhanced feedback
+                const kakaoButtons = [
                     "kakao-login",
-                    "google-login",
                     "kakao-signup",
-                    "google-signup",
                 ];
-                socialButtons.forEach((buttonId) => {
+                kakaoButtons.forEach((buttonId) => {
                     document
                         .getElementById(buttonId)
                         ?.addEventListener("click", function () {
@@ -1353,9 +1340,6 @@
                             setTimeout(() => {
                                 this.style.transform = "scale(1)";
                             }, 150);
-
-                            // Your social login logic here
-                            console.log(`${buttonId} 클릭됨`);
                         });
                 });
 

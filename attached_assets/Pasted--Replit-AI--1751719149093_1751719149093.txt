@@ -1,0 +1,123 @@
+알겠습니다. 제공해주신 오류 로그와 수정 희망사항을 바탕으로, Replit AI 개발 에이전트가 단 한 번에 문제를 해결하고 요구사항을 정확히 구현할 수 있도록 완벽한 **'작업 지시서'**를 생성해 드리겠습니다.
+
+[Replit AI 작업 지시서]
+
+1. @Context (작업 맥락):
+
+    작업 대상 파일:
+
+        js/auth.js (인증 로직 스크립트)
+
+        js/supabase-client.js (Supabase 클라이언트 초기화 및 관리 스크립트)
+
+        회원가입 및 로그인 폼이 포함된 HTML 파일 (예: auth.html, signup.html, login.html 등)
+
+    관련 함수/클래스:
+
+        handleSignup 함수 (이메일 회원가입 처리)
+
+        supabase.auth.signUp 및 supabase.auth.signInWithOAuth (Supabase 인증 함수)
+
+        카카오 로그인을 처리할 신규 함수 (예: handleKakaoLogin)
+
+    기술 스택: JavaScript (ES6+), Supabase v2, HTML5, Kakao Login for JavaScript
+
+2. @Problem (문제 정의):
+
+    현재 이메일/비밀번호를 이용한 회원가입 시, handleSignup 함수 내에서 Supabase API 호출이 실패하며 '서비스 연결 오류'가 발생합니다.
+
+    페이지 로드 시 AuthSessionMissingError 오류가 발생하여, 사용자의 로그인 상태를 올바르게 확인하고 관리하지 못하고 있습니다.
+
+    구글 로그인 기능은 UI 상에 존재하지만 제거되어야 하며, 카카오 로그인 기능은 현재 비활성화되어 있어 실제 동작하도록 구현해야 합니다.
+
+3. @Instructions (단계별 상세 지시):
+
+    js/auth.js 파일의 handleSignup 함수 수정:
+
+        기존 handleSignup 함수를 async/await를 사용하도록 변경하여 비동기 코드를 명확하게 처리하세요.
+
+        try...catch 블록을 사용하여 Supabase 회원가입 로직을 감싸세요.
+
+        try 블록 안에서 supabase.auth.signUp 메서드를 호출하여 회원가입을 시도합니다. 이 메서드는 email과 password를 포함하는 객체를 인자로 받습니다.
+        JavaScript
+
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password
+    });
+
+    error 객체를 확인하여 오류를 분기 처리하세요.
+
+        오류가 발생하면(if (error)), 콘솔에 오류를 기록하고 사용자에게 alert('회원가입에 실패했습니다: ' + error.message);와 같이 구체적인 오류 메시지를 표시하세요.
+
+        성공적으로 가입되면(else), alert('회원가입 성공! 이메일을 확인하여 계정을 활성화해주세요.'); 메시지를 표시하고 로그인 페이지로 리디렉션하세요.
+
+HTML 파일에서 구글 로그인 버튼 제거:
+
+    회원가입/로그인 폼이 있는 HTML 파일을 여세요.
+
+    'Google로 시작하기' 또는 이와 유사한 텍스트를 가진 구글 로그인 버튼(<button> 또는 <a> 태그)과 관련 div 컨테이너를 완전히 삭제하세요.
+
+카카오 로그인 기능 활성화 및 구현:
+
+    HTML 파일의 헤더(<head>)에 카카오 JavaScript SDK 스크립트가 있는지 확인하고, 없다면 추가하세요.
+    HTML
+
+    <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.1/kakao.min.js" integrity="sha384-kDljxUXHaJ9xAb2AzRd59KxjrFjzHa5TAoFQ6GbYTCAG0bjM55XohjjDT7tDDC01" crossorigin="anonymous"></script>
+
+    js/auth.js 파일에 handleKakaoLogin 이라는 새로운 async 함수를 생성하세요.
+
+    함수 최상단에서 Kakao.isInitialized()를 통해 SDK 초기화를 확인하고, 초기화되지 않았다면 Kakao.init('YOUR_KAKAO_JAVASCRIPT_KEY');를 호출하세요. (중요: YOUR_KAKAO_JAVASCRIPT_KEY는 실제 키가 아닌 플레이스홀더입니다. 주석으로 사용자에게 키를 입력하라고 안내해주세요.)
+
+    다음으로 supabase.auth.signInWithOAuth({ provider: 'kakao' })를 호출하여 Supabase를 통한 카카오 로그인을 실행하세요.
+
+    이 함수의 호출 결과를 data와 error로 구조 분해하여 받아오고, 오류 발생 시 alert('카카오 로그인에 실패했습니다: ' + error.message);를 통해 사용자에게 피드백을 제공하세요.
+
+    HTML 파일에서 카카오 로그인 버튼을 찾아, onclick="handleKakaoLogin()" 속성을 추가하여 위에서 만든 함수와 연결하세요.
+
+AuthSessionMissingError 오류 해결:
+
+    js/supabase-client.js 또는 auth.js에서 사용자의 세션 정보를 가져오려고 시도하는 코드(아마도 supabase.auth.getUser())를 찾으세요.
+
+    해당 코드가 페이지 로드 시 즉시 실행되는 대신, supabase.auth.onAuthStateChange 이벤트 리스너 내부에서 실행되도록 로직을 수정하세요. 이렇게 하면 인증 상태가 변경될 때만 사용자 정보를 가져오므로, 세션이 없는 초기 상태에서 오류가 발생하지 않습니다.
+    JavaScript
+
+        // 예시 코드
+        supabase.auth.onAuthStateChange((event, session) => {
+          if (session) {
+            // 세션이 있을 때만 사용자 정보를 가져오거나 관련 UI를 업데이트합니다.
+            console.log('로그인된 사용자:', session.user);
+            // const { data: { user } } = await supabase.auth.getUser(); -> 이런 코드를 이 안으로 이동
+          } else {
+            // 로그아웃 상태일 때 처리
+            console.log('사용자가 로그아웃했습니다.');
+          }
+        });
+
+4. @Constraints (준수해야 할 제약 조건):
+
+    이 지시서에 명시된 파일(js/auth.js, js/supabase-client.js, 관련 HTML) 외에는 절대 수정하지 마세요.
+
+    기존 코드의 포맷팅과 스타일 가이드를 일관성 있게 유지하세요.
+
+    axios나 jQuery 등 새로운 라이브러리를 설치하거나 CDN을 추가하지 마세요. (단, 카카오 SDK는 예외)
+
+    Supabase 및 Kakao API 키는 코드에 하드코딩하지 마세요. YOUR_..._KEY 와 같은 플레이스홀더를 사용하고, 사용자가 직접 자신의 키로 교체하도록 주석을 남겨주세요.
+
+5. @Verification (결과 확인 방법):
+
+    이메일 회원가입:
+
+        새로운 이메일과 비밀번호로 회원가입을 시도하면 "회원가입 성공!" 알림이 떠야 합니다.
+
+        이미 가입된 이메일로 다시 시도하면 "User already registered"와 같은 오류 메시지가 포함된 알림이 떠야 합니다.
+
+    구글 로그인: 웹사이트에서 구글 로그인 버튼이 완전히 사라졌는지 확인합니다.
+
+    카카오 로그인:
+
+        카카오 로그인 버튼을 클릭하면 카카오 계정 로그인 팝업창이 정상적으로 나타나야 합니다.
+
+        로그인 성공 후, Supabase에 사용자가 생성되고 웹사이트에 로그인 상태가 되어야 합니다. (개발자 도구의 콘솔에서 세션 정보를 확인)
+
+    세션 오류: 어떤 페이지를 새로고침해도 개발자 도구 콘솔에 AuthSessionMissingError가 더 이상 나타나지 않아야 합니다.
