@@ -162,9 +162,14 @@ Changelog:
   * Added external URL redirect for free course registration (configurable in handleAiMasterSignup function)
 - July 5, 2025. Content updates and development optimization:
   * Changed all "60일 내 100% 환불보장" → "추가 환불보증제도 60일 내 100% 조건부 환불보장"
+  * Updated achievement section: "6개월 누적 수익" → "6개월 수강생 평균수익"
   * Implemented Express.js development server with no-cache headers for immediate HTML text updates
   * Added cache prevention meta tags to all major HTML files (index, auth, mypage, admin)
   * Fixed dynamic content overwrite issue with protected achievement numbers using MutationObserver
+  * Updated AI Master course curriculum with structured free course content:
+    - 1. 초고속 자동화 EXE 파일 만들기 (크몽/SaaS 확장 가능)
+    - 2. 초고속 고퀄리티 웹사이트 제작법 (토큰 낭비 방지, n8n 자동화 포함)
+  * Enhanced free course presentation with structured benefits and call-to-action messaging
 ```
 
 ## User Preferences
