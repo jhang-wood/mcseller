@@ -2071,9 +2071,9 @@
                             <div class="achievement-icon">
                                 <i class="fas fa-won-sign"></i>
                             </div>
-                            <div class="achievement-number">2천만원</div>
+                            <div class="achievement-number" data-fixed="true">2천만원</div>
                             <div class="achievement-label">
-                                6개월 수강생 평균 수익
+                                수강생 6개월 평균 수익
                             </div>
                         </div>
                     </div>
@@ -3120,6 +3120,30 @@
                 // 초기 상태 설정 (안전하게)
                 setTimeout(() => {
                     checkAndUpdateUI();
+                    
+                    // Achievement 값 보호 - 2천만원으로 고정
+                    const achievementNumber = document.querySelector('.achievement-number[data-fixed="true"]');
+                    if (achievementNumber) {
+                        achievementNumber.textContent = '2천만원';
+                        achievementNumber.classList.remove('counter'); // 카운터 애니메이션에서 제외
+                        
+                        // MutationObserver로 값 변경 감지하여 원복
+                        const observer = new MutationObserver(function(mutations) {
+                            mutations.forEach(function(mutation) {
+                                if (mutation.target === achievementNumber && mutation.type === 'childList') {
+                                    achievementNumber.textContent = '2천만원';
+                                }
+                            });
+                        });
+                        observer.observe(achievementNumber, { childList: true, subtree: true });
+                        
+                        // 주기적으로 값 확인하여 원복
+                        setInterval(() => {
+                            if (achievementNumber.textContent !== '2천만원') {
+                                achievementNumber.textContent = '2천만원';
+                            }
+                        }, 1000);
+                    }
                 }, 100);
 
                 // 프로필 드롭다운 이벤트 리스너
