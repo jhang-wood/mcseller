@@ -5,13 +5,33 @@
  * - 회원가입 시 DB 스키마와 일치하도록 'full_name' 필드를 사용합니다.
  */
 
-// [핵심 개선] Supabase 클라이언트가 준비되었다는 신호를 받으면 페이지 초기화를 시작합니다.
-// 이렇게 하면 '서비스 연결 오류'가 발생하는 근본적인 원인이 해결됩니다.
-document.addEventListener("supabaseClientReady", initializeAuthPage);
+// 직접 초기화 - 간단하고 확실한 방법
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("DOM 로드 완료");
+    
+    // Supabase 라이브러리가 로드되었는지 확인
+    if (typeof supabase === 'undefined') {
+        console.error("❌ Supabase 라이브러리가 로드되지 않았습니다.");
+        alert("서비스 로딩에 문제가 있습니다. 페이지를 새로고침해주세요.");
+        return;
+    }
+    
+    console.log("✅ Supabase 라이브러리 로드 확인");
+    setTimeout(initializeAuthPage, 500);
+});
 
 // 페이지 초기화
 function initializeAuthPage() {
-    console.log("✅ Supabase 준비 완료. 인증 페이지 로직을 초기화합니다.");
+    console.log("✅ 인증 페이지 초기화 시작");
+    
+    // Supabase 클라이언트가 준비되었는지 확인
+    if (!window.supabaseClient) {
+        console.error("❌ Supabase 클라이언트를 찾을 수 없습니다. 다시 시도합니다...");
+        setTimeout(initializeAuthPage, 500);
+        return;
+    }
+    
+    console.log("✅ Supabase 클라이언트 확인 완료. 폼 이벤트를 설정합니다.");
     setupFormEvents();
     checkExistingSession();
     setupFormSwitching();
@@ -20,11 +40,16 @@ function initializeAuthPage() {
 
 // 기존 세션 확인 (로그인된 상태면 메인 페이지로 이동)
 async function checkExistingSession() {
-    const {
-        data: { session },
-    } = await window.supabaseClient.auth.getSession();
-    if (session) {
-        window.location.href = "index.html";
+    try {
+        const {
+            data: { session },
+        } = await window.supabaseClient.auth.getSession();
+        if (session) {
+            console.log("기존 세션 발견, 메인페이지로 이동");
+            window.location.href = "index.html";
+        }
+    } catch (error) {
+        console.log("세션 확인 중 오류:", error.message);
     }
 }
 
