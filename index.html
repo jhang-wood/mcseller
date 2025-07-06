@@ -4210,73 +4210,8 @@
                     }
                 });
 
-                // 로그인 상태 확인 및 UI 업데이트 함수
-
-                async function checkAndUpdateUI() {
-                    try {
-                        console.log("UI 확인 시작");
-
-                        // 요소 존재 확인
-
-                        const loginInfo = document.getElementById("login-info");
-
-                        const profileDropdown =
-                            document.getElementById("profile-dropdown");
-
-                        const startButton =
-                            document.getElementById("start-button");
-
-                        if (!loginInfo || !profileDropdown || !startButton) {
-                            console.log("UI 요소를 찾을 수 없음");
-
-                            return;
-                        }
-
-                        // 테스트 사용자 우선 확인
-
-                        const testUser = localStorage.getItem("testUser");
-
-                        if (testUser) {
-                            const user = JSON.parse(testUser);
-
-                            console.log("테스트 사용자 발견:", user);
-
-                            updateNavigationUI(user);
-
-                            return;
-                        }
-
-                        // Supabase 사용자 확인
-
-                        if (window.getCurrentUser) {
-                            const user = await window.getCurrentUser();
-
-                            if (user) {
-                                console.log("Supabase 사용자 발견:", user);
-
-                                updateNavigationUI({ ...user, isAdmin: false });
-
-                                return;
-                            }
-                        }
-
-                        // 로그인된 사용자가 없음
-
-                        console.log("로그인된 사용자 없음");
-
-                        updateNavigationUI(null);
-                    } catch (error) {
-                        console.error("UI 업데이트 오류:", error);
-
-                        updateNavigationUI(null);
-                    }
-                }
-
-                // 페이지 포커스시 UI 재확인
-
-                window.addEventListener("focus", () => {
-                    setTimeout(checkAndUpdateUI, 100);
-                });
+                // UI 업데이트는 main.js에서 관리됩니다.
+                console.log("UI 관리는 main.js에 위임되었습니다.");
             });
 
             // Toast 메시지 표시 함수 (간단한 버전)

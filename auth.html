@@ -1091,43 +1091,7 @@
         <script src="js/mobile-utils.js"></script>
         <script src="js/auth-clean.js"></script>
         
-        <!-- 임시 디버깅 스크립트 -->
-        <script>
-            // 5초 후 Supabase 상태 확인
-            setTimeout(function() {
-                console.log("=== 디버깅 정보 ===");
-                console.log("Supabase 라이브러리:", typeof supabase);
-                console.log("Supabase 클라이언트:", window.supabaseClient);
-                console.log("로그인 폼:", document.getElementById("loginForm"));
-                console.log("회원가입 폼:", document.getElementById("signupForm"));
-                
-                // 테스트 로그인 버튼 추가
-                const testBtn = document.createElement("button");
-                testBtn.innerHTML = "테스트 로그인";
-                testBtn.onclick = async function() {
-                    console.log("테스트 로그인 버튼 클릭");
-                    try {
-                        const result = await window.supabaseClient.auth.signInWithPassword({
-                            email: "test@test.com",
-                            password: "123456"
-                        });
-                        console.log("테스트 로그인 결과:", result);
-                        alert("테스트 로그인 결과: " + (result.data.user ? "성공" : "실패"));
-                    } catch (error) {
-                        console.error("테스트 로그인 오류:", error);
-                        alert("테스트 로그인 오류: " + error.message);
-                    }
-                };
-                testBtn.style.position = "fixed";
-                testBtn.style.top = "10px";
-                testBtn.style.right = "10px";
-                testBtn.style.zIndex = "9999";
-                testBtn.style.backgroundColor = "red";
-                testBtn.style.color = "white";
-                testBtn.style.padding = "10px";
-                document.body.appendChild(testBtn);
-            }, 5000);
-        </script>
+        <!-- 디버깅 스크립트 제거됨 -->
 
         <script>
             // Enhanced authentication page functionality

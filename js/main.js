@@ -97,22 +97,23 @@ async function updateUIAccordingToAuthState() {
             window.currentUser = null;
         }
         
-        // 인증 상태 변화 감지
-        window.supabaseClient.auth.onAuthStateChange((event, session) => {
-            console.log("인증 상태 변화:", event, session ? "로그인됨" : "로그아웃됨");
-            
-            if (event === "SIGNED_OUT") {
-                // 로그아웃 처리
-                console.log("사용자 로그아웃 감지");
-                window.currentUser = null;
-                updateUIAccordingToAuthState();
-            } else if (event === "SIGNED_IN" && session) {
-                // 로그인 처리
-                console.log("사용자 로그인 감지:", session.user.email);
-                window.currentUser = session.user;
-                updateUIAccordingToAuthState();
-            }
-        });
+        // 인증 상태 변화 감지 (한 번만 설정)
+        if (!window.authStateListenerSet) {
+            window.supabaseClient.auth.onAuthStateChange((event, session) => {
+                console.log("인증 상태 변화:", event, session ? "로그인됨" : "로그아웃됨");
+                
+                if (event === "SIGNED_OUT") {
+                    console.log("사용자 로그아웃 감지");
+                    window.currentUser = null;
+                    updateUIAccordingToAuthState();
+                } else if (event === "SIGNED_IN" && session) {
+                    console.log("사용자 로그인 감지:", session.user.email);
+                    window.currentUser = session.user;
+                    updateUIAccordingToAuthState();
+                }
+            });
+            window.authStateListenerSet = true;
+        }
         
     } catch (error) {
         console.error("❌ 인증 상태 확인 오류:", error);
