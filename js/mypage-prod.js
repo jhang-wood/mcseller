@@ -4,64 +4,97 @@
 
 // 페이지 초기화
 async function initializeMyPage() {
-    // Supabase 클라이언트 대기
-    if (!window.supabaseClient) {
-        await new Promise(resolve => {
-            window.addEventListener('supabaseClientReady', resolve, { once: true });
-        });
-    }
-    
-    // 로그인 확인 (세션 기반으로 더 안정적)
-    const { data: { session }, error } = await window.supabaseClient.auth.getSession();
-    
-    if (error) {
-        console.error('세션 확인 오류:', error);
-        showAuthError('인증 오류가 발생했습니다. 다시 로그인해주세요.');
-        return;
-    }
-    
-    if (!session || !session.user) {
-        showAuthError('로그인이 필요합니다.');
-        return;
-    }
-    
-    // 이메일 확인 체크 제거 - 바로 진행
+    console.log('🔄 마이페이지 초기화 시작...');
     
     try {
+        // Supabase 클라이언트 대기
+        if (!window.supabaseClient) {
+            console.log('⏳ Supabase 클라이언트 대기 중...');
+            await new Promise(resolve => {
+                window.addEventListener('supabaseClientReady', resolve, { once: true });
+            });
+        }
+        
+        console.log('✅ Supabase 클라이언트 준비 완료');
+        
+        // 로그인 확인 (세션 기반으로 더 안정적)
+        const { data: { session }, error } = await window.supabaseClient.auth.getSession();
+        
+        if (error) {
+            console.error('❌ 세션 확인 오류:', error);
+            showAuthError('인증 오류가 발생했습니다. 다시 로그인해주세요.');
+            return;
+        }
+        
+        if (!session || !session.user) {
+            console.log('❌ 로그인 세션 없음');
+            showAuthError('로그인이 필요합니다.');
+            return;
+        }
+        
+        console.log('✅ 사용자 인증 확인 완료:', session.user.email);
+        
+        // 이메일 확인 체크 제거 - 바로 진행
+        
         // 사용자 정보 로드
+        console.log('📊 사용자 정보 로딩 중...');
         await loadUserInfo(session.user);
         
         // 구매한 콘텐츠 로드
+        console.log('📚 구매 콘텐츠 로딩 중...');
         await loadPurchasedContent();
         
-        // 성공적으로 로드된 경우 UI 표시
+        // 모든 로딩 완료 - UI 표시
+        console.log('✅ 마이페이지 로딩 완료');
         document.body.style.opacity = '1';
         
+        // 전역 사용자 정보 설정
+        window.currentUser = session.user;
+        
+        // 실시간 인증 상태 감지 설정
+        setupAuthStateListener();
+        
     } catch (error) {
-        console.error('마이페이지 로드 오류:', error);
-        showAuthError('페이지 로드 중 오류가 발생했습니다. 새로고침을 시도해주세요.');
+        console.error('❌ 마이페이지 초기화 중 오류:', error);
+        showAuthError('페이지 로드 중 오류가 발생했습니다.');
     }
 }
 
-// 인증 오류 표시 함수
+// 인증 오류 표시 함수 (자동 리다이렉트)
 function showAuthError(message) {
-    document.body.innerHTML = `
-        <div class="container mt-5">
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <div class="alert alert-warning text-center">
-                        <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
-                        <h4>인증 필요</h4>
-                        <p>${message}</p>
-                        <a href="/auth.html" class="btn btn-primary">로그인하기</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
+    console.log('❌ 마이페이지 인증 실패:', message);
+    
+    // 즉시 로그인 페이지로 리다이렉트 (현재 페이지를 리다이렉트 파라미터로 전달)
+    const currentPath = window.location.pathname;
+    window.location.href = `/auth.html?redirect=${encodeURIComponent(currentPath)}`;
 }
 
-// 이메일 확인 관련 함수 제거됨
+// 실시간 인증 상태 감지 설정
+function setupAuthStateListener() {
+    if (!window.supabaseClient) return;
+    
+    // 인증 상태 변화 감지
+    window.supabaseClient.auth.onAuthStateChange((event, session) => {
+        console.log('🔄 마이페이지에서 인증 상태 변화 감지:', event);
+        
+        if (event === 'SIGNED_OUT' || !session) {
+            console.log('❌ 로그아웃 감지 - 로그인 페이지로 이동');
+            window.currentUser = null;
+            
+            // 즉시 로그인 페이지로 리다이렉트
+            const currentPath = window.location.pathname;
+            window.location.href = `/auth.html?redirect=${encodeURIComponent(currentPath)}`;
+        } else if (event === 'SIGNED_IN' && session?.user) {
+            console.log('✅ 새로운 로그인 감지:', session.user.email);
+            window.currentUser = session.user;
+            
+            // 페이지 새로고침하여 최신 데이터 로드
+            if (confirm('새로운 계정으로 로그인되었습니다. 페이지를 새로고침하시겠습니까?')) {
+                window.location.reload();
+            }
+        }
+    });
+}
 
 // 사용자 정보 로드
 async function loadUserInfo(user) {
