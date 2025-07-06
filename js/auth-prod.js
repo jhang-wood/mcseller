@@ -178,7 +178,8 @@ async function handleSignup(e) {
             options: {
                 data: {
                     full_name: name
-                }
+                },
+                emailRedirectTo: undefined,
             }
         });
         
