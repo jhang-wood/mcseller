@@ -100,43 +100,9 @@
         </div>
     </div>
 
-    <script src="js/config.js"></script>
     <script src="js/supabase-client.js"></script>
     <script src="js/mobile-utils.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            // 로그인 확인 (프로덕션 버전)
-            let user = null;
-            
-            if (window.getCurrentUser) {
-                user = await getCurrentUser();
-            }
-            
-            if (!user) {
-                alert('로그인이 필요합니다.');
-                window.location.href = 'auth.html';
-                return;
-            }
-            
-            // 관리자는 마이페이지 접근 불가
-            if (user.isAdmin) {
-                alert('관리자는 관리자 페이지를 이용해주세요.');
-                window.location.href = 'admin.html';
-                return;
-            }
-            
-            // 사용자 정보 표시
-            document.getElementById('user-email').textContent = user.email;
-        });
-
-        async function logout() {
-            // Supabase 로그아웃
-            if (window.signOut) {
-                await signOut();
-            }
-            window.location.href = 'index.html';
-        }
-    </script>
+    <script src="js/mypage.js"></script>
     <script src="js/protect-page.js"></script>
 </body>
 </html>

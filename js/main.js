@@ -9,8 +9,23 @@
 //  페이지 초기화
 // ===================================================================================
 
-// Supabase 클라이언트가 준비되면 모든 페이지 로직을 시작합니다.
-document.addEventListener("supabaseClientReady", initializeMainPage);
+// DOM과 Supabase 클라이언트가 준비되면 페이지 로직을 시작합니다.
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("메인페이지 DOM 로드 완료");
+    
+    // Supabase 클라이언트 대기
+    function waitForSupabase() {
+        if (window.supabaseClient) {
+            console.log("✅ Supabase 클라이언트 확인 완료");
+            initializeMainPage();
+        } else {
+            console.log("Supabase 클라이언트 대기 중...");
+            setTimeout(waitForSupabase, 100);
+        }
+    }
+    
+    waitForSupabase();
+});
 
 function initializeMainPage() {
     console.log("✅ Supabase 준비 완료. 메인 페이지 로직을 초기화합니다.");
@@ -36,31 +51,82 @@ function initializeMainPage() {
 // ===================================================================================
 
 // 인증 상태에 따라 UI를 업데이트하는 중앙 함수
-function updateUIAccordingToAuthState() {
-    window.supabaseClient.auth.onAuthStateChange((event, session) => {
-        if (event === "SIGNED_IN" || (event === "INITIAL_SESSION" && session)) {
-            // 로그인 상태 UI
-            document
-                .getElementById("my-content-link")
-                ?.classList.remove("d-none");
-            document.getElementById("logout-link")?.classList.remove("d-none");
-            document.getElementById("login-link")?.classList.add("d-none");
-
-            // '내 콘텐츠' 버튼에 이벤트 리스너 설정
-            const myContentBtn = document.getElementById("my-content-link");
-            if (myContentBtn) {
-                myContentBtn.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    showMyContent();
-                });
+async function updateUIAccordingToAuthState() {
+    try {
+        // 현재 세션 확인
+        const { data: { session }, error } = await window.supabaseClient.auth.getSession();
+        
+        console.log("현재 세션 상태:", session ? "로그인됨" : "로그아웃됨");
+        
+        if (session && session.user) {
+            // 로그인 상태 UI - 실제 HTML ID에 맞춤
+            console.log("✅ 로그인 상태 UI 업데이트:", session.user.email);
+            
+            // 드롭다운 형태의 프로필 메뉴 표시
+            const profileDropdown = document.querySelector('[data-bs-toggle="dropdown"]');
+            if (profileDropdown) {
+                profileDropdown.style.display = 'block';
             }
+            
+            // 로그인 버튼 숨기기 
+            const loginBtn = document.querySelector('a[href="auth.html"]');
+            if (loginBtn && loginBtn.textContent.includes('로그인')) {
+                loginBtn.style.display = 'none';
+            }
+            
+            // 전역 사용자 정보 설정
+            window.currentUser = session.user;
+
         } else {
             // 로그아웃 상태 UI
-            document.getElementById("my-content-link")?.classList.add("d-none");
-            document.getElementById("logout-link")?.classList.add("d-none");
-            document.getElementById("login-link")?.classList.remove("d-none");
+            console.log("❌ 로그아웃 상태 UI 업데이트");
+            
+            // 프로필 드롭다운 숨기기
+            const profileDropdown = document.querySelector('[data-bs-toggle="dropdown"]');
+            if (profileDropdown) {
+                profileDropdown.style.display = 'none';
+            }
+            
+            // 로그인 버튼 표시
+            const loginBtn = document.querySelector('a[href="auth.html"]');
+            if (loginBtn && loginBtn.textContent.includes('로그인')) {
+                loginBtn.style.display = 'block';
+            }
+            
+            // 전역 사용자 정보 초기화
+            window.currentUser = null;
         }
-    });
+        
+        // 인증 상태 변화 감지
+        window.supabaseClient.auth.onAuthStateChange((event, session) => {
+            console.log("인증 상태 변화:", event, session ? "로그인됨" : "로그아웃됨");
+            
+            if (event === "SIGNED_OUT") {
+                // 로그아웃 처리
+                console.log("사용자 로그아웃 감지");
+                window.currentUser = null;
+                updateUIAccordingToAuthState();
+            } else if (event === "SIGNED_IN" && session) {
+                // 로그인 처리
+                console.log("사용자 로그인 감지:", session.user.email);
+                window.currentUser = session.user;
+                updateUIAccordingToAuthState();
+            }
+        });
+        
+    } catch (error) {
+        console.error("❌ 인증 상태 확인 오류:", error);
+        // 기본값: 로그아웃 상태로 설정
+        const profileDropdown = document.querySelector('[data-bs-toggle="dropdown"]');
+        if (profileDropdown) {
+            profileDropdown.style.display = 'none';
+        }
+        
+        const loginBtn = document.querySelector('a[href="auth.html"]');
+        if (loginBtn && loginBtn.textContent.includes('로그인')) {
+            loginBtn.style.display = 'block';
+        }
+    }
 }
 
 // '내 콘텐츠' 모달을 표시하는 함수
