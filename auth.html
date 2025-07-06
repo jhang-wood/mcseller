@@ -1094,7 +1094,7 @@
         <!-- 디버깅 스크립트 제거됨 -->
 
         <script>
-            // Enhanced authentication page functionality
+            // 인증 페이지 UI 효과만 담당 (auth-clean.js에서 실제 인증 처리)
             document.addEventListener("DOMContentLoaded", function () {
                 // Create floating particles
                 const createParticles = () => {
@@ -1304,10 +1304,10 @@
                     }, 2000);
                 };
 
-                // Form submission handlers are handled by auth.js
-                // Removed duplicate event listeners to prevent conflicts
+                // Form submission handlers are handled by auth-clean.js
+                // All duplicate event listeners removed to prevent conflicts
 
-                // Kakao login handlers with enhanced feedback
+                // Kakao 버튼 시각적 효과만 (실제 로그인은 auth-clean.js에서 처리)
                 const kakaoButtons = [
                     "kakao-login",
                     "kakao-signup",
@@ -1320,6 +1320,7 @@
                             setTimeout(() => {
                                 this.style.transform = "scale(1)";
                             }, 150);
+                            console.log("Kakao 버튼 클릭:", buttonId);
                         });
                 });
 

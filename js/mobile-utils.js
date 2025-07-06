@@ -13,6 +13,7 @@ class MobileUtils {
         this.setupOrientationChange();
         this.setupPullToRefresh();
         this.setupMobileNavigation();
+        this.setupVibration();
     }
 
     // 터치 디바이스 감지
@@ -184,6 +185,12 @@ class MobileUtils {
     updateViewportHeight() {
         const vh = window.innerHeight * 0.01;
         document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+
+    // 진동 설정 초기화
+    setupVibration() {
+        this.vibrationSupport = 'vibrate' in navigator;
+        console.log('진동 지원:', this.vibrationSupport);
     }
 
     // 진동 피드백
