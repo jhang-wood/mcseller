@@ -62,22 +62,38 @@ async function updateUIAccordingToAuthState() {
             // 로그인 상태 UI - 실제 HTML ID에 맞춤
             console.log("✅ 로그인 상태 UI 업데이트:", session.user.email);
             
-            // 로그인 정보 영역 표시
-            const loginInfo = document.getElementById("login-info");
+            // 로그인 상태 UI 업데이트
+            console.log("로그인 상태 UI 요소 검색 중...");
+            
+            // 다양한 방법으로 요소 찾기
+            const loginInfo = document.getElementById("login-info") || 
+                             document.querySelector("#login-info") ||
+                             document.querySelector('[id="login-info"]');
+            
+            const profileDropdown = document.getElementById("profile-dropdown") ||
+                                  document.querySelector("#profile-dropdown") ||
+                                  document.querySelector('[id="profile-dropdown"]');
+            
+            const startButton = document.getElementById("start-button") ||
+                              document.querySelector("#start-button") ||
+                              document.querySelector('[id="start-button"]');
+            
+            console.log("찾은 요소들:", { loginInfo: !!loginInfo, profileDropdown: !!profileDropdown, startButton: !!startButton });
+            
+            // 로그인 상태: 로그인 버튼 숨기고 프로필 드롭다운 표시
             if (loginInfo) {
-                loginInfo.style.display = 'block';
+                loginInfo.style.display = 'none';  // 로그인 버튼 숨김
+                console.log("✅ login-info 숨김");
             }
             
-            // 프로필 드롭다운 표시
-            const profileDropdown = document.getElementById("profile-dropdown");
             if (profileDropdown) {
-                profileDropdown.style.display = 'block';
+                profileDropdown.style.display = 'block';  // 프로필 드롭다운 표시
+                console.log("✅ profile-dropdown 표시");
             }
             
-            // 시작하기 버튼 숨기기
-            const startButton = document.getElementById("start-button");
             if (startButton) {
-                startButton.style.display = 'none';
+                startButton.style.display = 'none';  // 시작하기 버튼 숨김
+                console.log("✅ start-button 숨김");
             }
             
             // 전역 사용자 정보 설정
@@ -87,22 +103,23 @@ async function updateUIAccordingToAuthState() {
             // 로그아웃 상태 UI
             console.log("❌ 로그아웃 상태 UI 업데이트");
             
-            // 로그인 정보 영역 숨기기
+            // 로그아웃 상태: 로그인 버튼 표시하고 프로필 드롭다운 숨김
             const loginInfo = document.getElementById("login-info");
             if (loginInfo) {
-                loginInfo.style.display = 'none';
+                loginInfo.style.display = 'block';  // 로그인 버튼 표시
+                console.log("✅ 로그아웃 상태: login-info 표시");
             }
             
-            // 프로필 드롭다운 숨기기
             const profileDropdown = document.getElementById("profile-dropdown");
             if (profileDropdown) {
-                profileDropdown.style.display = 'none';
+                profileDropdown.style.display = 'none';  // 프로필 드롭다운 숨김
+                console.log("✅ 로그아웃 상태: profile-dropdown 숨김");
             }
             
-            // 시작하기 버튼 표시
             const startButton = document.getElementById("start-button");
             if (startButton) {
-                startButton.style.display = 'block';
+                startButton.style.display = 'block';  // 시작하기 버튼 표시
+                console.log("✅ 로그아웃 상태: start-button 표시");
             }
             
             // 전역 사용자 정보 초기화
@@ -132,17 +149,17 @@ async function updateUIAccordingToAuthState() {
         // 기본값: 로그아웃 상태로 설정
         const loginInfo = document.getElementById("login-info");
         if (loginInfo) {
-            loginInfo.style.display = 'none';
+            loginInfo.style.display = 'block';  // 로그인 버튼 표시
         }
         
         const profileDropdown = document.getElementById("profile-dropdown");
         if (profileDropdown) {
-            profileDropdown.style.display = 'none';
+            profileDropdown.style.display = 'none';  // 프로필 드롭다운 숨김
         }
         
         const startButton = document.getElementById("start-button");
         if (startButton) {
-            startButton.style.display = 'block';
+            startButton.style.display = 'block';  // 시작하기 버튼 표시
         }
     }
 }

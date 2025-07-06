@@ -99,25 +99,8 @@ function showResetForm() {
 }
 
 // 기존 세션 확인
-async function checkExistingSession() {
-    try {
-        // 페이지가 완전히 로드된 후 세션 확인
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        const { data: { session } } = await window.supabaseClient.auth.getSession();
-        if (session && session.user) {
-            console.log("기존 세션 발견:", session.user.email);
-            // 즉시 이동하지 않고 확인 후 이동
-            if (confirm("이미 로그인되어 있습니다. 메인페이지로 이동하시겠습니까?")) {
-                window.location.href = "index.html";
-            }
-        } else {
-            console.log("기존 세션 없음, 로그인 페이지 유지");
-        }
-    } catch (error) {
-        console.log("세션 확인 중 오류:", error.message);
-    }
-}
+// 세션 확인 함수를 완전히 제거하여 로그인 페이지 접근 허용
+// async function checkExistingSession() { ... }
 
 // 로그인 처리
 async function handleLogin(e) {
