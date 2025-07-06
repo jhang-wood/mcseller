@@ -207,10 +207,20 @@ async function loadLectures() {
     if (!container) return;
     
     try {
-        // Static data를 사용하여 강의 로드
-        const lectures = window.ProductService ? 
-            window.ProductService.getByType('lectures') : 
-            [];
+        let lectures = [];
+        
+        if (window.supabaseClient) {
+            const { data, error } = await window.supabaseClient
+                .from('products')
+                .select('*')
+                .eq('type', 'lecture');
+            
+            if (error) {
+                console.error('강의 데이터 로드 오류:', error);
+            } else {
+                lectures = data || [];
+            }
+        }
         
         renderProducts(lectures, container, 'lecture');
         
@@ -226,10 +236,20 @@ async function loadEbooks() {
     if (!container) return;
     
     try {
-        // Static data를 사용하여 전자책 로드
-        const ebooks = window.ProductService ? 
-            window.ProductService.getByType('ebooks') : 
-            [];
+        let ebooks = [];
+        
+        if (window.supabaseClient) {
+            const { data, error } = await window.supabaseClient
+                .from('products')
+                .select('*')
+                .eq('type', 'ebook');
+            
+            if (error) {
+                console.error('전자책 데이터 로드 오류:', error);
+            } else {
+                ebooks = data || [];
+            }
+        }
         
         renderProducts(ebooks, container, 'ebook');
         
@@ -271,10 +291,10 @@ function renderProducts(products, container, type) {
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
                         <span class="product-price">₩${product.price.toLocaleString()}</span>
-                        <a href="product-detail.html?id=${product.id}" class="btn btn-primary btn-sm">
+                        <button class="btn btn-primary btn-sm view-content-btn" data-product-id="${product.id}">
                             <i class="fas fa-${type === 'lecture' ? 'play' : 'book'} me-1"></i>
                             ${type === 'lecture' ? '수강하기' : '읽기'}
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -477,6 +497,73 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.log('서비스 워커 등록 실패:', error);
             });
+    }
+});
+
+// 콘텐츠 보기 버튼 클릭 이벤트 리스너
+document.addEventListener('click', async function(e) {
+    if (e.target.classList.contains('view-content-btn') || 
+        e.target.closest('.view-content-btn')) {
+        
+        const button = e.target.classList.contains('view-content-btn') ? 
+                      e.target : e.target.closest('.view-content-btn');
+        
+        const productId = button.getAttribute('data-product-id');
+        
+        if (!productId) {
+            alert('상품 정보를 찾을 수 없습니다.');
+            return;
+        }
+
+        try {
+            // 로딩 상태 표시
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>확인 중...';
+            button.disabled = true;
+
+            // 구매 여부 확인
+            const hasPurchased = await window.checkPurchase(productId);
+            
+            if (hasPurchased) {
+                // 상품 타입 확인하여 적절한 뷰어로 이동
+                if (window.supabaseClient) {
+                    const { data: product, error } = await window.supabaseClient
+                        .from('products')
+                        .select('type')
+                        .eq('id', productId)
+                        .single();
+                    
+                    if (!error && product) {
+                        if (product.type === 'lecture') {
+                            window.location.href = `video-viewer.html?id=${productId}`;
+                        } else if (product.type === 'ebook') {
+                            window.location.href = `ebook-viewer.html?id=${productId}`;
+                        } else {
+                            window.location.href = `product-detail.html?id=${productId}`;
+                        }
+                    } else {
+                        window.location.href = `product-detail.html?id=${productId}`;
+                    }
+                } else {
+                    // Supabase 클라이언트가 없는 경우 기본 처리
+                    window.location.href = `video-viewer.html?id=${productId}`;
+                }
+            } else {
+                alert('구매가 필요한 상품입니다.');
+            }
+
+            // 로딩 상태 해제
+            button.innerHTML = originalText;
+            button.disabled = false;
+            
+        } catch (error) {
+            console.error('상품 접근 확인 오류:', error);
+            alert('상품 정보를 확인하는 중 오류가 발생했습니다.');
+            
+            // 로딩 상태 해제
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }
     }
 });
 
