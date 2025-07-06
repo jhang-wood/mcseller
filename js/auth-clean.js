@@ -23,8 +23,7 @@ function initializeAuthPage() {
     setupFormEvents();
     setupFormSwitching();
     
-    // 세션 확인을 비활성화하여 로그인 페이지 접근 허용
-    // checkExistingSession();
+    // 로그인 페이지 접근 허용을 위해 세션 확인 완전 제거
 }
 
 // 폼 이벤트 설정

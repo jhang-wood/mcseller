@@ -62,16 +62,22 @@ async function updateUIAccordingToAuthState() {
             // 로그인 상태 UI - 실제 HTML ID에 맞춤
             console.log("✅ 로그인 상태 UI 업데이트:", session.user.email);
             
-            // 드롭다운 형태의 프로필 메뉴 표시
-            const profileDropdown = document.querySelector('[data-bs-toggle="dropdown"]');
+            // 로그인 정보 영역 표시
+            const loginInfo = document.getElementById("login-info");
+            if (loginInfo) {
+                loginInfo.style.display = 'block';
+            }
+            
+            // 프로필 드롭다운 표시
+            const profileDropdown = document.getElementById("profile-dropdown");
             if (profileDropdown) {
                 profileDropdown.style.display = 'block';
             }
             
-            // 로그인 버튼 숨기기 
-            const loginBtn = document.querySelector('a[href="auth.html"]');
-            if (loginBtn && loginBtn.textContent.includes('로그인')) {
-                loginBtn.style.display = 'none';
+            // 시작하기 버튼 숨기기
+            const startButton = document.getElementById("start-button");
+            if (startButton) {
+                startButton.style.display = 'none';
             }
             
             // 전역 사용자 정보 설정
@@ -81,16 +87,22 @@ async function updateUIAccordingToAuthState() {
             // 로그아웃 상태 UI
             console.log("❌ 로그아웃 상태 UI 업데이트");
             
+            // 로그인 정보 영역 숨기기
+            const loginInfo = document.getElementById("login-info");
+            if (loginInfo) {
+                loginInfo.style.display = 'none';
+            }
+            
             // 프로필 드롭다운 숨기기
-            const profileDropdown = document.querySelector('[data-bs-toggle="dropdown"]');
+            const profileDropdown = document.getElementById("profile-dropdown");
             if (profileDropdown) {
                 profileDropdown.style.display = 'none';
             }
             
-            // 로그인 버튼 표시
-            const loginBtn = document.querySelector('a[href="auth.html"]');
-            if (loginBtn && loginBtn.textContent.includes('로그인')) {
-                loginBtn.style.display = 'block';
+            // 시작하기 버튼 표시
+            const startButton = document.getElementById("start-button");
+            if (startButton) {
+                startButton.style.display = 'block';
             }
             
             // 전역 사용자 정보 초기화
@@ -118,14 +130,19 @@ async function updateUIAccordingToAuthState() {
     } catch (error) {
         console.error("❌ 인증 상태 확인 오류:", error);
         // 기본값: 로그아웃 상태로 설정
-        const profileDropdown = document.querySelector('[data-bs-toggle="dropdown"]');
+        const loginInfo = document.getElementById("login-info");
+        if (loginInfo) {
+            loginInfo.style.display = 'none';
+        }
+        
+        const profileDropdown = document.getElementById("profile-dropdown");
         if (profileDropdown) {
             profileDropdown.style.display = 'none';
         }
         
-        const loginBtn = document.querySelector('a[href="auth.html"]');
-        if (loginBtn && loginBtn.textContent.includes('로그인')) {
-            loginBtn.style.display = 'block';
+        const startButton = document.getElementById("start-button");
+        if (startButton) {
+            startButton.style.display = 'block';
         }
     }
 }
