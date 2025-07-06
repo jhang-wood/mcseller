@@ -188,3 +188,46 @@ WHERE email = '관리자이메일@example.com';
    -- 이 권한이 있어야 로그인하지 않은 상태에서 함수를 호출할 수 있습니다.
    GRANT EXECUTE ON FUNCTION public.get_email_for_username(TEXT) TO anon;
    ```
+
+### 회원가입 시 프로필 정보를 안전하게 업데이트하는 함수
+CREATE OR REPLACE FUNCTION public.update_user_profile(
+  p_user_id UUID,
+  p_username TEXT,
+  p_full_name TEXT
+)
+RETURNS BOOLEAN AS $$
+BEGIN
+  -- profiles 테이블에 사용자 정보 업데이트
+  UPDATE public.profiles 
+  SET username = p_username, full_name = p_full_name
+  WHERE id = p_user_id;
+  
+  -- 업데이트가 성공했는지 확인
+  IF FOUND THEN
+    RETURN TRUE;
+  ELSE
+    RETURN FALSE;
+  END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- authenticated 사용자(로그인한 사용자)에게 함수 실행 권한 부여
+GRANT EXECUTE ON FUNCTION public.update_user_profile(UUID, TEXT, TEXT) TO authenticated;
+
+-- 아이디 중복 확인용 함수 (익명 사용자도 사용 가능)
+CREATE OR REPLACE FUNCTION public.check_username_exists(p_username TEXT)
+RETURNS BOOLEAN AS $$
+DECLARE
+  username_count INTEGER;
+BEGIN
+  SELECT COUNT(*)
+  INTO username_count
+  FROM public.profiles
+  WHERE username = p_username;
+  
+  RETURN username_count > 0;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 익명 사용자에게도 아이디 중복 확인 함수 실행 권한 부여
+GRANT EXECUTE ON FUNCTION public.check_username_exists(TEXT) TO anon;

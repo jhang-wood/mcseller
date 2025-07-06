@@ -184,14 +184,16 @@ async function handleSignup(e) {
     submitBtn.disabled = true;
     
     try {
-        // 1. 아이디(username) 중복 확인
-        const { data: existingUser } = await window.supabaseClient
-            .from('profiles')
-            .select('username')
-            .eq('username', id)
-            .maybeSingle(); // 데이터가 없어도 오류 아님
+        // 1. 아이디(username) 중복 확인 (RPC 함수 사용으로 변경)
+        const { data: usernameExists, error: checkError } = await window.supabaseClient
+            .rpc('check_username_exists', { p_username: id });
 
-        if (existingUser) {
+        if (checkError) {
+            console.error('아이디 중복 확인 오류:', checkError);
+            throw new Error('아이디 중복 확인 중 오류가 발생했습니다.');
+        }
+
+        if (usernameExists) {
             throw new Error('이미 사용 중인 아이디입니다.');
         }
 
@@ -207,20 +209,21 @@ async function handleSignup(e) {
             throw signUpError;
         }
         
-        // 3. profiles 테이블에 추가 정보(이름, 아이디) 업데이트
+        // 3. profiles 테이블에 추가 정보(이름, 아이디) 업데이트 (RPC 함수 사용)
         if (signUpData.user) {
             // 'handle_new_user' 트리거가 실행될 시간을 약간 기다려줌
-            await new Promise(r => setTimeout(r, 500)); 
+            await new Promise(r => setTimeout(r, 1000)); // 1초로 늘림
 
-            const { error: updateError } = await window.supabaseClient
-                .from('profiles')
-                .update({ full_name: name, username: id })
-                .eq('id', signUpData.user.id);
+            const { data: updateSuccess, error: updateError } = await window.supabaseClient
+                .rpc('update_user_profile', { 
+                    p_user_id: signUpData.user.id,
+                    p_username: id,
+                    p_full_name: name 
+                });
 
-            if (updateError) {
+            if (updateError || !updateSuccess) {
                 console.error('프로필 업데이트 오류:', updateError);
-                // 여기서 가입된 사용자를 롤백하는 로직을 추가할 수 있으나, 복잡하므로 에러 알림 처리
-                throw new Error('프로필 정보 저장에 실패했습니다. 관리자에게 문의하세요.');
+                throw new Error(`프로필 정보 저장에 실패했습니다. 아이디: ${id}, 오류: ${updateError?.message || '알 수 없는 오류'}`);
             }
             
             showToast('🎉 가입이 완료되었습니다. 바로 로그인됩니다.', 'success');
@@ -241,7 +244,7 @@ async function handleSignup(e) {
         if (error.message) {
             if (error.message.includes('User already registered')) {
                 errorMessage = '이미 가입된 이메일입니다.';
-            } else if (error.message.includes('already being used') || error.message.includes('profiles_username_key')) {
+            } else if (error.message.includes('이미 사용 중인 아이디')) {
                 errorMessage = '이미 사용 중인 아이디입니다.';
             } else if (error.message.includes('should be at least 6 characters')) {
                 errorMessage = '비밀번호는 최소 6자 이상이어야 합니다.';
