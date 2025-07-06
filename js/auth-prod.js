@@ -113,20 +113,17 @@ async function handleLogin(e) {
     submitBtn.disabled = true;
     
     try {
-        // 1. 아이디로 프로필 정보(이메일) 조회
-        const { data: profile, error: profileError } = await window.supabaseClient
-            .from('profiles')
-            .select('email')
-            .eq('username', id)
-            .single();
+        // 1. 아이디로 프로필 정보(이메일) 조회 (RPC 함수 사용으로 변경)
+        const { data: email, error: rpcError } = await window.supabaseClient
+            .rpc('get_email_for_username', { p_username: id });
 
-        if (profileError || !profile) {
+        if (rpcError || !email) {
             throw new Error('아이디 또는 비밀번호가 올바르지 않습니다.');
         }
 
         // 2. 조회한 이메일로 로그인 시도
         const { data, error } = await window.supabaseClient.auth.signInWithPassword({
-            email: profile.email,
+            email: email, // RPC로부터 받은 이메일 사용
             password: password
         });
         

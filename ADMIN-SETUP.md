@@ -163,3 +163,28 @@ WHERE email = '관리자이메일@example.com';
    -- 3. username 검색 성능 향상을 위한 인덱스 추가
    CREATE INDEX IF NOT EXISTS idx_profiles_username ON public.profiles(username);
    ```
+
+### 데이터베이스 함수 생성
+
+1. **아이디로 이메일을 안전하게 조회하는 데이터베이스 함수 생성**
+   ```sql
+   -- 1. 아이디로 이메일을 안전하게 조회하는 데이터베이스 함수 생성
+   -- 이 함수는 RLS를 우회하여 username을 조회할 수 있도록 SECURITY DEFINER로 실행됩니다.
+   CREATE OR REPLACE FUNCTION public.get_email_for_username(p_username TEXT)
+   RETURNS TEXT AS $$
+   DECLARE
+     user_email TEXT;
+   BEGIN
+     SELECT email
+     INTO user_email
+     FROM public.profiles
+     WHERE username = p_username;
+     
+     RETURN user_email;
+   END;
+   $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+   -- 2. 익명(anon) 사용자에게 위 함수를 실행할 권한 부여
+   -- 이 권한이 있어야 로그인하지 않은 상태에서 함수를 호출할 수 있습니다.
+   GRANT EXECUTE ON FUNCTION public.get_email_for_username(TEXT) TO anon;
+   ```
