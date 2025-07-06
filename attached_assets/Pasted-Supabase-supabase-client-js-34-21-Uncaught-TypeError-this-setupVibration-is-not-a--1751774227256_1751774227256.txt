@@ -1,0 +1,33 @@
+Supabase 클라이언트가 초기화되었습니다. supabase-client.js:34:21
+Uncaught TypeError: this.setupVibration is not a function
+    init https://www.mcsell.co.kr/js/mobile-utils.js:14
+    MobileUtils https://www.mcsell.co.kr/js/mobile-utils.js:7
+    <anonymous> https://www.mcsell.co.kr/js/mobile-utils.js:453
+mobile-utils.js:14:14
+MCSELLER 인증 페이지가 로드되었습니다. auth:1434:25
+TypeError: can't access property "always", items.dragfreestorage is undefined
+releaseDrag.js:88:24
+“chrome-extension://team@livestartpage.com/pages/client/livestartpage-message-add.js” 소스의 <script> 로드에 실패했습니다. auth:1:1
+인증 상태 변경: INITIAL_SESSION null supabase-client.js:54:13
+Error: Accessing from Xray wrapper is not supported. user-provider-f92b0d66.js:50:624
+[2025-07-06T03:56:46.261Z]  @firebase/app: Error: Not allowed to define cross-origin object as property on [Object] or [Array] XrayWrapper
+    triggerHeartbeat moz-extension://f685e03e-f568-4474-aa10-4e0bcbfdcd39/assets/firebase-05ca956a.js:362
+firebase-05ca956a.js:227:455
+[2025-07-06T03:56:46.261Z]  @firebase/app: Error: Not allowed to define cross-origin object as property on [Object] or [Array] XrayWrapper
+    triggerHeartbeat moz-extension://f685e03e-f568-4474-aa10-4e0bcbfdcd39/assets/firebase-05ca956a.js:362
+firebase-05ca956a.js:227:455
+[2025-07-06T03:56:46.261Z]  @firebase/app: Error: Not allowed to define cross-origin object as property on [Object] or [Array] XrayWrapper
+    triggerHeartbeat moz-extension://f685e03e-f568-4474-aa10-4e0bcbfdcd39/assets/firebase-05ca956a.js:362
+firebase-05ca956a.js:227:455
+[2025-07-06T03:56:46.261Z]  @firebase/app: Error: Not allowed to define cross-origin object as property on [Object] or [Array] XrayWrapper
+    triggerHeartbeat moz-extension://f685e03e-f568-4474-aa10-4e0bcbfdcd39/assets/firebase-05ca956a.js:362
+firebase-05ca956a.js:227:455
+로그인 처리 auth.js:167:17
+테스트 계정 확인: user@test2.com 123456 undefined auth.js:174:17
+로그인 오류: Error: 서비스 연결 오류
+    handleLogin https://www.mcsell.co.kr/js/auth.js:197
+auth.js:231:17
+Supabase 오류 (로그인): Error: 서비스 연결 오류
+    handleLogin https://www.mcsell.co.kr/js/auth.js:197
+supabase-client.js:242:13
+로그인 처리
