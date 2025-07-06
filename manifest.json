@@ -47,6 +47,18 @@
       ]
     },
     {
+      "name": "무료 강의",
+      "short_name": "무료강의",
+      "description": "AI 자동화 무료 강의 수강",
+      "url": "/#courses",
+      "icons": [
+        {
+          "src": "https://via.placeholder.com/96x96/ff9900/ffffff?text=🎓",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
       "name": "로그인",
       "short_name": "로그인",
       "description": "계정에 로그인하기",
@@ -58,5 +70,25 @@
         }
       ]
     }
-  ]
+  ],
+  "file_handlers": [
+    {
+      "action": "/ebook-viewer.html",
+      "accept": {
+        "text/html": [".html"],
+        "application/pdf": [".pdf"]
+      }
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+mcseller",
+      "url": "/?action=%s"
+    }
+  ],
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "edge_side_panel": {
+    "preferred_width": 480
+  },
+  "prefer_related_applications": false
 }
