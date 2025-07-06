@@ -1,58 +1,131 @@
 /**
- * MCSELLER 프로덕션 Supabase 클라이언트
- * 완전한 프로덕션 환경용으로 작성됨
+ * MCSELLER 통합 Supabase 클라이언트
+ * supabase-config.js의 중앙 설정을 사용합니다.
  */
+
+// 전역 변수
+let supabaseClient = null;
 
 // Supabase 클라이언트 초기화 함수
 async function initializeSupabaseClient() {
-    // ⚠️ 사용자가 제공한 실제 Supabase 프로젝트 정보로 교체하세요
-    const SUPABASE_URL = "https://rpcctgtmtplfahwtnglq.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwY2N0Z3RtdHBsZmFod3RuZ2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUxOTA1MDksImV4cCI6MjA1MDc2NjUwOX0.7n3yEJCZLRTnFvAhD_Nq2oepgAAhcqFqH_rGQbAhBjo";
-    
-    const supabaseUrl = SUPABASE_URL;
-    const supabaseAnonKey = SUPABASE_ANON_KEY;
-    
-    if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes("사용자에게_받은") || supabaseAnonKey.includes("사용자에게_받은")) {
-        console.error('❌ Supabase 환경 변수가 설정되지 않았습니다.');
-        console.error('위 파일에서 SUPABASE_URL과 SUPABASE_ANON_KEY를 실제 값으로 교체해주세요.');
-        throw new Error('Supabase configuration missing - Please update the actual values');
-    }
-    
     try {
-        // Supabase 클라이언트 생성 (이메일 확인 비활성화)
-        const client = supabase.createClient(supabaseUrl, supabaseAnonKey, {
-            auth: {
-                autoRefreshToken: true,
-                persistSession: true,
-                detectSessionInUrl: true,
-                storage: localStorage,
-                storageKey: 'mcseller-auth',
-                confirmEmail: false
-            },
-            global: {
-                headers: {
-                    'X-Client-Info': 'mcseller-production'
-                }
-            }
-        });
+        console.log('🔄 Supabase 클라이언트 초기화 시작...');
+        
+        // 설정 파일이 로드되었는지 확인
+        if (!window.SUPABASE_CONFIG) {
+            console.error('❌ Supabase 설정이 로드되지 않았습니다.');
+            throw new Error('Supabase configuration not loaded');
+        }
+        
+        // 설정 검증
+        if (!window.validateSupabaseConfig()) {
+            throw new Error('Invalid Supabase configuration');
+        }
+        
+        const config = window.SUPABASE_CONFIG;
+        
+        // Supabase 클라이언트 생성
+        supabaseClient = supabase.createClient(config.url, config.anonKey, config.options);
         
         // 전역 변수로 설정
-        window.supabaseClient = client;
+        window.supabaseClient = supabaseClient;
         
         console.log('✅ Supabase 클라이언트 초기화 완료');
+        console.log('📍 프로젝트 URL:', config.url);
+        console.log('🔑 Anon Key 길이:', config.anonKey.length);
         
         // 초기화 완료 이벤트 발생
         window.dispatchEvent(new Event('supabaseClientReady'));
         document.dispatchEvent(new Event('supabaseClientReady'));
         
-        return client;
+        // 인증 상태 변화 리스너 설정
+        setupGlobalAuthListener();
+        
+        return supabaseClient;
+        
     } catch (error) {
         console.error('❌ Supabase 초기화 실패:', error);
+        
+        // 사용자에게 친화적인 오류 메시지
+        const userMessage = `
+서비스 연결에 문제가 발생했습니다.
+
+가능한 원인:
+1. Supabase Anon Key가 잘못되었거나 만료되었습니다.
+2. 인터넷 연결에 문제가 있습니다.
+3. Supabase 프로젝트가 일시적으로 중단되었습니다.
+
+해결 방법:
+1. js/supabase-config.js 파일의 anonKey를 Supabase 대시보드에서 복사한 값으로 교체하세요.
+2. 페이지를 새로고침해보세요.
+3. 문제가 지속되면 관리자에게 문의하세요.
+        `;
+        
+        alert(userMessage.trim());
         throw error;
     }
 }
 
+// 전역 인증 상태 리스너
+function setupGlobalAuthListener() {
+    if (!window.supabaseClient) return;
+    
+    window.supabaseClient.auth.onAuthStateChange((event, session) => {
+        console.log('🔄 전역 인증 상태 변화:', event);
+        
+        // 전역 이벤트 발생
+        window.dispatchEvent(new CustomEvent('authStateChange', {
+            detail: { event, session }
+        }));
+        
+        // 현재 사용자 정보 업데이트
+        window.currentUser = session?.user || null;
+    });
+}
+
 // 헬퍼 함수들
+
+/**
+ * 현재 로그인한 사용자 정보 가져오기
+ */
+async function getCurrentUser() {
+    if (!window.supabaseClient) {
+        console.error('Supabase 클라이언트가 초기화되지 않았습니다.');
+        return null;
+    }
+    
+    try {
+        const { data: { user }, error } = await window.supabaseClient.auth.getUser();
+        if (error) throw error;
+        return user;
+    } catch (error) {
+        console.error('사용자 정보 가져오기 실패:', error);
+        return null;
+    }
+}
+
+/**
+ * 현재 세션 가져오기
+ */
+async function getSession() {
+    if (!window.supabaseClient) {
+        console.error('Supabase 클라이언트가 초기화되지 않았습니다.');
+        return null;
+    }
+    
+    try {
+        const { data: { session }, error } = await window.supabaseClient.auth.getSession();
+        if (error) throw error;
+        return session;
+    } catch (error) {
+        console.error('세션 가져오기 실패:', error);
+        return null;
+    }
+}
+
+/**
+ * 구매 확인 함수
+ */
 async function checkPurchase(productId) {
     if (!window.supabaseClient) {
         console.error('구매 확인 실패: Supabase 클라이언트가 준비되지 않았습니다.');
@@ -60,10 +133,8 @@ async function checkPurchase(productId) {
     }
 
     try {
-        const { data: { user } } = await window.supabaseClient.auth.getUser();
-        if (!user) {
-            return false;
-        }
+        const user = await getCurrentUser();
+        if (!user) return false;
 
         const { data, error } = await window.supabaseClient
             .from('purchases')
@@ -79,10 +150,37 @@ async function checkPurchase(productId) {
     }
 }
 
-// 전역 노출
-window.checkPurchase = checkPurchase;
+/**
+ * 로그아웃 함수
+ */
+async function signOut() {
+    if (!window.supabaseClient) {
+        console.error('로그아웃 실패: Supabase 클라이언트가 준비되지 않았습니다.');
+        return false;
+    }
+    
+    try {
+        const { error } = await window.supabaseClient.auth.signOut();
+        if (error) throw error;
+        
+        console.log('✅ 로그아웃 성공');
+        return true;
+    } catch (error) {
+        console.error('로그아웃 실패:', error);
+        return false;
+    }
+}
 
-// 초기화 실행
-initializeSupabaseClient().catch(err => {
-    console.error('Supabase 초기화 중 오류:', err);
-});
+// 전역 함수 노출
+window.getCurrentUser = getCurrentUser;
+window.getSession = getSession;
+window.checkPurchase = checkPurchase;
+window.signOut = signOut;
+
+// 자동 초기화 (DOMContentLoaded 대기)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeSupabaseClient);
+} else {
+    // 이미 로드된 경우 즉시 실행
+    initializeSupabaseClient();
+}

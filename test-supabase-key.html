@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Key 테스트</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Supabase Key 테스트</h1>
+    <div id="result"></div>
+    
+    <script>
+        // 현재 사용 중인 키들
+        const SUPABASE_URL = "https://rpcctgtmtplfahwtnglq.supabase.co";
+        const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwY2N0Z3RtdHBsZmFod3RuZ2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEwNjUzMTEsImV4cCI6MjA2NjY0MTMxMX0.yv63jWBQIjbzRWh2w6fAu1vgs3W_wQvEL4ePnTD5Sss";
+        
+        const resultDiv = document.getElementById('result');
+        
+        async function testKey() {
+            try {
+                resultDiv.innerHTML = '<p>테스트 중...</p>';
+                
+                // JWT 디코딩 (base64)
+                const parts = ANON_KEY.split('.');
+                const payload = JSON.parse(atob(parts[1]));
+                
+                resultDiv.innerHTML += `
+                    <h3>JWT 정보:</h3>
+                    <ul>
+                        <li>프로젝트 REF: ${payload.ref}</li>
+                        <li>역할: ${payload.role}</li>
+                        <li>발급일: ${new Date(payload.iat * 1000).toLocaleString()}</li>
+                        <li>만료일: ${new Date(payload.exp * 1000).toLocaleString()}</li>
+                        <li>만료 여부: ${payload.exp * 1000 < Date.now() ? '❌ 만료됨' : '✅ 유효함'}</li>
+                    </ul>
+                `;
+                
+                // Supabase 클라이언트 생성 테스트
+                const supabase = window.supabase.createClient(SUPABASE_URL, ANON_KEY);
+                
+                resultDiv.innerHTML += '<p>✅ Supabase 클라이언트 생성 성공</p>';
+                
+                // 간단한 쿼리 테스트
+                const { data, error } = await supabase.auth.getSession();
+                
+                if (error) {
+                    resultDiv.innerHTML += `<p style="color: red;">❌ 세션 확인 오류: ${error.message}</p>`;
+                } else {
+                    resultDiv.innerHTML += '<p>✅ 세션 확인 성공 (로그인하지 않은 상태)</p>';
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML += `<p style="color: red;">❌ 오류: ${error.message}</p>`;
+            }
+        }
+        
+        testKey();
+    </script>
+</body>
+</html> 

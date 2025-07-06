@@ -402,24 +402,37 @@ async function initializeMainPageAuth() {
     try {
         console.log('🔄 메인페이지 인증 초기화 시작...');
         
-        // Supabase 클라이언트 대기
+        // Supabase 클라이언트 대기 (supabaseClientReady 이벤트 사용)
         if (!window.supabaseClient) {
             console.log('⏳ Supabase 클라이언트 대기 중...');
             await new Promise(resolve => {
-                const checkClient = () => {
-                    if (window.supabaseClient) {
-                        resolve();
-                    } else {
-                        setTimeout(checkClient, 100);
+                // 이미 준비된 경우
+                if (window.supabaseClient) {
+                    resolve();
+                    return;
+                }
+                
+                // 이벤트 대기
+                window.addEventListener('supabaseClientReady', resolve, { once: true });
+                
+                // 타임아웃 설정 (10초)
+                setTimeout(() => {
+                    if (!window.supabaseClient) {
+                        console.error('❌ Supabase 클라이언트 타임아웃');
+                        resolve(); // 에러 대신 계속 진행
                     }
-                };
-                checkClient();
+                }, 10000);
             });
+        }
+        
+        if (!window.supabaseClient) {
+            console.error('❌ Supabase 클라이언트를 사용할 수 없습니다.');
+            return;
         }
         
         console.log('✅ Supabase 클라이언트 준비 완료');
         
-        // 인증 상태 리스너 설정
+        // 전역 인증 상태 변화 리스너 설정
         setupAuthStateListener();
         
         // 초기 로그인 상태 확인
