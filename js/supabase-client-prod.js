@@ -5,21 +5,17 @@
 
 // Supabase 클라이언트 초기화 함수
 async function initializeSupabaseClient() {
-    // 환경 변수가 로드될 때까지 대기
-    let retries = 0;
-    const maxRetries = 10;
+    // ⚠️ 사용자가 제공한 실제 Supabase 프로젝트 정보로 교체하세요
+    const SUPABASE_URL = "https://rpcctgtmtplfahwtnglq.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwY2N0Z3RtdHBsZmFod3RuZ2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEwNjUzMTEsImV4cCI6MjA2NjY0MTMxMX0.yv63jWBQIjbzRWh2w6fAu1vgs3W_wQvEL4ePnTD5Sss";
     
-    while ((!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) && retries < maxRetries) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        retries++;
-    }
+    const supabaseUrl = SUPABASE_URL;
+    const supabaseAnonKey = SUPABASE_ANON_KEY;
     
-    const supabaseUrl = window.SUPABASE_URL;
-    const supabaseAnonKey = window.SUPABASE_ANON_KEY;
-    
-    if (!supabaseUrl || !supabaseAnonKey) {
+    if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes("사용자에게_받은") || supabaseAnonKey.includes("사용자에게_받은")) {
         console.error('❌ Supabase 환경 변수가 설정되지 않았습니다.');
-        throw new Error('Supabase configuration missing');
+        console.error('위 파일에서 SUPABASE_URL과 SUPABASE_ANON_KEY를 실제 값으로 교체해주세요.');
+        throw new Error('Supabase configuration missing - Please update the actual values');
     }
     
     try {

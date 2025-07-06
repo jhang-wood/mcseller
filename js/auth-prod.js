@@ -125,7 +125,10 @@ async function handleLogin(e) {
             
             // 로그인 성공 후 메인 페이지로 이동
             setTimeout(() => {
-                window.location.href = '/';
+                // URL에 리다이렉트 파라미터가 있으면 해당 페이지로, 없으면 메인 페이지로
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirectTo = urlParams.get('redirect') || '/index.html';
+                window.location.href = redirectTo;
             }, 1000);
         }
     } catch (error) {
@@ -191,7 +194,10 @@ async function handleSignup(e) {
                 // 바로 로그인 가능한 경우
                 showToast('가입 성공! 로그인 중...', 'success');
                 setTimeout(() => {
-                    window.location.href = '/';
+                    // URL에 리다이렉트 파라미터가 있으면 해당 페이지로, 없으면 메인 페이지로
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const redirectTo = urlParams.get('redirect') || '/index.html';
+                    window.location.href = redirectTo;
                 }, 1000);
             }
         }

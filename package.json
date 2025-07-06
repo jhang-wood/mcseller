@@ -3,16 +3,17 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "@slack/web-api": "^7.9.3",
     "@stripe/react-stripe-js": "^3.7.0",
     "@stripe/stripe-js": "^7.4.0",
+    "@supabase/mcp-server-supabase": "^0.4.5",
     "@supabase/supabase-js": "^2.50.3",
     "compression": "^1.8.0",
     "cors": "^2.8.5",
@@ -23,5 +24,14 @@
     "morgan": "^1.10.0",
     "multer": "^2.0.1",
     "stripe": "^18.3.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jhang-wood/mcseller.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jhang-wood/mcseller/issues"
+  },
+  "homepage": "https://github.com/jhang-wood/mcseller#readme",
+  "description": ""
 }
