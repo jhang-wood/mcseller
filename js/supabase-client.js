@@ -10,6 +10,20 @@ let supabaseClient = null;
 async function initializeSupabaseClient() {
     try {
         console.log('🔄 Supabase 클라이언트 초기화 시작...');
+
+        // Supabase 라이브러리 로드 대기
+        if (typeof supabase === 'undefined') {
+            console.log('⏳ Supabase 라이브러리 대기 중...');
+            await new Promise(resolve => {
+                const checkInterval = setInterval(() => {
+                    if (typeof supabase !== 'undefined') {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }
+                }, 100);
+            });
+            console.log('✅ Supabase 라이브러리 로드 완료');
+        }
         
         // 설정 파일이 로드되었는지 확인
         if (!window.SUPABASE_CONFIG) {
