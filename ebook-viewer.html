@@ -1,272 +1,1161 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>전자책 뷰어 - MCSELLER</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body { font-family: 'Noto Sans KR', sans-serif; }
-        .sidebar { 
-            position: fixed; left: 0; top: 0; height: 100vh; width: 300px; 
-            background: #f8f9fa; border-right: 1px solid #dee2e6; z-index: 1000;
-            transition: transform 0.3s ease;
-        }
-        .sidebar.hidden { transform: translateX(-300px); }
-        .content { margin-left: 300px; padding: 20px; transition: margin-left 0.3s ease; }
-        .content.expanded { margin-left: 0; }
-        .chapter { padding: 20px; margin-bottom: 30px; border-bottom: 1px solid #eee; }
-        .toc-item { padding: 8px 15px; cursor: pointer; border-bottom: 1px solid #eee; }
-        .toc-item:hover { background: #e9ecef; }
-        .toc-item.active { background: #007bff; color: white; }
-        .toggle-btn { position: fixed; top: 70px; left: 310px; z-index: 1001; transition: left 0.3s ease; }
-        .toggle-btn.expanded { left: 10px; }
-    </style>
-</head>
-<body>
-    <!-- 사이드바 -->
-    <div class="sidebar" id="sidebar">
-        <div class="p-3 border-bottom">
-            <h5><i class="fas fa-book-open me-2"></i>목차</h5>
-            <button class="btn btn-sm btn-outline-secondary" onclick="toggleSidebar()">
-                <i class="fas fa-times"></i> 숨기기
-            </button>
-        </div>
-        <div id="table-of-contents">
-            <!-- 목차가 여기에 동적으로 추가됩니다 -->
-        </div>
-    </div>
+                                <!DOCTYPE html>
+                                <html lang="ko">
+                                <head>
+                                    <meta charset="UTF-8">
+                                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                    <title>전자책 뷰어 - MCSELLER</title>
+                                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+                                    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+                                    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=Noto+Serif+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 
-    <!-- 사이드바 토글 버튼 -->
-    <button class="btn btn-primary toggle-btn" id="toggleBtn" onclick="toggleSidebar()" style="display: none;">
-        <i class="fas fa-bars"></i>
-    </button>
+                                    <style>
+                                        /* MCSELLER Ebook Reader Theme */
+                                        :root {
+                                            --primary-gradient: linear-gradient(135deg, #111111 0%, #23272f 100%);
+                                            --accent-gradient: linear-gradient(90deg, #ff9900, #ffe259);
+                                            --glass-gradient: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+                                            --text-light: #e0e0e0;
+                                            --text-muted: #b5b5b5;
+                                            --white: #ffffff;
+                                            --dark: #111111;
+                                            --border-color: rgba(255, 153, 0, 0.2);
+                                            --shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                                        }
 
-    <!-- 상단 네비게이션 -->
-    <nav class="navbar navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="mypage.html">
-                <i class="fas fa-arrow-left me-2"></i>마이페이지로 돌아가기
-            </a>
-            <div class="d-flex gap-2">
-                <span class="navbar-text" id="book-title">전자책 제목</span>
-                <button class="btn btn-outline-light btn-sm" onclick="logout()">로그아웃</button>
-            </div>
-        </div>
-    </nav>
+                                        /* Light Theme Variables */
+                                        [data-theme="light"] {
+                                            --bg-primary: #ffffff;
+                                            --bg-secondary: #f8f9fa;
+                                            --bg-sidebar: #ffffff;
+                                            --text-primary: #212529;
+                                            --text-secondary: #6c757d;
+                                            --border-main: #dee2e6;
+                                            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.1);
+                                        }
 
-    <!-- 메인 콘텐츠 -->
-    <div class="content" id="content">
-        <div id="ebook-content">
-            <!-- 전자책 내용이 여기에 표시됩니다 -->
-        </div>
-    </div>
+                                        /* Dark Theme Variables */
+                                        [data-theme="dark"] {
+                                            --bg-primary: #1a1a1a;
+                                            --bg-secondary: #2d3748;
+                                            --bg-sidebar: #252525;
+                                            --text-primary: #e0e0e0;
+                                            --text-secondary: #b5b5b5;
+                                            --border-main: rgba(255, 153, 0, 0.2);
+                                            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.4);
+                                        }
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase-client.js"></script>
-    <script>
-        // 테스트용 전자책 데이터
-        const ebookData = {
-            ebook1: {
-                title: "온라인 수익화 전략서 1탄",
-                chapters: [
-                    {
-                        id: "ch1",
-                        title: "1장. 온라인 수익화의 기초",
-                        content: `
-                            <h2>1장. 온라인 수익화의 기초</h2>
-                            <p>온라인에서 수익을 창출하는 것은 더 이상 꿈이 아닙니다. 올바른 전략과 방법을 알면 누구나 시작할 수 있습니다.</p>
-                            
-                            <h3>1.1 수익화 모델의 종류</h3>
-                            <p>온라인 수익화에는 여러 가지 모델이 있습니다:</p>
-                            <ul>
-                                <li><strong>제품 판매:</strong> 물리적 또는 디지털 제품을 직접 판매</li>
-                                <li><strong>서비스 제공:</strong> 컨설팅, 코칭, 강의 등</li>
-                                <li><strong>광고 수익:</strong> 블로그, 유튜브 등을 통한 광고 수익</li>
-                                <li><strong>구독 모델:</strong> 정기적인 수익 창출</li>
-                            </ul>
-                            
-                            <h3>1.2 성공을 위한 핵심 요소</h3>
-                            <p>온라인 수익화 성공을 위해서는 다음 요소들이 중요합니다:</p>
-                            <ol>
-                                <li>명확한 타겟 고객 설정</li>
-                                <li>가치 있는 콘텐츠 제공</li>
-                                <li>꾸준한 마케팅 활동</li>
-                                <li>데이터 기반 의사결정</li>
-                            </ol>
-                        `
-                    },
-                    {
-                        id: "ch2",
-                        title: "2장. 플랫폼 선택 전략",
-                        content: `
-                            <h2>2장. 플랫폼 선택 전략</h2>
-                            <p>적절한 플랫폼 선택은 온라인 수익화의 핵심입니다. 각 플랫폼의 특성을 이해하고 자신에게 맞는 플랫폼을 선택해야 합니다.</p>
-                            
-                            <h3>2.1 전자상거래 플랫폼</h3>
-                            <p>상품 판매를 위한 주요 플랫폼들:</p>
-                            <ul>
-                                <li><strong>네이버 스마트스토어:</strong> 국내 최대 규모, 높은 신뢰도</li>
-                                <li><strong>쿠팡:</strong> 빠른 배송, 높은 고객 만족도</li>
-                                <li><strong>아마존:</strong> 글로벌 진출 가능</li>
-                                <li><strong>자체 쇼핑몰:</strong> 높은 수익률, 브랜딩 가능</li>
-                            </ul>
-                            
-                            <h3>2.2 콘텐츠 플랫폼</h3>
-                            <p>콘텐츠를 통한 수익화 플랫폼:</p>
-                            <ul>
-                                <li><strong>유튜브:</strong> 영상 콘텐츠, 광고 수익</li>
-                                <li><strong>인스타그램:</strong> 시각적 콘텐츠, 인플루언서 마케팅</li>
-                                <li><strong>블로그:</strong> 검색 트래픽, 장기적 수익</li>
-                                <li><strong>클래스101:</strong> 온라인 강의 플랫폼</li>
-                            </ul>
-                        `
-                    },
-                    {
-                        id: "ch3",
-                        title: "3장. 실전 수익화 사례",
-                        content: `
-                            <h2>3장. 실전 수익화 사례</h2>
-                            <p>실제 성공 사례를 통해 온라인 수익화의 실전 노하우를 알아보겠습니다.</p>
-                            
-                            <h3>3.1 사례 1: 블로그를 통한 수익화</h3>
-                            <p><strong>배경:</strong> 직장인 A씨, 취미로 시작한 요리 블로그</p>
-                            <p><strong>전략:</strong></p>
-                            <ul>
-                                <li>매일 1개씩 레시피 포스팅</li>
-                                <li>SEO 최적화로 검색 상위 노출</li>
-                                <li>광고 및 제휴 마케팅 활용</li>
-                            </ul>
-                            <p><strong>결과:</strong> 6개월 만에 월 100만원 수익 달성</p>
-                            
-                            <h3>3.2 사례 2: 온라인 강의 제작</h3>
-                            <p><strong>배경:</strong> 프리랜서 디자이너 B씨</p>
-                            <p><strong>전략:</strong></p>
-                            <ul>
-                                <li>포토샵 기초 강의 제작</li>
-                                <li>무료 샘플 강의로 신뢰도 구축</li>
-                                <li>수강생 피드백 반영한 지속적 업데이트</li>
-                            </ul>
-                            <p><strong>결과:</strong> 첫 달 200만원 매출, 현재 월 500만원 수익</p>
-                            
-                            <h3>3.3 핵심 성공 요인 분석</h3>
-                            <p>위 사례들의 공통점:</p>
-                            <ol>
-                                <li><strong>전문성:</strong> 자신만의 전문 분야 확보</li>
-                                <li><strong>꾸준함:</strong> 지속적인 콘텐츠 업데이트</li>
-                                <li><strong>고객 중심:</strong> 고객 니즈에 맞는 콘텐츠 제작</li>
-                                <li><strong>데이터 활용:</strong> 성과 분석 후 개선</li>
-                            </ol>
-                        `
-                    }
-                ]
-            },
-            ebook2: {
-                title: "실전 수익화 가이드북 2탄",
-                chapters: [
-                    {
-                        id: "ch1",
-                        title: "1장. 고급 마케팅 전략",
-                        content: `<h2>1장. 고급 마케팅 전략</h2><p>더욱 효과적인 마케팅 방법들을 알아보겠습니다...</p>`
-                    },
-                    {
-                        id: "ch2", 
-                        title: "2장. 자동화 시스템 구축",
-                        content: `<h2>2장. 자동화 시스템 구축</h2><p>수익을 자동화하는 방법을 배워보겠습니다...</p>`
-                    }
-                ]
-            }
-        };
+                                        /* Sepia Theme Variables */
+                                        [data-theme="sepia"] {
+                                            --bg-primary: #f7f3e9;
+                                            --bg-secondary: #f0e6d2;
+                                            --bg-sidebar: #f4ead5;
+                                            --text-primary: #5d4037;
+                                            --text-secondary: #8d6e63;
+                                            --border-main: #d7ccc8;
+                                            --shadow-light: 0 4px 20px rgba(139, 110, 92, 0.15);
+                                        }
 
-        let currentBook = null;
-        let sidebarVisible = true;
+                                        * {
+                                            margin: 0;
+                                            padding: 0;
+                                            box-sizing: border-box;
+                                        }
 
-        // 페이지 로드시 초기화
-        document.addEventListener('DOMContentLoaded', function() {
-            // protect-page.js에서 인증 확인 후 loadEbook 실행
-            setTimeout(loadEbook, 1000);
-        });
+                                        body {
+                                            font-family: "Noto Sans KR", sans-serif;
+                                            background: var(--bg-primary, var(--primary-gradient));
+                                            color: var(--text-primary, var(--text-light));
+                                            line-height: 1.7;
+                                            transition: all 0.3s ease;
+                                            overflow-x: hidden;
+                                        }
 
-        // checkAccess 함수는 protect-page.js에서 자동으로 처리됩니다.
+                                        /* Navigation */
+                                        .navbar {
+                                            background: rgba(17, 17, 17, 0.95) !important;
+                                            backdrop-filter: blur(15px);
+                                            border-bottom: 2px solid var(--border-color);
+                                            box-shadow: 0 4px 20px rgba(255, 153, 0, 0.2);
+                                            padding: 12px 0;
+                                            z-index: 1050;
+                                        }
 
-        function loadEbook() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const bookId = urlParams.get('id');
-            
-            if (!bookId || !ebookData[bookId]) {
-                alert('존재하지 않는 전자책입니다.');
-                window.location.href = 'mypage.html';
-                return;
-            }
+                                        .navbar-brand {
+                                            color: var(--white) !important;
+                                            font-weight: 700;
+                                            transition: all 0.3s ease;
+                                            display: flex;
+                                            align-items: center;
+                                        }
 
-            currentBook = ebookData[bookId];
-            document.getElementById('book-title').textContent = currentBook.title;
-            
-            generateTableOfContents();
-            loadChapter(currentBook.chapters[0].id);
-        }
+                                        .navbar-brand:hover {
+                                            color: #ff9900 !important;
+                                            transform: translateX(-5px);
+                                        }
 
-        function generateTableOfContents() {
-            const tocContainer = document.getElementById('table-of-contents');
-            tocContainer.innerHTML = '';
+                                        .navbar-text {
+                                            color: var(--text-light) !important;
+                                            font-weight: 600;
+                                            background: var(--accent-gradient);
+                                            -webkit-background-clip: text;
+                                            -webkit-text-fill-color: transparent;
+                                            background-clip: text;
+                                        }
 
-            currentBook.chapters.forEach((chapter, index) => {
-                const tocItem = document.createElement('div');
-                tocItem.className = 'toc-item';
-                tocItem.innerHTML = `<i class="fas fa-file-text me-2"></i>${chapter.title}`;
-                tocItem.onclick = () => loadChapter(chapter.id);
-                tocItem.setAttribute('data-chapter', chapter.id);
-                tocContainer.appendChild(tocItem);
-            });
-        }
+                                        .btn-outline-light {
+                                            border: 2px solid rgba(255, 153, 0, 0.8);
+                                            color: #ff9900;
+                                            background: transparent;
+                                            font-weight: 600;
+                                            padding: 6px 16px;
+                                            border-radius: 20px;
+                                            transition: all 0.3s ease;
+                                        }
 
-        function loadChapter(chapterId) {
-            const chapter = currentBook.chapters.find(ch => ch.id === chapterId);
-            if (!chapter) return;
+                                        .btn-outline-light:hover {
+                                            background: var(--accent-gradient);
+                                            color: var(--dark);
+                                            border-color: #ff9900;
+                                            transform: translateY(-2px);
+                                            box-shadow: 0 6px 16px rgba(255, 153, 0, 0.3);
+                                        }
 
-            // 활성 목차 업데이트
-            document.querySelectorAll('.toc-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            document.querySelector(`[data-chapter="${chapterId}"]`).classList.add('active');
+                                        /* Sidebar */
+                                        .sidebar {
+                                            position: fixed;
+                                            left: 0;
+                                            top: 0;
+                                            height: 100vh;
+                                            width: 320px;
+                                            background: var(--bg-sidebar, var(--glass-gradient));
+                                            border-right: 2px solid var(--border-main, var(--border-color));
+                                            z-index: 1000;
+                                            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                                            backdrop-filter: blur(20px);
+                                            box-shadow: var(--shadow-light, var(--shadow));
+                                            overflow-y: auto;
+                                        }
 
-            // 챕터 내용 표시
-            const contentDiv = document.getElementById('ebook-content');
-            contentDiv.innerHTML = `<div class="chapter">${chapter.content}</div>`;
+                                        .sidebar.hidden {
+                                            transform: translateX(-320px);
+                                        }
 
-            // 스크롤 맨 위로
-            window.scrollTo(0, 0);
-        }
+                                        .sidebar-header {
+                                            padding: 25px 20px;
+                                            border-bottom: 2px solid var(--border-main, var(--border-color));
+                                            background: rgba(255, 153, 0, 0.1);
+                                            backdrop-filter: blur(10px);
+                                        }
 
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const content = document.getElementById('content');
-            const toggleBtn = document.getElementById('toggleBtn');
+                                        .sidebar-header h5 {
+                                            color: var(--text-primary, var(--white));
+                                            font-weight: 800;
+                                            margin: 0 0 15px 0;
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 10px;
+                                            font-size: 1.3rem;
+                                        }
 
-            sidebarVisible = !sidebarVisible;
+                                        .sidebar-header h5 i {
+                                            color: #ff9900;
+                                        }
 
-            if (sidebarVisible) {
-                sidebar.classList.remove('hidden');
-                content.classList.remove('expanded');
-                toggleBtn.classList.remove('expanded');
-                toggleBtn.style.display = 'none';
-            } else {
-                sidebar.classList.add('hidden');
-                content.classList.add('expanded');
-                toggleBtn.classList.add('expanded');
-                toggleBtn.style.display = 'block';
-            }
-        }
+                                        .sidebar-controls {
+                                            display: flex;
+                                            gap: 10px;
+                                            flex-wrap: wrap;
+                                        }
 
-        function logout() {
-            if (localStorage.getItem('testUser')) {
-                localStorage.removeItem('testUser');
-            }
-            window.location.href = 'index.html';
-        }
-    </script>
-    <script src="js/protect-page.js"></script>
-</body>
-</html>
+                                        /* Theme Controls */
+                                        .theme-controls {
+                                            display: flex;
+                                            gap: 8px;
+                                            margin-bottom: 15px;
+                                        }
+
+                                        .theme-btn {
+                                            width: 32px;
+                                            height: 32px;
+                                            border: 2px solid var(--border-main, var(--border-color));
+                                            border-radius: 50%;
+                                            cursor: pointer;
+                                            transition: all 0.3s ease;
+                                            position: relative;
+                                        }
+
+                                        .theme-btn.light {
+                                            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+                                        }
+
+                                        .theme-btn.dark {
+                                            background: linear-gradient(135deg, #1a1a1a, #2d3748);
+                                        }
+
+                                        .theme-btn.sepia {
+                                            background: linear-gradient(135deg, #f7f3e9, #f0e6d2);
+                                        }
+
+                                        .theme-btn.active {
+                                            border-color: #ff9900;
+                                            transform: scale(1.1);
+                                            box-shadow: 0 4px 12px rgba(255, 153, 0, 0.3);
+                                        }
+
+                                        .theme-btn::after {
+                                            content: '';
+                                            position: absolute;
+                                            top: 50%;
+                                            left: 50%;
+                                            transform: translate(-50%, -50%);
+                                            width: 12px;
+                                            height: 12px;
+                                            border-radius: 50%;
+                                            background: #ff9900;
+                                            opacity: 0;
+                                            transition: opacity 0.3s ease;
+                                        }
+
+                                        .theme-btn.active::after {
+                                            opacity: 1;
+                                        }
+
+                                        /* Font Controls */
+                                        .font-controls {
+                                            display: flex;
+                                            gap: 8px;
+                                            align-items: center;
+                                        }
+
+                                        .font-btn {
+                                            background: rgba(255, 153, 0, 0.1);
+                                            border: 1px solid var(--border-main, var(--border-color));
+                                            color: var(--text-primary, var(--text-light));
+                                            padding: 6px 12px;
+                                            border-radius: 8px;
+                                            cursor: pointer;
+                                            transition: all 0.3s ease;
+                                            font-weight: 600;
+                                        }
+
+                                        .font-btn:hover {
+                                            background: rgba(255, 153, 0, 0.2);
+                                            border-color: #ff9900;
+                                            transform: translateY(-1px);
+                                        }
+
+                                        .font-size-display {
+                                            color: var(--text-secondary, var(--text-muted));
+                                            font-weight: 600;
+                                            min-width: 30px;
+                                            text-align: center;
+                                        }
+
+                                        /* Table of Contents */
+                                        .toc-container {
+                                            padding: 15px 0;
+                                        }
+
+                                        .toc-item {
+                                            padding: 15px 20px;
+                                            cursor: pointer;
+                                            border-bottom: 1px solid var(--border-main, rgba(255, 153, 0, 0.1));
+                                            transition: all 0.3s ease;
+                                            color: var(--text-primary, var(--text-light));
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 12px;
+                                            font-weight: 500;
+                                        }
+
+                                        .toc-item:hover {
+                                            background: rgba(255, 153, 0, 0.1);
+                                            transform: translateX(5px);
+                                            border-left: 4px solid #ff9900;
+                                        }
+
+                                        .toc-item.active {
+                                            background: var(--accent-gradient);
+                                            color: var(--dark);
+                                            font-weight: 700;
+                                            border-left: 4px solid transparent;
+                                            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+                                        }
+
+                                        .toc-item i {
+                                            color: #ff9900;
+                                            font-size: 0.9rem;
+                                            min-width: 16px;
+                                        }
+
+                                        .toc-item.active i {
+                                            color: var(--dark);
+                                        }
+
+                                        /* Content Area */
+                                        .content {
+                                            margin-left: 320px;
+                                            padding: 30px 40px;
+                                            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                                            background: var(--bg-primary, transparent);
+                                            min-height: 100vh;
+                                            max-width: 900px;
+                                        }
+
+                                        .content.expanded {
+                                            margin-left: 0;
+                                        }
+
+                                        /* Chapter Content */
+                                        .chapter {
+                                            background: var(--bg-secondary, rgba(255, 255, 255, 0.05));
+                                            border: 1px solid var(--border-main, var(--border-color));
+                                            border-radius: 20px;
+                                            padding: 40px;
+                                            margin-bottom: 40px;
+                                            backdrop-filter: blur(10px);
+                                            box-shadow: var(--shadow-light, 0 15px 35px rgba(255, 153, 0, 0.1));
+                                            line-height: 1.8;
+                                            transition: all 0.3s ease;
+                                        }
+
+                                        .chapter:hover {
+                                            transform: translateY(-2px);
+                                            box-shadow: var(--shadow-light, 0 20px 40px rgba(255, 153, 0, 0.15));
+                                        }
+
+                                        .chapter h2 {
+                                            color: var(--text-primary, var(--white));
+                                            font-weight: 800;
+                                            margin-bottom: 25px;
+                                            font-size: 2.2rem;
+                                            line-height: 1.3;
+                                            background: var(--accent-gradient);
+                                            -webkit-background-clip: text;
+                                            -webkit-text-fill-color: transparent;
+                                            background-clip: text;
+                                        }
+
+                                        .chapter h3 {
+                                            color: var(--text-primary, var(--text-light));
+                                            font-weight: 700;
+                                            margin: 30px 0 20px 0;
+                                            font-size: 1.5rem;
+                                            border-left: 4px solid #ff9900;
+                                            padding-left: 15px;
+                                        }
+
+                                        .chapter p {
+                                            color: var(--text-primary, var(--text-light));
+                                            margin-bottom: 20px;
+                                            font-size: 1.1rem;
+                                            line-height: 1.8;
+                                        }
+
+                                        .chapter ul, .chapter ol {
+                                            margin: 20px 0;
+                                            padding-left: 25px;
+                                        }
+
+                                        .chapter li {
+                                            color: var(--text-primary, var(--text-light));
+                                            margin-bottom: 10px;
+                                            line-height: 1.7;
+                                            font-size: 1.05rem;
+                                        }
+
+                                        .chapter strong {
+                                            color: #ff9900;
+                                            font-weight: 700;
+                                        }
+
+                                        /* Toggle Button */
+                                        .toggle-btn {
+                                            position: fixed;
+                                            top: 80px;
+                                            left: 330px;
+                                            z-index: 1001;
+                                            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                                            background: var(--accent-gradient);
+                                            border: none;
+                                            color: var(--dark);
+                                            width: 50px;
+                                            height: 50px;
+                                            border-radius: 50%;
+                                            box-shadow: 0 8px 25px rgba(255, 153, 0, 0.3);
+                                            font-size: 1.2rem;
+                                            display: none;
+                                        }
+
+                                        .toggle-btn:hover {
+                                            transform: scale(1.1) translateY(-2px);
+                                            box-shadow: 0 12px 30px rgba(255, 153, 0, 0.4);
+                                            color: var(--dark);
+                                        }
+
+                                        .toggle-btn.expanded {
+                                            left: 20px;
+                                        }
+
+                                        /* Progress Bar */
+                                        .progress-container {
+                                            position: fixed;
+                                            top: 0;
+                                            left: 0;
+                                            width: 100%;
+                                            height: 3px;
+                                            background: rgba(255, 255, 255, 0.1);
+                                            z-index: 1060;
+                                        }
+
+                                        .progress-bar-reading {
+                                            height: 100%;
+                                            background: var(--accent-gradient);
+                                            width: 0%;
+                                            transition: width 0.1s ease;
+                                        }
+
+                                        /* Reading Controls */
+                                        .reading-controls {
+                                            position: fixed;
+                                            bottom: 30px;
+                                            right: 30px;
+                                            display: flex;
+                                            flex-direction: column;
+                                            gap: 15px;
+                                            z-index: 1000;
+                                        }
+
+                                        .control-btn {
+                                            width: 50px;
+                                            height: 50px;
+                                            background: var(--glass-gradient);
+                                            border: 1px solid var(--border-main, var(--border-color));
+                                            border-radius: 50%;
+                                            color: var(--text-primary, var(--text-light));
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            cursor: pointer;
+                                            transition: all 0.3s ease;
+                                            backdrop-filter: blur(10px);
+                                            box-shadow: var(--shadow-light, 0 5px 15px rgba(0, 0, 0, 0.2));
+                                        }
+
+                                        .control-btn:hover {
+                                            background: var(--accent-gradient);
+                                            color: var(--dark);
+                                            transform: scale(1.1) translateY(-2px);
+                                            box-shadow: 0 8px 20px rgba(255, 153, 0, 0.3);
+                                        }
+
+                                        /* Font Family Toggle */
+                                        .font-family-toggle {
+                                            background: rgba(255, 153, 0, 0.1);
+                                            border: 1px solid var(--border-main, var(--border-color));
+                                            border-radius: 8px;
+                                            padding: 8px 12px;
+                                            color: var(--text-primary, var(--text-light));
+                                            cursor: pointer;
+                                            transition: all 0.3s ease;
+                                            font-weight: 600;
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 5px;
+                                        }
+
+                                        .font-family-toggle:hover {
+                                            background: rgba(255, 153, 0, 0.2);
+                                            border-color: #ff9900;
+                                        }
+
+                                        /* Responsive Design */
+                                        @media (max-width: 768px) {
+                                            .sidebar {
+                                                width: 280px;
+                                            }
+
+                                            .sidebar.hidden {
+                                                transform: translateX(-280px);
+                                            }
+
+                                            .content {
+                                                margin-left: 0;
+                                                padding: 20px 15px;
+                                            }
+
+                                            .chapter {
+                                                padding: 25px 20px;
+                                            }
+
+                                            .chapter h2 {
+                                                font-size: 1.8rem;
+                                            }
+
+                                            .chapter h3 {
+                                                font-size: 1.3rem;
+                                            }
+
+                                            .toggle-btn {
+                                                top: 70px;
+                                                left: 20px;
+                                                display: block;
+                                            }
+
+                                            .reading-controls {
+                                                bottom: 20px;
+                                                right: 20px;
+                                            }
+
+                                            .font-controls {
+                                                flex-wrap: wrap;
+                                            }
+                                        }
+
+                                        /* Smooth Scrolling */
+                                        html {
+                                            scroll-behavior: smooth;
+                                        }
+
+                                        /* Custom Scrollbar */
+                                        ::-webkit-scrollbar {
+                                            width: 8px;
+                                        }
+
+                                        ::-webkit-scrollbar-track {
+                                            background: var(--bg-secondary, rgba(255, 255, 255, 0.1));
+                                        }
+
+                                        ::-webkit-scrollbar-thumb {
+                                            background: var(--accent-gradient);
+                                            border-radius: 10px;
+                                        }
+
+                                        ::-webkit-scrollbar-thumb:hover {
+                                            background: linear-gradient(90deg, #e68900, #f0d147);
+                                        }
+
+                                        /* Animation Classes */
+                                        .fade-in {
+                                            animation: fadeIn 0.6s ease-out;
+                                        }
+
+                                        .slide-in-left {
+                                            animation: slideInLeft 0.6s ease-out;
+                                        }
+
+                                        @keyframes fadeIn {
+                                            from { opacity: 0; }
+                                            to { opacity: 1; }
+                                        }
+
+                                        @keyframes slideInLeft {
+                                            from {
+                                                opacity: 0;
+                                                transform: translateX(-30px);
+                                            }
+                                            to {
+                                                opacity: 1;
+                                                transform: translateX(0);
+                                            }
+                                        }
+
+                                        /* Focus States for Accessibility */
+                                        .toc-item:focus,
+                                        .theme-btn:focus,
+                                        .font-btn:focus,
+                                        .control-btn:focus {
+                                            outline: 2px solid #ff9900;
+                                            outline-offset: 2px;
+                                        }
+
+                                        /* Print Styles */
+                                        @media print {
+                                            .sidebar,
+                                            .toggle-btn,
+                                            .reading-controls,
+                                            .navbar {
+                                                display: none !important;
+                                            }
+
+                                            .content {
+                                                margin-left: 0 !important;
+                                                padding: 0 !important;
+                                            }
+
+                                            .chapter {
+                                                box-shadow: none !important;
+                                                border: 1px solid #ddd !important;
+                                                background: white !important;
+                                                color: black !important;
+                                            }
+                                        }
+                                    </style>
+                                </head>
+                                <body data-theme="light">
+                                    <!-- Progress Bar -->
+                                    <div class="progress-container">
+                                        <div class="progress-bar-reading" id="reading-progress"></div>
+                                    </div>
+
+                                    <!-- 사이드바 -->
+                                    <div class="sidebar slide-in-left" id="sidebar">
+                                        <div class="sidebar-header">
+                                            <h5>
+                                                <i class="fas fa-book-open"></i>
+                                                목차
+                                            </h5>
+
+                                            <!-- Theme Controls -->
+                                            <div class="theme-controls">
+                                                <div class="theme-btn light active" onclick="setTheme('light')" title="라이트 모드"></div>
+                                                <div class="theme-btn dark" onclick="setTheme('dark')" title="다크 모드"></div>
+                                                <div class="theme-btn sepia" onclick="setTheme('sepia')" title="세피아 모드"></div>
+                                            </div>
+
+                                            <!-- Font Controls -->
+                                            <div class="font-controls">
+                                                <button class="font-btn" onclick="changeFontSize(-1)" title="글자 크기 줄이기">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                                <span class="font-size-display" id="font-size-display">16</span>
+                                                <button class="font-btn" onclick="changeFontSize(1)" title="글자 크기 늘리기">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                                <div class="font-family-toggle" onclick="toggleFontFamily()" title="글꼴 변경">
+                                                    <i class="fas fa-font"></i>
+                                                    <span id="font-family-display">Sans</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="sidebar-controls">
+                                                <button class="font-btn" onclick="toggleSidebar()" title="사이드바 숨기기">
+                                                    <i class="fas fa-times"></i> 숨기기
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="toc-container" id="table-of-contents">
+                                            <!-- 목차가 여기에 동적으로 추가됩니다 -->
+                                        </div>
+                                    </div>
+
+                                    <!-- 사이드바 토글 버튼 -->
+                                    <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()" title="목차 열기">
+                                        <i class="fas fa-bars"></i>
+                                    </button>
+
+                                    <!-- 상단 네비게이션 -->
+                                    <nav class="navbar navbar-dark">
+                                        <div class="container-fluid">
+                                            <a class="navbar-brand" href="mypage.html">
+                                                <i class="fas fa-arrow-left me-2"></i>
+                                                마이페이지로 돌아가기
+                                            </a>
+                                            <div class="d-flex gap-3 align-items-center">
+                                                <span class="navbar-text" id="book-title">전자책 제목</span>
+                                                <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                                                    <i class="fas fa-sign-out-alt me-1"></i>
+                                                    로그아웃
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </nav>
+
+                                    <!-- 메인 콘텐츠 -->
+                                    <div class="content fade-in" id="content">
+                                        <div id="ebook-content">
+                                            <!-- 전자책 내용이 여기에 표시됩니다 -->
+                                        </div>
+                                    </div>
+
+                                    <!-- Reading Controls -->
+                                    <div class="reading-controls">
+                                        <div class="control-btn" onclick="scrollToTop()" title="맨 위로">
+                                            <i class="fas fa-arrow-up"></i>
+                                        </div>
+                                        <div class="control-btn" onclick="toggleFullscreen()" title="전체화면">
+                                            <i class="fas fa-expand"></i>
+                                        </div>
+                                        <div class="control-btn" onclick="printPage()" title="인쇄">
+                                            <i class="fas fa-print"></i>
+                                        </div>
+                                    </div>
+
+                                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+                                    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+                                    <script src="js/supabase-client.js"></script>
+                                    <script>
+                                        // 테스트용 전자책 데이터
+                                        const ebookData = {
+                                            ebook1: {
+                                                title: "온라인 수익화 전략서 1탄",
+                                                chapters: [
+                                                    {
+                                                        id: "ch1",
+                                                        title: "1장. 온라인 수익화의 기초",
+                                                        content: `
+                                                            <h2>1장. 온라인 수익화의 기초</h2>
+                                                            <p>온라인에서 수익을 창출하는 것은 더 이상 꿈이 아닙니다. 올바른 전략과 방법을 알면 누구나 시작할 수 있습니다.</p>
+
+                                                            <h3>1.1 수익화 모델의 종류</h3>
+                                                            <p>온라인 수익화에는 여러 가지 모델이 있습니다:</p>
+                                                            <ul>
+                                                                <li><strong>제품 판매:</strong> 물리적 또는 디지털 제품을 직접 판매</li>
+                                                                <li><strong>서비스 제공:</strong> 컨설팅, 코칭, 강의 등</li>
+                                                                <li><strong>광고 수익:</strong> 블로그, 유튜브 등을 통한 광고 수익</li>
+                                                                <li><strong>구독 모델:</strong> 정기적인 수익 창출</li>
+                                                            </ul>
+
+                                                            <h3>1.2 성공을 위한 핵심 요소</h3>
+                                                            <p>온라인 수익화 성공을 위해서는 다음 요소들이 중요합니다:</p>
+                                                            <ol>
+                                                                <li>명확한 타겟 고객 설정</li>
+                                                                <li>가치 있는 콘텐츠 제공</li>
+                                                                <li>꾸준한 마케팅 활동</li>
+                                                                <li>데이터 기반 의사결정</li>
+                                                            </ol>
+                                                        `
+                                                    },
+                                                    {
+                                                        id: "ch2",
+                                                        title: "2장. 플랫폼 선택 전략",
+                                                        content: `
+                                                            <h2>2장. 플랫폼 선택 전략</h2>
+                                                            <p>적절한 플랫폼 선택은 온라인 수익화의 핵심입니다. 각 플랫폼의 특성을 이해하고 자신에게 맞는 플랫폼을 선택해야 합니다.</p>
+
+                                                            <h3>2.1 전자상거래 플랫폼</h3>
+                                                            <p>상품 판매를 위한 주요 플랫폼들:</p>
+                                                            <ul>
+                                                                <li><strong>네이버 스마트스토어:</strong> 국내 최대 규모, 높은 신뢰도</li>
+                                                                <li><strong>쿠팡:</strong> 빠른 배송, 높은 고객 만족도</li>
+                                                                <li><strong>아마존:</strong> 글로벌 진출 가능</li>
+                                                                <li><strong>자체 쇼핑몰:</strong> 높은 수익률, 브랜딩 가능</li>
+                                                            </ul>
+
+                                                            <h3>2.2 콘텐츠 플랫폼</h3>
+                                                            <p>콘텐츠를 통한 수익화 플랫폼:</p>
+                                                            <ul>
+                                                                <li><strong>유튜브:</strong> 영상 콘텐츠, 광고 수익</li>
+                                                                <li><strong>인스타그램:</strong> 시각적 콘텐츠, 인플루언서 마케팅</li>
+                                                                <li><strong>블로그:</strong> 검색 트래픽, 장기적 수익</li>
+                                                                <li><strong>클래스101:</strong> 온라인 강의 플랫폼</li>
+                                                            </ul>
+                                                        `
+                                                    },
+                                                    {
+                                                        id: "ch3",
+                                                        title: "3장. 실전 수익화 사례",
+                                                        content: `
+                                                            <h2>3장. 실전 수익화 사례</h2>
+                                                            <p>실제 성공 사례를 통해 온라인 수익화의 실전 노하우를 알아보겠습니다.</p>
+
+                                                            <h3>3.1 사례 1: 블로그를 통한 수익화</h3>
+                                                            <p><strong>배경:</strong> 직장인 A씨, 취미로 시작한 요리 블로그</p>
+                                                            <p><strong>전략:</strong></p>
+                                                            <ul>
+                                                                <li>포토샵 기초 강의 제작</li>
+                                                                <li>무료 샘플 강의로 신뢰도 구축</li>
+                                                                <li>수강생 피드백 반영한 지속적 업데이트</li>
+                                                            </ul>
+                                                            <p><strong>결과:</strong> 첫 달 200만원 매출, 현재 월 500만원 수익</p>
+
+                                                            <h3>3.3 핵심 성공 요인 분석</h3>
+                                                            <p>위 사례들의 공통점:</p>
+                                                            <ol>
+                                                                <li><strong>전문성:</strong> 자신만의 전문 분야 확보</li>
+                                                                <li><strong>꾸준함:</strong> 지속적인 콘텐츠 업데이트</li>
+                                                                <li><strong>고객 중심:</strong> 고객 니즈에 맞는 콘텐츠 제작</li>
+                                                                <li><strong>데이터 활용:</strong> 성과 분석 후 개선</li>
+                                                            </ol>
+                                                        `
+                                                    }
+                                                ]
+                                            },
+                                            ebook2: {
+                                                title: "실전 수익화 가이드북 2탄",
+                                                chapters: [
+                                                    {
+                                                        id: "ch1",
+                                                        title: "1장. 고급 마케팅 전략",
+                                                        content: `<h2>1장. 고급 마케팅 전략</h2><p>더욱 효과적인 마케팅 방법들을 알아보겠습니다...</p>`
+                                                    },
+                                                    {
+                                                        id: "ch2", 
+                                                        title: "2장. 자동화 시스템 구축",
+                                                        content: `<h2>2장. 자동화 시스템 구축</h2><p>수익을 자동화하는 방법을 배워보겠습니다...</p>`
+                                                    }
+                                                ]
+                                            }
+                                        };
+
+                                        let currentBook = null;
+                                        let sidebarVisible = true;
+                                        let currentFontSize = 16;
+                                        let isSerifFont = false;
+
+                                        // 페이지 로드시 초기화
+                                        document.addEventListener('DOMContentLoaded', function() {
+                                            // 저장된 설정 불러오기
+                                            loadSettings();
+
+                                            // protect-page.js에서 인증 확인 후 loadEbook 실행
+                                            setTimeout(loadEbook, 1000);
+
+                                            // 스크롤 진행률 업데이트
+                                            updateReadingProgress();
+                                            window.addEventListener('scroll', updateReadingProgress);
+
+                                            // 모바일에서 사이드바 숨김
+                                            if (window.innerWidth <= 768) {
+                                                toggleSidebar();
+                                            }
+                                        });
+
+                                        // 설정 저장/불러오기
+                                        function saveSettings() {
+                                            const settings = {
+                                                theme: document.body.getAttribute('data-theme'),
+                                                fontSize: currentFontSize,
+                                                isSerifFont: isSerifFont
+                                            };
+                                            localStorage.setItem('ebookSettings', JSON.stringify(settings));
+                                        }
+
+                                        function loadSettings() {
+                                            const settings = JSON.parse(localStorage.getItem('ebookSettings') || '{}');
+
+                                            if (settings.theme) {
+                                                setTheme(settings.theme);
+                                            }
+
+                                            if (settings.fontSize) {
+                                                currentFontSize = settings.fontSize;
+                                                updateFontSize();
+                                            }
+
+                                            if (settings.isSerifFont) {
+                                                isSerifFont = settings.isSerifFont;
+                                                updateFontFamily();
+                                            }
+                                        }
+
+                                        function loadEbook() {
+                                            const urlParams = new URLSearchParams(window.location.search);
+                                            const bookId = urlParams.get('id');
+
+                                            if (!bookId || !ebookData[bookId]) {
+                                                showNotification('존재하지 않는 전자책입니다.', 'error');
+                                                setTimeout(() => {
+                                                    window.location.href = 'mypage.html';
+                                                }, 2000);
+                                                return;
+                                            }
+
+                                            currentBook = ebookData[bookId];
+                                            document.getElementById('book-title').textContent = currentBook.title;
+
+                                            generateTableOfContents();
+                                            loadChapter(currentBook.chapters[0].id);
+
+                                            showNotification('전자책이 로드되었습니다!', 'success');
+                                        }
+
+                                        function generateTableOfContents() {
+                                            const tocContainer = document.getElementById('table-of-contents');
+                                            tocContainer.innerHTML = '';
+
+                                            currentBook.chapters.forEach((chapter, index) => {
+                                                const tocItem = document.createElement('div');
+                                                tocItem.className = 'toc-item';
+                                                tocItem.innerHTML = `<i class="fas fa-file-text"></i>${chapter.title}`;
+                                                tocItem.onclick = () => loadChapter(chapter.id);
+                                                tocItem.setAttribute('data-chapter', chapter.id);
+                                                tocItem.setAttribute('tabindex', '0');
+
+                                                // 키보드 접근성
+                                                tocItem.addEventListener('keypress', (e) => {
+                                                    if (e.key === 'Enter' || e.key === ' ') {
+                                                        loadChapter(chapter.id);
+                                                    }
+                                                });
+
+                                                tocContainer.appendChild(tocItem);
+                                            });
+                                        }
+
+                                        function loadChapter(chapterId) {
+                                            const chapter = currentBook.chapters.find(ch => ch.id === chapterId);
+                                            if (!chapter) return;
+
+                                            // 활성 목차 업데이트
+                                            document.querySelectorAll('.toc-item').forEach(item => {
+                                                item.classList.remove('active');
+                                            });
+
+                                            const activeItem = document.querySelector(`[data-chapter="${chapterId}"]`);
+                                            if (activeItem) {
+                                                activeItem.classList.add('active');
+                                            }
+
+                                            // 챕터 내용 표시 (애니메이션 효과)
+                                            const contentDiv = document.getElementById('ebook-content');
+                                            contentDiv.style.opacity = '0';
+                                            contentDiv.style.transform = 'translateY(20px)';
+
+                                            setTimeout(() => {
+                                                contentDiv.innerHTML = `<div class="chapter">${chapter.content}</div>`;
+                                                contentDiv.style.transition = 'all 0.5s ease';
+                                                contentDiv.style.opacity = '1';
+                                                contentDiv.style.transform = 'translateY(0)';
+
+                                                // 스크롤 맨 위로
+                                                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                                                // 진행률 리셋
+                                                updateReadingProgress();
+                                            }, 200);
+                                        }
+
+                                        function toggleSidebar() {
+                                            const sidebar = document.getElementById('sidebar');
+                                            const content = document.getElementById('content');
+                                            const toggleBtn = document.getElementById('toggleBtn');
+
+                                            sidebarVisible = !sidebarVisible;
+
+                                            if (sidebarVisible) {
+                                                sidebar.classList.remove('hidden');
+                                                content.classList.remove('expanded');
+                                                toggleBtn.classList.remove('expanded');
+                                                toggleBtn.style.display = 'none';
+                                            } else {
+                                                sidebar.classList.add('hidden');
+                                                content.classList.add('expanded');
+                                                toggleBtn.classList.add('expanded');
+                                                toggleBtn.style.display = 'block';
+                                            }
+                                        }
+
+                                        // 테마 설정
+                                        function setTheme(theme) {
+                                            document.body.setAttribute('data-theme', theme);
+
+                                            // 테마 버튼 활성화 상태 업데이트
+                                            document.querySelectorAll('.theme-btn').forEach(btn => {
+                                                btn.classList.remove('active');
+                                            });
+                                            document.querySelector(`.theme-btn.${theme}`).classList.add('active');
+
+                                            saveSettings();
+                                            showNotification(`${theme === 'light' ? '라이트' : theme === 'dark' ? '다크' : '세피아'} 모드로 변경되었습니다.`, 'info');
+                                        }
+
+                                        // 폰트 크기 조절
+                                        function changeFontSize(delta) {
+                                            currentFontSize = Math.max(12, Math.min(24, currentFontSize + delta));
+                                            updateFontSize();
+                                            saveSettings();
+                                        }
+
+                                        function updateFontSize() {
+                                            const contentDiv = document.getElementById('ebook-content');
+                                            const chapters = contentDiv.querySelectorAll('.chapter');
+
+                                            chapters.forEach(chapter => {
+                                                chapter.style.fontSize = `${currentFontSize}px`;
+                                            });
+
+                                            document.getElementById('font-size-display').textContent = currentFontSize;
+                                        }
+
+                                        // 폰트 패밀리 변경
+                                        function toggleFontFamily() {
+                                            isSerifFont = !isSerifFont;
+                                            updateFontFamily();
+                                            saveSettings();
+                                        }
+
+                                        function updateFontFamily() {
+                                            const contentDiv = document.getElementById('ebook-content');
+                                            const fontFamily = isSerifFont ? '"Noto Serif KR", serif' : '"Noto Sans KR", sans-serif';
+
+                                            contentDiv.style.fontFamily = fontFamily;
+                                            document.getElementById('font-family-display').textContent = isSerifFont ? 'Serif' : 'Sans';
+                                        }
+
+                                        // 읽기 진행률
+                                        function updateReadingProgress() {
+                                            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                                            const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+                                            const progress = (scrollTop / scrollHeight) * 100;
+
+                                            document.getElementById('reading-progress').style.width = `${Math.min(100, Math.max(0, progress))}%`;
+                                        }
+
+                                        // 유틸리티 함수들
+                                        function scrollToTop() {
+                                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        }
+
+                                        function toggleFullscreen() {
+                                            if (!document.fullscreenElement) {
+                                                document.documentElement.requestFullscreen().catch(() => {
+                                                    showNotification('전체화면 모드를 지원하지 않는 브라우저입니다.', 'warning');
+                                                });
+                                            } else {
+                                                document.exitFullscreen();
+                                            }
+                                        }
+
+                                        function printPage() {
+                                            window.print();
+                                        }
+
+                                        function logout() {
+                                            if (confirm('정말 로그아웃하시겠습니까?')) {
+                                                if (localStorage.getItem('testUser')) {
+                                                    localStorage.removeItem('testUser');
+                                                }
+
+                                                // 페이드 아웃 효과
+                                                document.body.style.transition = 'opacity 0.5s ease';
+                                                document.body.style.opacity = '0';
+
+                                                setTimeout(() => {
+                                                    window.location.href = 'index.html';
+                                                }, 500);
+                                            }
+                                        }
+
+                                        // 알림 시스템
+                                        function showNotification(message, type = 'info', duration = 3000) {
+                                            // 기존 알림 제거
+                                            const existingNotifications = document.querySelectorAll('.notification-toast');
+                                            existingNotifications.forEach(notification => notification.remove());
+
+                                            const notification = document.createElement('div');
+                                            notification.className = 'notification-toast position-fixed';
+                                            notification.style.cssText = `
+                                                top: 80px;
+                                                right: 20px;
+                                                z-index: 9999;
+                                                max-width: 350px;
+                                                padding: 15px 20px;
+                                                border-radius: 12px;
+                                                font-weight: 600;
+                                                backdrop-filter: blur(15px);
+                                                animation: slideInRight 0.5s ease-out;
+                                                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                                            `;
+
+                                            const typeStyles = {
+                                                success: 'background: linear-gradient(135deg, rgba(40, 167, 69, 0.9), rgba(52, 208, 88, 0.8)); color: white; border: 1px solid rgba(40, 167, 69, 0.5);',
+                                                error: 'background: linear-gradient(135deg, rgba(220, 53, 69, 0.9), rgba(245, 101, 101, 0.8)); color: white; border: 1px solid rgba(220, 53, 69, 0.5);',
+                                                warning: 'background: linear-gradient(135deg, rgba(255, 193, 7, 0.9), rgba(255, 213, 79, 0.8)); color: #111; border: 1px solid rgba(255, 193, 7, 0.5);',
+                                                info: 'background: linear-gradient(135deg, rgba(23, 162, 184, 0.9), rgba(56, 178, 172, 0.8)); color: white; border: 1px solid rgba(23, 162, 184, 0.5);'
+                                            };
+
+                                            notification.style.cssText += typeStyles[type] || typeStyles.info;
+                                            notification.innerHTML = `
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+                                                        <span>${message}</span>
+                                                    </div>
+                                                    <button class="btn-close btn-close-white ms-2" onclick="this.parentElement.parentElement.remove()"></button>
+                                                </div>
+                                            `;
+
+                                            document.body.appendChild(notification);
+
+                                            // 자동 제거
+                                            setTimeout(() => {
+                                                if (notification.parentElement) {
+                                                    notification.style.animation = 'slideOutRight 0.5s ease-in';
+                                                    setTimeout(() => notification.remove(), 500);
+                                                }
+                                            }, duration);
+                                        }
+
+                                        // 키보드 단축키
+                                        document.addEventListener('keydown', function(e) {
+                                            // ESC: 사이드바 토글
+                                            if (e.key === 'Escape') {
+                                                e.preventDefault();
+                                                toggleSidebar();
+                                            }
+
+                                            // Ctrl/Cmd + =: 글자 크기 증가
+                                            if ((e.ctrlKey || e.metaKey) && e.key === '=') {
+                                                e.preventDefault();
+                                                changeFontSize(1);
+                                            }
+
+                                            // Ctrl/Cmd + -: 글자 크기 감소
+                                            if ((e.ctrlKey || e.metaKey) && e.key === '-') {
+                                                e.preventDefault();
+                                                changeFontSize(-1);
+                                            }
+
+                                            // F11: 전체화면
+                                            if (e.key === 'F11') {
+                                                e.preventDefault();
+                                                toggleFullscreen();
+                                            }
+
+                                            // Home: 맨 위로
+                                            if (e.key === 'Home') {
+                                                e.preventDefault();
+                                                scrollToTop();
+                                            }
+                                        });
+
+                                        // 애니메이션 스타일 추가
+                                        const style = document.createElement('style');
+                                        style.textContent = `
+                                            @keyframes slideInRight {
+                                                from {
+                                                    transform: translateX(100%);
+                                                    opacity: 0;
+                                                }
+                                                to {
+                                                    transform: translateX(0);
+                                                    opacity: 1;
+                                                }
+                                            }
+                                            @keyframes slideOutRight {
+                                                from {
+                                                    transform: translateX(0);
+                                                    opacity: 1;
+                                                }
+                                                to {
+                                                    transform: translateX(100%);
+                                                    opacity: 0;
+                                                }
+                                            }
+                                        `;
+                                        document.head.appendChild(style);
+
+                                        // 페이지 가시성 변경 시 설정 저장
+                                        document.addEventListener('visibilitychange', function() {
+                                            if (document.hidden) {
+                                                saveSettings();
+                                            }
+                                        });
+
+                                        console.log('MCSELLER 전자책 뷰어가 로드되었습니다.');
+                                    </script>
+                                    <script src="js/protect-page.js"></script>
+                                </body>
+                                </html>
+                                                                <li>매일 1개씩 레시피 포스팅</li>
+                                                                <li>SEO 최적화로 검색 상위 노출</li>
+                                                                <li>광고 및 제휴 마케팅 활용</li>
+                                                            </ul>
+                                                            <p><strong>결과:</strong> 6개월 만에 월 100만원 수익 달성</p>
+
+                                                            <h3>3.2 사례 2: 온라인 강의 제작</h3>
+                                                            <p><strong>배경:</strong> 프리랜서 디자이너 B씨</p>
+                                                            <p><strong>전략:</strong></p>
+                                                            <ul>
