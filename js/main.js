@@ -1,333 +1,299 @@
-// 메인 페이지 JavaScript
-document.addEventListener('DOMContentLoaded', function() {
-    // 페이지 초기화
-    initializePage();
-    
-    // 스무스 스크롤
+/**
+ * MCSELLER 메인 페이지 스크립트 (리팩토링 버전)
+ * - 데이터 로딩을 정적 데이터에서 Supabase DB로 완전히 전환합니다.
+ * - 상품 클릭 시 불필요한 DB 조회를 제거하여 성능을 개선합니다.
+ * - 이벤트 리스너를 통합하고 이벤트 위임을 사용하여 코드를 최적화합니다.
+ */
+
+// ===================================================================================
+//  페이지 초기화
+// ===================================================================================
+
+// Supabase 클라이언트가 준비되면 모든 페이지 로직을 시작합니다.
+document.addEventListener("supabaseClientReady", initializeMainPage);
+
+function initializeMainPage() {
+    console.log("✅ Supabase 준비 완료. 메인 페이지 로직을 초기화합니다.");
+
+    // UI/UX 기능 초기화
+    initializeAnimations();
     initializeSmoothScroll();
-    
-    // 상품 데이터 로드
-    loadProducts();
-    
-    // 후기 데이터 로드
-    loadReviews();
-    
-    // 내비게이션 이벤트
     setupNavigation();
-});
 
-// 페이지 초기화
-function initializePage() {
-    // 로딩 애니메이션
-    const elements = document.querySelectorAll('.fade-in');
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('animate__animated', 'animate__fadeInUp');
+    // 데이터 로딩 및 이벤트 설정
+    loadProductsAndSetupHandlers(); // 상품 로드와 클릭 핸들러 설정을 통합
+    loadReviews();
+
+    // 로그인 상태에 따른 UI 업데이트
+    updateUIAccordingToAuthState();
+
+    // PWA 및 성능 최적화
+    initializePerformanceOptimizations();
+}
+
+// ===================================================================================
+//  인증 및 UI 업데이트
+// ===================================================================================
+
+// 인증 상태에 따라 UI를 업데이트하는 중앙 함수
+function updateUIAccordingToAuthState() {
+    window.supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (event === "SIGNED_IN" || (event === "INITIAL_SESSION" && session)) {
+            // 로그인 상태 UI
+            document
+                .getElementById("my-content-link")
+                ?.classList.remove("d-none");
+            document.getElementById("logout-link")?.classList.remove("d-none");
+            document.getElementById("login-link")?.classList.add("d-none");
+
+            // '내 콘텐츠' 버튼에 이벤트 리스너 설정
+            const myContentBtn = document.getElementById("my-content-link");
+            if (myContentBtn) {
+                myContentBtn.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    showMyContent();
+                });
             }
-        });
-    });
-    
-    elements.forEach(el => observer.observe(el));
-    
-    // 현재 사용자 상태 확인
-    checkUserStatus();
-}
-
-// 사용자 상태 확인
-async function checkUserStatus() {
-    if (!window.supabaseClient) return;
-    
-    try {
-        const user = await getCurrentUser();
-        if (user) {
-            updateUIForLoggedInUser(user);
+        } else {
+            // 로그아웃 상태 UI
+            document.getElementById("my-content-link")?.classList.add("d-none");
+            document.getElementById("logout-link")?.classList.add("d-none");
+            document.getElementById("login-link")?.classList.remove("d-none");
         }
-    } catch (error) {
-        console.error('사용자 상태 확인 오류:', error);
-    }
+    });
 }
 
-// 로그인된 사용자 UI 업데이트
-function updateUIForLoggedInUser(user) {
-    // 내 콘텐츠 버튼 이벤트 추가
-    const myContentBtn = document.getElementById('my-content');
-    if (myContentBtn) {
-        myContentBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            showMyContent();
-        });
-    }
-}
-
-// 내 콘텐츠 표시
+// '내 콘텐츠' 모달을 표시하는 함수
 async function showMyContent() {
     try {
-        const user = await getCurrentUser();
+        const {
+            data: { user },
+        } = await window.supabaseClient.auth.getUser();
         if (!user) {
-            window.location.href = 'auth.html';
+            window.location.href = "auth.html";
             return;
         }
-        
-        // 구매한 콘텐츠 조회
-        const { data: purchases, error } = await supabaseClient
-            .from('access_rights')
-            .select(`
+
+        // [핵심 수정] 'access_rights' -> 'purchases' 테이블로 수정
+        const { data: purchases, error } = await window.supabaseClient
+            .from("purchases")
+            .select(
+                `
                 product_id,
                 created_at,
-                products (
-                    id,
-                    title,
-                    type,
-                    image_url,
-                    price
-                )
-            `)
-            .eq('user_id', user.id);
-        
-        if (error) {
-            console.error('구매 내역 조회 오류:', error);
-            showToast('구매 내역을 불러올 수 없습니다.', 'error');
-            return;
-        }
-        
+                products ( id, name, type, image_url, price )
+            `,
+            )
+            .eq("user_id", user.id);
+
+        if (error) throw error;
+
         if (purchases.length === 0) {
-            showToast('구매한 콘텐츠가 없습니다.', 'info');
+            alert("구매한 콘텐츠가 없습니다.");
             return;
         }
-        
-        // 구매한 콘텐츠 모달 표시
+
         showMyContentModal(purchases);
-        
     } catch (error) {
-        console.error('내 콘텐츠 조회 오류:', error);
-        showToast('오류가 발생했습니다.', 'error');
+        console.error("내 콘텐츠 조회 오류:", error);
+        alert("구매 내역을 불러오는 중 오류가 발생했습니다.");
     }
 }
 
-// 구매한 콘텐츠 모달 표시
+// 구매한 콘텐츠 모달을 생성하고 표시하는 함수
 function showMyContentModal(purchases) {
     const modalHtml = `
         <div class="modal fade" id="myContentModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">내 강의/책</h5>
+                        <h5 class="modal-title">내 콘텐츠</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <div class="row g-3">
-                            ${purchases.map(purchase => `
+                            ${purchases
+                                .map((p) => {
+                                    const product = p.products; // 관계형 데이터는 'products' 객체 안에 있습니다.
+                                    if (!product) return ""; // 혹시 모를 오류 방지
+                                    const typeText =
+                                        product.type === "lecture"
+                                            ? "강의"
+                                            : "전자책";
+                                    const badgeColor =
+                                        product.type === "lecture"
+                                            ? "primary"
+                                            : "warning";
+                                    const viewerUrl =
+                                        product.type === "lecture"
+                                            ? "video-viewer.html"
+                                            : "ebook-viewer.html";
+
+                                    return `
                                 <div class="col-md-6">
                                     <div class="card h-100">
-                                        <img src="${purchase.products.image_url || 'https://via.placeholder.com/300x200'}" 
-                                             class="card-img-top" style="height: 150px; object-fit: cover;" 
-                                             alt="${purchase.products.title}">
-                                        <div class="card-body">
-                                            <span class="badge bg-${purchase.products.type === 'lecture' ? 'primary' : 'warning'} mb-2">
-                                                ${purchase.products.type === 'lecture' ? '강의' : '전자책'}
-                                            </span>
-                                            <h6 class="card-title">${purchase.products.title}</h6>
-                                            <p class="text-muted small">
-                                                구매일: ${new Date(purchase.created_at).toLocaleDateString('ko-KR')}
+                                        <img src="${product.image_url || "https://placehold.co/600x400/eee/ccc?text=No+Image"}" 
+                                             class="card-img-top" style="height: 150px; object-fit: cover;" alt="${product.name}">
+                                        <div class="card-body d-flex flex-column">
+                                            <span class="badge bg-${badgeColor} mb-2 align-self-start">${typeText}</span>
+                                            <h6 class="card-title flex-grow-1">${product.name}</h6>
+                                            <p class="text-muted small mb-2">
+                                                구매일: ${new Date(p.created_at).toLocaleDateString("ko-KR")}
                                             </p>
-                                            <a href="purchased-content.html?id=${purchase.products.id}" 
-                                               class="btn btn-primary btn-sm w-100">
+                                            <a href="${viewerUrl}?id=${product.id}" class="btn btn-primary btn-sm w-100 mt-auto">
                                                 <i class="fas fa-play me-2"></i>보기
                                             </a>
                                         </div>
                                     </div>
-                                </div>
-                            `).join('')}
+                                </div>`;
+                                })
+                                .join("")}
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    `;
-    
-    // 기존 모달 제거
-    const existingModal = document.getElementById('myContentModal');
-    if (existingModal) {
-        existingModal.remove();
-    }
-    
-    // 새 모달 추가
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    
-    // 모달 표시
-    const modal = new bootstrap.Modal(document.getElementById('myContentModal'));
+        </div>`;
+
+    const existingModal = document.getElementById("myContentModal");
+    if (existingModal) existingModal.remove();
+
+    document.body.insertAdjacentHTML("beforeend", modalHtml);
+    const modal = new bootstrap.Modal(
+        document.getElementById("myContentModal"),
+    );
     modal.show();
-    
-    // 모달이 숨겨진 후 DOM에서 제거
-    document.getElementById('myContentModal').addEventListener('hidden.bs.modal', function() {
-        this.remove();
-    });
-}
-
-// 스무스 스크롤 초기화
-function initializeSmoothScroll() {
-    const links = document.querySelectorAll('a[href^="#"]');
-    
-    links.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            const targetId = this.getAttribute('href');
-            const targetSection = document.querySelector(targetId);
-            
-            if (targetSection) {
-                targetSection.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
+    document
+        .getElementById("myContentModal")
+        .addEventListener("hidden.bs.modal", function () {
+            this.remove();
         });
-    });
 }
 
-// 상품 데이터 로드
-async function loadProducts() {
+// ===================================================================================
+//  상품 데이터 로딩 및 핸들러
+// ===================================================================================
+
+// 상품 로드와 클릭 핸들러 설정을 통합
+async function loadProductsAndSetupHandlers() {
     try {
-        // 강의 로드
-        await loadLectures();
-        
-        // 전자책 로드
-        await loadEbooks();
-        
+        await Promise.all([
+            loadAndRenderSection("lecture", "lectures-container"),
+            loadAndRenderSection("ebook", "ebooks-container"),
+        ]);
+        setupProductClickHandlers(); // 모든 상품이 렌더링 된 후 클릭 핸들러 설정
     } catch (error) {
-        console.error('상품 로드 오류:', error);
-        showProductLoadError();
+        console.error("전체 상품 로드 중 오류:", error);
+        showProductLoadError(document.getElementById("lectures-container"));
+        showProductLoadError(document.getElementById("ebooks-container"));
     }
 }
 
-// 강의 로드
-async function loadLectures() {
-    const container = document.getElementById('lectures-container');
+// 특정 타입의 상품을 로드하고 렌더링하는 범용 함수
+async function loadAndRenderSection(type, containerId) {
+    const container = document.getElementById(containerId);
     if (!container) return;
-    
-    try {
-        let lectures = [];
-        
-        if (window.supabaseClient) {
-            const { data, error } = await window.supabaseClient
-                .from('products')
-                .select('*')
-                .eq('type', 'lecture');
-            
-            if (error) {
-                console.error('강의 데이터 로드 오류:', error);
-            } else {
-                lectures = data || [];
-            }
-        }
-        
-        renderProducts(lectures, container, 'lecture');
-        
-    } catch (error) {
-        console.error('강의 로드 처리 오류:', error);
+
+    const { data: products, error } = await window.supabaseClient
+        .from("products")
+        .select("id, name, description, price, image_url, type") // 필요한 컬럼만 명시
+        .eq("type", type);
+
+    if (error) {
+        console.error(`${type} 로드 오류:`, error);
         showProductLoadError(container);
+        throw error; // Promise.all이 오류를 감지하도록 에러를 다시 던짐
     }
+
+    renderProducts(products, container, type);
 }
 
-// 전자책 로드
-async function loadEbooks() {
-    const container = document.getElementById('ebooks-container');
-    if (!container) return;
-    
-    try {
-        let ebooks = [];
-        
-        if (window.supabaseClient) {
-            const { data, error } = await window.supabaseClient
-                .from('products')
-                .select('*')
-                .eq('type', 'ebook');
-            
-            if (error) {
-                console.error('전자책 데이터 로드 오류:', error);
-            } else {
-                ebooks = data || [];
-            }
-        }
-        
-        renderProducts(ebooks, container, 'ebook');
-        
-    } catch (error) {
-        console.error('전자책 로드 처리 오류:', error);
-        showProductLoadError(container);
-    }
-}
-
-// 상품 렌더링
+// 상품 목록을 HTML로 렌더링
 function renderProducts(products, container, type) {
+    const typeText = type === "lecture" ? "강의" : "전자책";
     if (!products || products.length === 0) {
-        container.innerHTML = `
-            <div class="col-12 text-center py-5">
-                <i class="fas fa-${type === 'lecture' ? 'video' : 'book'} fa-3x text-muted mb-3"></i>
-                <h5 class="text-muted">등록된 ${type === 'lecture' ? '강의' : '전자책'}가 없습니다</h5>
-                <p class="text-muted">곧 새로운 콘텐츠가 업데이트될 예정입니다.</p>
-            </div>
-        `;
+        container.innerHTML = `<div class="col-12 text-center py-5"><h5 class="text-muted">등록된 ${typeText}가 없습니다</h5></div>`;
         return;
     }
-    
-    const productsHtml = products.map(product => `
+
+    const productsHtml = products
+        .map(
+            (product) => `
         <div class="col-lg-4 col-md-6 mb-4 fade-in">
-            <div class="product-card card h-100">
-                <img src="${product.image || product.image_url || 'https://via.placeholder.com/300x200'}" 
-                     class="card-img-top" alt="${product.title}">
-                <div class="card-body">
-                    <span class="badge bg-${type === 'lecture' ? 'primary' : 'warning'} mb-2">
-                        ${type === 'lecture' ? '강의' : '전자책'}
-                    </span>
-                    <h5 class="card-title">${product.title}</h5>
-                    <p class="card-text">${product.description}</p>
-                    <div class="product-rating mb-2">
-                        <div class="stars">
-                            ${generateStars(product.rating || 4.5)}
-                        </div>
-                        <span class="text-muted ms-2">(${product.totalStudents || product.totalReaders || 128})</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="product-price">₩${product.price.toLocaleString()}</span>
-                        <button class="btn btn-primary btn-sm view-content-btn" data-product-id="${product.id}">
-                            <i class="fas fa-${type === 'lecture' ? 'play' : 'book'} me-1"></i>
-                            ${type === 'lecture' ? '수강하기' : '읽기'}
+            <div class="product-card card h-100 shadow-sm">
+                <img src="${product.image_url || "https://placehold.co/600x400/eee/ccc?text=No+Image"}" class="card-img-top" alt="${product.name}">
+                <div class="card-body d-flex flex-column">
+                    <span class="badge bg-${type === "lecture" ? "primary" : "warning"} mb-2 align-self-start">${typeText}</span>
+                    <h5 class="card-title flex-grow-1">${product.name}</h5>
+                    <p class="card-text small text-muted">${product.description || ""}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-auto">
+                        <span class="product-price fw-bold">₩${(product.price || 0).toLocaleString()}</span>
+                        <!-- [핵심 개선] 버튼에 상품 ID와 타입을 모두 저장 -->
+                        <button class="btn btn-primary btn-sm view-content-btn" data-product-id="${product.id}" data-product-type="${product.type}">
+                            <i class="fas fa-${type === "lecture" ? "play" : "book"} me-1"></i>
+                            상세 보기
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-    `).join('');
-    
+    `,
+        )
+        .join("");
+
     container.innerHTML = productsHtml;
 }
 
-// 별점 생성
-function generateStars(rating) {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-    
-    let starsHtml = '';
-    
-    // 채워진 별
-    for (let i = 0; i < fullStars; i++) {
-        starsHtml += '<i class="fas fa-star"></i>';
-    }
-    
-    // 반 별
-    if (hasHalfStar) {
-        starsHtml += '<i class="fas fa-star-half-alt"></i>';
-    }
-    
-    // 빈 별
-    for (let i = 0; i < emptyStars; i++) {
-        starsHtml += '<i class="far fa-star"></i>';
-    }
-    
-    return starsHtml;
+// 상품 카드 버튼에 대한 클릭 이벤트 핸들러 설정 (이벤트 위임 사용)
+function setupProductClickHandlers() {
+    document.body.addEventListener("click", async function (e) {
+        const button = e.target.closest(".view-content-btn");
+        if (!button) return; // '보기' 버튼이 아니면 무시
+
+        const productId = button.dataset.productId;
+        const productType = button.dataset.productType;
+
+        // [핵심 개선] 상세 페이지로 먼저 이동. 접근 제어는 상세 페이지에서.
+        // 이렇게 하면 비로그인 사용자도 상품 상세 정보는 볼 수 있습니다.
+        window.location.href = `product-detail.html?id=${productId}`;
+    });
+}
+
+// ===================================================================================
+//  UI/UX 및 기타 유틸리티 (기존 코드 유지 및 개선)
+// ===================================================================================
+
+// 등장 애니메이션 초기화
+function initializeAnimations() {
+    const elements = document.querySelectorAll(".fade-in");
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add(
+                    "animate__animated",
+                    "animate__fadeInUp",
+                );
+                observer.unobserve(entry.target);
+            }
+        });
+    });
+    elements.forEach((el) => observer.observe(el));
+}
+
+// 스무스 스크롤 초기화
+function initializeSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach((link) => {
+        link.addEventListener("click", function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute("href");
+            const targetSection = document.querySelector(targetId);
+            if (targetSection) {
+                targetSection.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                });
+            }
+        });
+    });
 }
 
 // 상품 로드 오류 표시
@@ -335,238 +301,106 @@ function showProductLoadError(container) {
     if (container) {
         container.innerHTML = `
             <div class="col-12 text-center py-5">
-                <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
-                <h5 class="text-muted">콘텐츠를 불러올 수 없습니다</h5>
-                <p class="text-muted">네트워크 연결을 확인하고 페이지를 새로고침해 주세요.</p>
-                <button class="btn btn-primary" onclick="window.location.reload()">
-                    <i class="fas fa-redo me-2"></i>새로고침
-                </button>
-            </div>
-        `;
+                <h5 class="text-muted">콘텐츠를 불러올 수 없습니다.</h5>
+                <p class="text-muted">네트워크 연결을 확인하고 새로고침해 주세요.</p>
+            </div>`;
     }
 }
 
-// 후기 데이터 로드
-async function loadReviews() {
-    const container = document.getElementById('reviews-container');
+// 후기 데이터 로드 (현재는 정적 데이터 사용)
+function loadReviews() {
+    const container = document.getElementById("reviews-container");
     if (!container) return;
-    
-    try {
-        // 실제 서비스에서는 OCR로 추출된 후기를 사용
-        // 현재는 정적 데이터 사용
-        const reviews = getStaticReviews();
-        renderReviews(reviews, container);
-        
-    } catch (error) {
-        console.error('후기 로드 오류:', error);
-        showReviewsLoadError(container);
-    }
-}
-
-// 정적 후기 데이터 (OCR 추출 시뮬레이션)
-function getStaticReviews() {
-    return [
+    const reviews = [
         {
             id: 1,
-            author: '김○○',
+            author: "김○○",
             rating: 5,
-            content: '강의 내용이 정말 알차고 이해하기 쉽게 설명해주셔서 많은 도움이 되었습니다. 추천합니다!',
-            date: '2025-01-15',
-            product_title: 'JavaScript 마스터클래스'
+            content:
+                "강의 내용이 정말 알차고 이해하기 쉽게 설명해주셔서 많은 도움이 되었습니다.",
+            date: "2025-01-15",
+            product_title: "JavaScript 마스터클래스",
         },
         {
             id: 2,
-            author: '이○○',
+            author: "이○○",
             rating: 5,
-            content: '전자책의 구성이 체계적이고 실무에서 바로 적용할 수 있는 내용들이 많아서 좋았습니다.',
-            date: '2025-01-10',
-            product_title: '웹 개발 완벽 가이드'
+            content:
+                "전자책의 구성이 체계적이고 실무에서 바로 적용할 수 있는 내용들이 많아서 좋았습니다.",
+            date: "2025-01-10",
+            product_title: "웹 개발 완벽 가이드",
         },
         {
             id: 3,
-            author: '박○○',
+            author: "박○○",
             rating: 4,
-            content: '초보자도 따라할 수 있게 친절하게 설명되어 있어서 만족합니다. 다음 강의도 기대됩니다.',
-            date: '2025-01-05',
-            product_title: 'React 입문부터 실전까지'
-        }
+            content:
+                "초보자도 따라할 수 있게 친절하게 설명되어 있어서 만족합니다. 다음 강의도 기대됩니다.",
+            date: "2025-01-05",
+            product_title: "React 입문부터 실전까지",
+        },
     ];
+    renderReviews(reviews, container);
 }
 
 // 후기 렌더링
 function renderReviews(reviews, container) {
     if (!reviews || reviews.length === 0) {
-        container.innerHTML = `
-            <div class="col-12 text-center py-5">
-                <i class="fas fa-star fa-3x text-muted mb-3"></i>
-                <h5 class="text-muted">등록된 후기가 없습니다</h5>
-                <p class="text-muted">첫 번째 후기를 남겨보세요!</p>
-            </div>
-        `;
+        container.innerHTML = `<div class="col-12 text-center py-5"><h5 class="text-muted">등록된 후기가 없습니다</h5></div>`;
         return;
     }
-    
-    const reviewsHtml = reviews.map(review => `
+    const reviewsHtml = reviews
+        .map(
+            (review) => `
         <div class="col-lg-4 col-md-6 mb-4 fade-in">
-            <div class="review-card">
-                <div class="review-header">
-                    <div class="review-avatar">
-                        ${review.author.charAt(0)}
+            <div class="review-card card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="review-avatar">${review.author.charAt(0)}</div>
+                        <div class="ms-2">
+                            <div class="fw-bold">${review.author}</div>
+                            <div class="text-muted small">${generateStars(review.rating)}</div>
+                        </div>
                     </div>
-                    <div>
-                        <div class="review-author">${review.author}</div>
-                        <div class="review-date">${new Date(review.date).toLocaleDateString('ko-KR')}</div>
-                    </div>
-                    <div class="review-rating">
-                        ${generateStars(review.rating)}
-                    </div>
-                </div>
-                <div class="review-content">
-                    <p>"${review.content}"</p>
-                    <small class="text-muted">- ${review.product_title}</small>
+                    <p class="review-content">"${review.content}"</p>
+                    <small class="text-muted d-block text-end">- ${review.product_title}</small>
                 </div>
             </div>
         </div>
-    `).join('');
-    
+    `,
+        )
+        .join("");
     container.innerHTML = reviewsHtml;
 }
 
-// 후기 로드 오류 표시
-function showReviewsLoadError(container) {
-    container.innerHTML = `
-        <div class="col-12 text-center py-5">
-            <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
-            <h5 class="text-muted">후기를 불러올 수 없습니다</h5>
-            <p class="text-muted">잠시 후 다시 시도해 주세요.</p>
-        </div>
-    `;
+// 별점 생성
+function generateStars(rating) {
+    let starsHtml = "";
+    for (let i = 1; i <= 5; i++) {
+        if (i <= rating)
+            starsHtml += '<i class="fas fa-star text-warning"></i>';
+        else starsHtml += '<i class="far fa-star text-warning"></i>';
+    }
+    return starsHtml;
 }
 
 // 내비게이션 이벤트 설정
 function setupNavigation() {
-    // 스크롤 시 내비게이션 바 스타일 변경
-    window.addEventListener('scroll', function() {
-        const navbar = document.querySelector('.navbar');
-        if (window.scrollY > 100) {
-            navbar.classList.add('navbar-scrolled');
-        } else {
-            navbar.classList.remove('navbar-scrolled');
+    window.addEventListener("scroll", function () {
+        const navbar = document.querySelector(".navbar");
+        if (navbar) {
+            if (window.scrollY > 50) navbar.classList.add("navbar-scrolled");
+            else navbar.classList.remove("navbar-scrolled");
         }
-    });
-    
-    // 모바일 메뉴 자동 닫기
-    const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
-    const navbarToggler = document.querySelector('.navbar-toggler');
-    const navbarCollapse = document.querySelector('.navbar-collapse');
-    
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            if (navbarCollapse.classList.contains('show')) {
-                navbarToggler.click();
-            }
-        });
     });
 }
 
-// 페이지 성능 최적화
-document.addEventListener('DOMContentLoaded', function() {
-    // 이미지 지연 로딩
-    if ('IntersectionObserver' in window) {
-        const imageObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    img.src = img.dataset.src;
-                    img.classList.remove('lazy');
-                    observer.unobserve(img);
-                }
-            });
-        });
-        
-        const lazyImages = document.querySelectorAll('img[data-src]');
-        lazyImages.forEach(img => imageObserver.observe(img));
+// PWA 및 성능 최적화
+function initializePerformanceOptimizations() {
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+            .register("/sw.js")
+            .then((reg) => console.log("서비스 워커 등록 성공:", reg))
+            .catch((err) => console.log("서비스 워커 등록 실패:", err));
     }
-    
-    // 서비스 워커 등록 (PWA 대응)
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-                console.log('서비스 워커 등록 성공:', registration);
-            })
-            .catch(error => {
-                console.log('서비스 워커 등록 실패:', error);
-            });
-    }
-});
-
-// 콘텐츠 보기 버튼 클릭 이벤트 리스너
-document.addEventListener('click', async function(e) {
-    if (e.target.classList.contains('view-content-btn') || 
-        e.target.closest('.view-content-btn')) {
-        
-        const button = e.target.classList.contains('view-content-btn') ? 
-                      e.target : e.target.closest('.view-content-btn');
-        
-        const productId = button.getAttribute('data-product-id');
-        
-        if (!productId) {
-            alert('상품 정보를 찾을 수 없습니다.');
-            return;
-        }
-
-        try {
-            // 로딩 상태 표시
-            const originalText = button.innerHTML;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>확인 중...';
-            button.disabled = true;
-
-            // 구매 여부 확인
-            const hasPurchased = await window.checkPurchase(productId);
-            
-            if (hasPurchased) {
-                // 상품 타입 확인하여 적절한 뷰어로 이동
-                if (window.supabaseClient) {
-                    const { data: product, error } = await window.supabaseClient
-                        .from('products')
-                        .select('type')
-                        .eq('id', productId)
-                        .single();
-                    
-                    if (!error && product) {
-                        if (product.type === 'lecture') {
-                            window.location.href = `video-viewer.html?id=${productId}`;
-                        } else if (product.type === 'ebook') {
-                            window.location.href = `ebook-viewer.html?id=${productId}`;
-                        } else {
-                            window.location.href = `product-detail.html?id=${productId}`;
-                        }
-                    } else {
-                        window.location.href = `product-detail.html?id=${productId}`;
-                    }
-                } else {
-                    // Supabase 클라이언트가 없는 경우 기본 처리
-                    window.location.href = `video-viewer.html?id=${productId}`;
-                }
-            } else {
-                alert('구매가 필요한 상품입니다.');
-            }
-
-            // 로딩 상태 해제
-            button.innerHTML = originalText;
-            button.disabled = false;
-            
-        } catch (error) {
-            console.error('상품 접근 확인 오류:', error);
-            alert('상품 정보를 확인하는 중 오류가 발생했습니다.');
-            
-            // 로딩 상태 해제
-            button.innerHTML = originalText;
-            button.disabled = false;
-        }
-    }
-});
-
-// 전역 함수로 내보내기
-window.loadProducts = loadProducts;
-window.showMyContent = showMyContent;
+}
