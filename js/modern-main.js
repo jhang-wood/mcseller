@@ -31,12 +31,20 @@ class ModernPlatform {
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', (e) => {
                 e.preventDefault();
-                const target = document.querySelector(anchor.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+                const href = anchor.getAttribute('href');
+                // href가 유효한 CSS 선택자인지 확인
+                if (href && href.startsWith('#') && href.length > 1) {
+                    try {
+                        const target = document.querySelector(href);
+                        if (target) {
+                            target.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    } catch (error) {
+                        console.warn('유효하지 않은 선택자:', href);
+                    }
                 }
             });
         });

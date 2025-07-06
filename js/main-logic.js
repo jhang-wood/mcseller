@@ -523,7 +523,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const link = e.target.closest("#profile-mypage-link");
             if (link && link.href) {
+                // href 속성이 URL이므로 직접 이동
                 window.location.href = link.href;
+            } else {
+                // 백업 경로
+                window.location.href = '/mypage.html';
             }
         }
     });

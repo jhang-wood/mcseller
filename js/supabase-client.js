@@ -9,8 +9,8 @@
 // ===================================================================================
 // 환경 변수에서 Supabase 설정 가져오기
 // 프로덕션 환경에서는 반드시 실제 키를 사용하세요
-const supabaseUrl = window.SUPABASE_URL || "";
-const supabaseAnonKey = window.SUPABASE_ANON_KEY || "";
+const supabaseUrl = window.SUPABASE_URL || "https://rpcctgtmtplfahwtnglq.supabase.co";
+const supabaseAnonKey = window.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwY2N0Z3RtdHBsZmFod3RuZ2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUxOTA1MDksImV4cCI6MjA1MDc2NjUwOX0.7n3yEJCZLRTnFvAhD_Nq2oepgAAhcqFqH_rGQbAhBjo";
 
 // ===================================================================================
 //  클라이언트 초기화

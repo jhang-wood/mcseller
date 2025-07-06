@@ -456,7 +456,12 @@ class MobileUtils {
 
 // 초기화
 document.addEventListener('DOMContentLoaded', () => {
-    window.mobileUtils = new MobileUtils();
+    try {
+        window.mobileUtils = new MobileUtils();
+        window.mobileUtils.init();
+    } catch (error) {
+        console.warn('MobileUtils 초기화 중 오류:', error);
+    }
     
     // CSS 애니메이션 추가
     const style = document.createElement('style');
