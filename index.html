@@ -2373,6 +2373,7 @@
                                         class="dropdown-item"
                                         href="#"
                                         id="profile-logout-link"
+                                        onclick="handleLogout()"
                                     >
                                         <i class="fas fa-sign-out-alt me-2"></i
                                         >로그아웃
@@ -3941,5 +3942,27 @@
         <script src="js/modern-main.js"></script>
 
         <script src="js/main-logic.js"></script>
+        
+        <script>
+            // 페이지 로드 시 인증 상태 확인
+            document.addEventListener('DOMContentLoaded', function() {
+                // Supabase 클라이언트 준비 확인
+                if (window.supabaseClient) {
+                    checkLoginStatus();
+                    setupAuthStateListener();
+                } else {
+                    // 클라이언트가 준비되면 상태 확인
+                    window.addEventListener('supabaseClientReady', function() {
+                        checkLoginStatus();
+                        setupAuthStateListener();
+                    });
+                }
+            });
+            
+            // 전역 로그아웃 함수
+            function handleLogout() {
+                logout();
+            }
+        </script>
     </body>
 </html>

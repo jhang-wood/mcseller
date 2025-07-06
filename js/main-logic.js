@@ -104,7 +104,34 @@ const courseLandings = {
 // 핵심 함수 정의
 function updateNavigationUI(user) {
     console.log("네비게이션 UI 업데이트:", user ? "로그인됨" : "로그아웃됨");
-    // 실제 UI 업데이트는 main.js에서 처리
+    
+    const loginInfo = document.getElementById('login-info');
+    const profileDropdown = document.getElementById('profile-dropdown');
+    const startButton = document.getElementById('start-button');
+    
+    if (user) {
+        // 로그인 상태: 로그인 버튼 숨기고 프로필 드롭다운 표시
+        if (loginInfo) loginInfo.style.display = 'none';
+        if (profileDropdown) {
+            profileDropdown.style.display = 'block';
+            
+            // 사용자 정보 업데이트
+            const userEmailElement = profileDropdown.querySelector('.user-email');
+            if (userEmailElement) {
+                userEmailElement.textContent = user.email;
+            }
+        }
+        if (startButton) startButton.style.display = 'none';
+        
+        console.log("✅ UI 업데이트 완료: 로그인 상태");
+    } else {
+        // 로그아웃 상태: 로그인 버튼 표시하고 프로필 드롭다운 숨기기
+        if (loginInfo) loginInfo.style.display = 'block';
+        if (profileDropdown) profileDropdown.style.display = 'none';
+        if (startButton) startButton.style.display = 'block';
+        
+        console.log("✅ UI 업데이트 완료: 로그아웃 상태");
+    }
 }
 
 function showToast(message, type = "info") {
@@ -278,23 +305,78 @@ function handleAiMasterSignup() {
 }
 
 async function checkLoginStatus() {
-    // 테스트 사용자 확인
-    const testUser = localStorage.getItem("testUser");
-    if (testUser) {
-        return true;
-    }
-
-    // Supabase 사용자 확인
-    if (window.getCurrentUser) {
-        try {
-            const user = await window.getCurrentUser();
-            return user !== null;
-        } catch (error) {
+    try {
+        if (!window.supabaseClient) {
+            console.log("Supabase 클라이언트를 기다리는 중...");
             return false;
         }
+        
+        const { data: { session }, error } = await window.supabaseClient.auth.getSession();
+        
+        if (error) {
+            console.error("세션 확인 오류:", error);
+            return false;
+        }
+        
+        if (session && session.user) {
+            console.log("✅ 로그인 상태 확인됨:", session.user.email);
+            window.currentUser = session.user;
+            updateNavigationUI(session.user);
+            return session.user;
+        } else {
+            console.log("❌ 로그인되지 않음");
+            updateNavigationUI(null);
+            return false;
+        }
+    } catch (error) {
+        console.error("로그인 상태 확인 중 오류:", error);
+        updateNavigationUI(null);
+        return false;
     }
+}
 
-    return false;
+// 로그아웃 기능
+async function logout() {
+    try {
+        if (window.supabaseClient) {
+            const { error } = await window.supabaseClient.auth.signOut();
+            if (error) {
+                console.error("로그아웃 오류:", error);
+            }
+        }
+        
+        // 로컬 상태 초기화
+        window.currentUser = null;
+        
+        // UI 업데이트
+        updateNavigationUI(null);
+        
+        // 토스트 메시지 표시
+        showToast("로그아웃되었습니다.", "success");
+        
+        console.log("✅ 로그아웃 완료");
+    } catch (error) {
+        console.error("로그아웃 중 오류:", error);
+        showToast("로그아웃 중 오류가 발생했습니다.", "error");
+    }
+}
+
+// Supabase 인증 상태 변화 리스너 설정
+function setupAuthStateListener() {
+    if (window.supabaseClient) {
+        window.supabaseClient.auth.onAuthStateChange((event, session) => {
+            console.log("인증 상태 변화:", event, session?.user?.email);
+            
+            if (event === 'SIGNED_IN' && session?.user) {
+                window.currentUser = session.user;
+                updateNavigationUI(session.user);
+                showToast("로그인되었습니다.", "success");
+            } else if (event === 'SIGNED_OUT') {
+                window.currentUser = null;
+                updateNavigationUI(null);
+            }
+        });
+    }
 }
 
 // 단일 DOMContentLoaded 이벤트 리스너
