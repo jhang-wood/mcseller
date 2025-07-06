@@ -1,0 +1,49 @@
+✅ Supabase 클라이언트가 성공적으로 초기화되었습니다. supabase-client.js:41:13
+MCSELLER 페이지 스크립트 로딩 완료 www.mcsell.co.kr:1892:21
+🚀 MCSELLER Platform initialized successfully modern-main.js:25:17
+MCSELLER 메인 로직 초기화 완료 main-logic.js:430:13
+MCSELLER 페이지 로딩 시작 www.mcsell.co.kr:1538:25
+MCSELLER 페이지 로딩 완료 www.mcsell.co.kr:1578:25
+Service Worker 등록 성공: https://www.mcsell.co.kr/ main-logic.js:469:21
+“chrome-extension://team@livestartpage.com/pages/client/livestartpage-message-add.js” 소스의 <script> 로드에 실패했습니다. www.mcsell.co.kr:1:1
+Error: Accessing from Xray wrapper is not supported. user-provider-f92b0d66.js:50:624
+환경 변수 로드 실패: SyntaxError: JSON.parse: unexpected character at line 1 column 1 of the JSON data env-loader.js:17:17
+페이지 오류: DOMException: Document.querySelector: '#' is not a valid selector
+    setupEventListeners https://www.mcsell.co.kr/js/modern-main.js:34
+    setupEventListeners https://www.mcsell.co.kr/js/modern-main.js:32
+    setupEventListeners https://www.mcsell.co.kr/js/modern-main.js:31
+    init https://www.mcsell.co.kr/js/modern-main.js:14
+    initializeModernPage https://www.mcsell.co.kr/js/modern-main.js:553
+    EventListener.handleEvent* https://www.mcsell.co.kr/js/modern-main.js:558
+www.mcsell.co.kr:1583:25
+Uncaught DOMException: Document.querySelector: '#' is not a valid selector
+    setupEventListeners https://www.mcsell.co.kr/js/modern-main.js:34
+    setupEventListeners https://www.mcsell.co.kr/js/modern-main.js:32
+    setupEventListeners https://www.mcsell.co.kr/js/modern-main.js:31
+    init https://www.mcsell.co.kr/js/modern-main.js:14
+    initializeModernPage https://www.mcsell.co.kr/js/modern-main.js:553
+    EventListener.handleEvent* https://www.mcsell.co.kr/js/modern-main.js:558
+modern-main.js:34
+페이지 오류: DOMException: Document.querySelector: '#' is not a valid selector
+    <anonymous> https://www.mcsell.co.kr/js/main-logic.js:377
+    EventListener.handleEvent* https://www.mcsell.co.kr/js/main-logic.js:374
+    <anonymous> https://www.mcsell.co.kr/js/main-logic.js:373
+    EventListener.handleEvent* https://www.mcsell.co.kr/js/main-logic.js:301
+www.mcsell.co.kr:1583:25
+Uncaught DOMException: Document.querySelector: '#' is not a valid selector
+    <anonymous> https://www.mcsell.co.kr/js/main-logic.js:377
+    EventListener.handleEvent* https://www.mcsell.co.kr/js/main-logic.js:374
+    <anonymous> https://www.mcsell.co.kr/js/main-logic.js:373
+    EventListener.handleEvent* https://www.mcsell.co.kr/js/main-logic.js:301
+main-logic.js:377
+페이지 오류: DOMException: Document.querySelector: '#' is not a valid selector
+    <anonymous> https://www.mcsell.co.kr/:1568
+    EventListener.handleEvent* https://www.mcsell.co.kr/:1566
+    <anonymous> https://www.mcsell.co.kr/:1565
+    EventListener.handleEvent* https://www.mcsell.co.kr/:1537
+www.mcsell.co.kr:1583:25
+Uncaught DOMException: Document.querySelector: '#' is not a valid selector
+    <anonymous> https://www.mcsell.co.kr/:1568
+    EventListener.handleEvent* https://www.mcsell.co.kr/:1566
+    <anonymous> https://www.mcsell.co.kr/:1565
+    EventListener.handleEvent* https://www.mcsell.co.kr/:1537
