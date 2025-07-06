@@ -120,6 +120,25 @@ function updateNavigationUI(user) {
             if (userEmailElement) {
                 userEmailElement.textContent = user.email;
             }
+            
+            // 드롭다운 초기화 및 링크 설정
+            const dropdownToggle = profileDropdown.querySelector('[data-bs-toggle="dropdown"]');
+            if (dropdownToggle && !dropdownToggle.hasAttribute('data-initialized')) {
+                dropdownToggle.setAttribute('data-initialized', 'true');
+                
+                // Bootstrap 드롭다운 초기화
+                const dropdown = new bootstrap.Dropdown(dropdownToggle);
+                
+                // 마이페이지 링크 설정
+                const mypageLink = document.getElementById('profile-mypage-link');
+                if (mypageLink) {
+                    mypageLink.href = '/mypage.html';
+                    mypageLink.onclick = (e) => {
+                        e.preventDefault();
+                        window.location.href = '/mypage.html';
+                    };
+                }
+            }
         }
         if (startButton) startButton.style.display = 'none';
         

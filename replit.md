@@ -220,6 +220,19 @@ Changelog:
   * Added environment variable integration for Supabase configuration
   * Fixed logout button onclick handler in navigation dropdown
   * Platform now properly shows/hides UI elements based on authentication status
+- July 6, 2025. Complete Payapp payment system implementation:
+  * Removed Toss Pay integration and replaced with Payapp for immediate usability
+  * Added payapp_url column to products table for admin-managed payment links
+  * Created comprehensive Payapp webhook endpoint (/api/webhook/payapp) with automatic:
+    - Order creation in database
+    - Content access grant to purchaser
+    - Slack notification with payment details
+  * Enhanced admin panel with Payapp URL management column in products grid
+  * Created PayappIntegration class for centralized payment processing
+  * Updated all purchase flows to use Payapp redirect instead of embedded payment
+  * Added test-product.html for webhook testing and system validation
+  * Created PAYAPP-SETUP.md with complete integration guide
+  * System now supports fully automated payment processing without manual intervention
 ```
 
 ## User Preferences

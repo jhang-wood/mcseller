@@ -460,15 +460,22 @@ async function handlePurchaseClick() {
         return;
     }
     
-    // 이미 구매한 경우
-    const hasPurchased = await checkPurchaseHistory(user.id, currentProduct.id);
-    if (hasPurchased) {
-        window.location.href = `purchased-content.html?id=${currentProduct.id}`;
-        return;
+    // Payapp 결제 시작
+    if (window.payappIntegration) {
+        await window.payappIntegration.initiatePayment(currentProduct.id, {
+            name: user.full_name || user.username || '구매자'
+        });
+    } else {
+        // 이미 구매한 경우
+        const hasPurchased = await checkPurchaseHistory(user.id, currentProduct.id);
+        if (hasPurchased) {
+            window.location.href = `purchased-content.html?id=${currentProduct.id}`;
+            return;
+        }
+        
+        // 결제 모달 표시
+        showPaymentModal();
     }
-    
-    // 결제 모달 표시
-    showPaymentModal();
 }
 
 // 장바구니 추가

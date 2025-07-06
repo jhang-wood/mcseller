@@ -380,8 +380,9 @@ async function loadProductsGrid() {
                 { data: 'id', title: 'ID', readOnly: true, width: 80 },
                 { data: 'title', title: '제목', width: 200 },
                 { data: 'description', title: '설명', width: 300 },
-                { data: 'type', title: '유형', type: 'dropdown', source: ['lecture', 'ebook'], width: 100 },
+                { data: 'product_type', title: '유형', type: 'dropdown', source: ['course', 'ebook', 'bundle'], width: 100 },
                 { data: 'price', title: '가격', type: 'numeric', width: 100 },
+                { data: 'payapp_url', title: 'Payapp URL', width: 250 },
                 { data: 'is_active', title: '활성화', type: 'checkbox', width: 80 },
                 { data: 'created_at', title: '생성일', readOnly: true, width: 120 }
             ],

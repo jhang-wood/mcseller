@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>결제 성공 - MCSELLER</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .success-icon {
+            font-size: 5rem;
+            color: #28a745;
+            animation: bounce 1s ease-in-out;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center">
+                <div class="card shadow">
+                    <div class="card-body py-5">
+                        <i class="fas fa-check-circle success-icon mb-4"></i>
+                        <h1 class="h3 mb-3">결제가 완료되었습니다!</h1>
+                        <p class="text-muted mb-4">구매해주셔서 감사합니다.</p>
+                        <div id="loading" class="mb-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">처리 중...</span>
+                            </div>
+                            <p class="mt-2">결제 정보를 확인하고 있습니다...</p>
+                        </div>
+                        <div id="result" style="display: none;">
+                            <p class="mb-4">콘텐츠 접근 권한이 부여되었습니다.</p>
+                            <a href="/mypage.html" class="btn btn-primary me-2">
+                                <i class="fas fa-user me-2"></i>마이페이지
+                            </a>
+                            <a href="/" class="btn btn-outline-secondary">
+                                <i class="fas fa-home me-2"></i>홈으로
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/env-loader.js"></script>
+    <script src="js/supabase-client-prod.js"></script>
+    <script src="js/content-access.js"></script>
+    <script src="js/payment-tosspay.js"></script>
+    <script>
+        async function processPaymentSuccess() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const paymentKey = urlParams.get('paymentKey');
+            const orderId = urlParams.get('orderId');
+            const amount = urlParams.get('amount');
+            
+            if (!paymentKey || !orderId || !amount) {
+                alert('결제 정보가 올바르지 않습니다.');
+                window.location.href = '/';
+                return;
+            }
+            
+            try {
+                await window.payment.handlePaymentSuccess(paymentKey, orderId, parseInt(amount));
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('result').style.display = 'block';
+            } catch (error) {
+                console.error('결제 처리 오류:', error);
+                alert('결제 처리 중 오류가 발생했습니다. 고객센터에 문의해주세요.');
+                window.location.href = '/';
+            }
+        }
+        
+        // Supabase 클라이언트 준비 후 실행
+        window.addEventListener('supabaseClientReady', processPaymentSuccess);
+    </script>
+</body>
+</html>

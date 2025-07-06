@@ -65,15 +65,47 @@ async function loadProduct() {
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('product');
     
-    if (!productId || !PRODUCTS[productId]) {
+    if (!productId) {
         alert('잘못된 상품입니다.');
         window.location.href = '/';
         return;
     }
     
-    currentProduct = PRODUCTS[productId];
-    document.getElementById('product-title').textContent = currentProduct.title;
-    document.getElementById('product-price').textContent = '₩' + currentProduct.price.toLocaleString();
+    try {
+        // Supabase에서 상품 정보 가져오기
+        const { data: product, error } = await supabaseClient
+            .from('products')
+            .select('*')
+            .eq('id', productId)
+            .eq('is_active', true)
+            .single();
+            
+        if (error || !product) {
+            alert('상품을 찾을 수 없습니다.');
+            window.location.href = '/';
+            return;
+        }
+        
+        // currentProduct 설정
+        currentProduct = {
+            id: productId,
+            dbId: product.id, // 실제 데이터베이스 ID 저장
+            title: product.title,
+            description: product.description,
+            price: product.price,
+            type: product.product_type,
+            image: product.image_url,
+            payappUrl: product.payapp_url
+        };
+        
+        document.getElementById('product-title').textContent = currentProduct.title;
+        document.getElementById('product-price').textContent = '₩' + currentProduct.price.toLocaleString();
+        
+    } catch (error) {
+        console.error('상품 로드 오류:', error);
+        alert('상품 정보를 불러올 수 없습니다.');
+        window.location.href = '/';
+    }
 }
 
 // 사용자 정보 로드
@@ -284,30 +316,47 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
-// 결제 처리 (개선된 버전)
+// 결제 처리 (Payapp 연동)
 async function processPay() {
     try {
-        setLoadingState(true);
-        
         const method = document.querySelector('input[name="payment-method"]:checked').value;
         const pointsUsed = parseInt(document.getElementById('points').value) || 0;
         const finalAmount = parseInt(document.getElementById('final-amount').textContent.replace(/[^0-9]/g, ''));
         
-        // 진행률 업데이트
-        document.querySelector('.progress-steps .step.active').classList.remove('active');
-        document.querySelector('.progress-steps .step.active').classList.add('completed');
-        document.querySelector('.progress-steps .step:last-child').classList.add('active');
-        
-        // 결제 시뮬레이션
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        if (finalAmount === 0) {
-            await completeOrder();
+        // 로그인 상태 확인
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) {
+            showError('로그인이 필요합니다.');
+            window.location.href = '/auth.html?redirect=' + encodeURIComponent(window.location.href);
             return;
         }
         
-        // 실제 결제 처리 로직
-        await completeOrder();
+        // 상품의 Payapp URL 가져오기
+        const { data: product, error } = await supabaseClient
+            .from('products')
+            .select('payapp_url')
+            .eq('id', currentProduct.dbId)
+            .single();
+            
+        if (error || !product || !product.payapp_url) {
+            showError('결제 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
+            return;
+        }
+        
+        // Payapp 결제 페이지로 리다이렉트
+        // custom_data에 필요한 정보 포함
+        const customData = {
+            user_id: user.id,
+            product_id: currentProduct.dbId
+        };
+        
+        // Payapp URL에 custom_data 파라미터 추가
+        const payappUrl = new URL(product.payapp_url);
+        payappUrl.searchParams.set('custom_data', JSON.stringify(customData));
+        payappUrl.searchParams.set('buyer_email', user.email);
+        
+        // Payapp 결제 페이지로 이동
+        window.location.href = payappUrl.toString();
         
     } catch (error) {
         setLoadingState(false);

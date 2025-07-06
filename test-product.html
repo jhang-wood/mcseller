@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>테스트 상품 페이지 - MCSELLER</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="text-center">Payapp 테스트 상품</h3>
+                    </div>
+                    <div class="card-body">
+                        <h5>테스트 전자책</h5>
+                        <p class="text-muted">Payapp 결제 시스템 테스트용 상품입니다.</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="fs-4 fw-bold text-primary">₩10,000</span>
+                            <span class="badge bg-success">활성</span>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button id="purchase-btn" class="btn btn-primary btn-lg">
+                                <i class="fas fa-shopping-cart"></i> 지금 구매하기
+                            </button>
+                            <button id="admin-test-btn" class="btn btn-outline-secondary">
+                                관리자 테스트 (Webhook 시뮬레이션)
+                            </button>
+                        </div>
+                        
+                        <div id="status-message" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/env-loader.js"></script>
+    <script src="js/supabase-client-prod.js"></script>
+    <script src="js/payapp-integration.js"></script>
+    
+    <script>
+        let testProductId = null;
+        
+        // 페이지 로드 시 테스트 상품 생성
+        document.addEventListener('DOMContentLoaded', async function() {
+            await createTestProduct();
+            setupEventListeners();
+        });
+        
+        async function createTestProduct() {
+            try {
+                // Supabase 클라이언트 초기화 대기
+                let attempts = 0;
+                while (!window.supabaseClient && attempts < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+                
+                if (!window.supabaseClient) {
+                    showMessage('Supabase 클라이언트를 초기화할 수 없습니다.', 'danger');
+                    return;
+                }
+                
+                // 기존 테스트 상품 확인
+                const { data: existingProduct } = await window.supabaseClient
+                    .from('products')
+                    .select('*')
+                    .eq('title', 'Payapp 테스트 상품')
+                    .single();
+                
+                if (existingProduct) {
+                    testProductId = existingProduct.id;
+                    showMessage('기존 테스트 상품을 찾았습니다.', 'info');
+                    return;
+                }
+                
+                // 새 테스트 상품 생성
+                const { data: newProduct, error } = await window.supabaseClient
+                    .from('products')
+                    .insert({
+                        title: 'Payapp 테스트 상품',
+                        description: 'Payapp 결제 시스템 테스트용 전자책입니다.',
+                        price: 10000,
+                        product_type: 'ebook',
+                        image_url: '/images/test-product.jpg',
+                        content_url: '/content/test-ebook.pdf',
+                        payapp_url: 'https://payapp.kr/pay/test-url-here', // 실제 Payapp URL로 교체 필요
+                        is_active: true
+                    })
+                    .select()
+                    .single();
+                
+                if (error) {
+                    console.error('테스트 상품 생성 오류:', error);
+                    showMessage('테스트 상품 생성에 실패했습니다.', 'danger');
+                    return;
+                }
+                
+                testProductId = newProduct.id;
+                showMessage('테스트 상품이 생성되었습니다.', 'success');
+                
+            } catch (error) {
+                console.error('테스트 상품 설정 오류:', error);
+                showMessage('테스트 상품 설정 중 오류가 발생했습니다.', 'danger');
+            }
+        }
+        
+        function setupEventListeners() {
+            document.getElementById('purchase-btn').addEventListener('click', async function() {
+                if (!testProductId) {
+                    showMessage('테스트 상품이 준비되지 않았습니다.', 'warning');
+                    return;
+                }
+                
+                // 로그인 확인
+                const { data: { user } } = await window.supabaseClient.auth.getUser();
+                if (!user) {
+                    showMessage('로그인이 필요합니다. auth.html로 이동합니다.', 'warning');
+                    setTimeout(() => {
+                        window.location.href = '/auth.html?redirect=' + encodeURIComponent(window.location.href);
+                    }, 2000);
+                    return;
+                }
+                
+                // Payapp 결제 시작
+                if (window.payappIntegration) {
+                    const success = await window.payappIntegration.initiatePayment(testProductId, {
+                        name: user.email.split('@')[0]
+                    });
+                    
+                    if (!success) {
+                        showMessage('결제 시작에 실패했습니다. Payapp URL이 설정되었는지 확인해주세요.', 'danger');
+                    }
+                } else {
+                    showMessage('Payapp 결제 모듈이 로드되지 않았습니다.', 'danger');
+                }
+            });
+            
+            document.getElementById('admin-test-btn').addEventListener('click', async function() {
+                await simulateWebhook();
+            });
+        }
+        
+        async function simulateWebhook() {
+            if (!testProductId) {
+                showMessage('테스트 상품이 준비되지 않았습니다.', 'warning');
+                return;
+            }
+            
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            if (!user) {
+                showMessage('로그인이 필요합니다.', 'warning');
+                return;
+            }
+            
+            try {
+                const webhookData = {
+                    transaction_id: 'test_' + Date.now(),
+                    merchant_id: 'merchant_test',
+                    amount: 10000,
+                    product_name: 'Payapp 테스트 상품',
+                    buyer_email: user.email,
+                    buyer_name: user.email.split('@')[0],
+                    status: 'completed',
+                    custom_data: JSON.stringify({
+                        user_id: user.id,
+                        product_id: testProductId
+                    })
+                };
+                
+                const response = await fetch('/api/webhook/payapp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(webhookData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showMessage('Webhook 시뮬레이션 성공! 주문이 생성되었습니다.', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/mypage.html';
+                    }, 2000);
+                } else {
+                    showMessage('Webhook 시뮬레이션 실패: ' + result.error, 'danger');
+                }
+                
+            } catch (error) {
+                console.error('Webhook 시뮬레이션 오류:', error);
+                showMessage('Webhook 시뮬레이션 중 오류가 발생했습니다.', 'danger');
+            }
+        }
+        
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('status-message');
+            messageDiv.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            // 3초 후 자동 숨김
+            setTimeout(() => {
+                const alert = messageDiv.querySelector('.alert');
+                if (alert) {
+                    alert.classList.remove('show');
+                    setTimeout(() => alert.remove(), 150);
+                }
+            }, 3000);
+        }
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

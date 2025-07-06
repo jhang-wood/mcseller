@@ -8,9 +8,9 @@
 //  1. 여기에 실제 Supabase URL과 Anon Key를 정확히 입력해주세요. (가장 중요)
 // ===================================================================================
 // 환경 변수에서 Supabase 설정 가져오기
-// server.js를 통해 제공되는 환경 변수를 사용합니다
-const supabaseUrl = window.SUPABASE_URL || "https://rpcctgtmtplfahwtnglq.supabase.co";
-const supabaseAnonKey = window.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwY2N0Z3RtdHBsZmFod3RuZ2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEwNjUzMTEsImV4cCI6MjA2NjY0MTMxMX0.yv63jWBQIjbzRWh2w6fAu1vgs3W_wQvEL4ePnTD5Sss";
+// 프로덕션 환경에서는 반드시 실제 키를 사용하세요
+const supabaseUrl = window.SUPABASE_URL || "";
+const supabaseAnonKey = window.SUPABASE_ANON_KEY || "";
 
 // ===================================================================================
 //  클라이언트 초기화
