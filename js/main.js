@@ -26,6 +26,39 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // 약간의 지연 후 시작하여 모든 스크립트가 로드되도록 함
     setTimeout(waitForSupabase, 500);
+
+    // 로그인 버튼 클릭 시 로그인 페이지로 이동
+    const loginInfo = document.getElementById("login-info");
+    if (loginInfo) {
+        const loginBtn = loginInfo.querySelector("a");
+        if (loginBtn) {
+            loginBtn.addEventListener("click", function(e) {
+                e.preventDefault();
+                window.location.href = "auth.html";
+            });
+        }
+    }
+
+    // 로그아웃 버튼 클릭 시 Supabase 로그아웃
+    const logoutBtn = document.getElementById("profile-logout-link");
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", async function(e) {
+            e.preventDefault();
+            if (window.supabaseClient) {
+                await window.supabaseClient.auth.signOut();
+                updateUIAccordingToAuthState();
+            }
+        });
+    }
+
+    // 마이페이지 이동
+    const mypageBtn = document.getElementById("profile-mypage-link");
+    if (mypageBtn) {
+        mypageBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            window.location.href = "mypage.html";
+        });
+    }
 });
 
 // 페이지 재로드 시에도 초기화 (로그인 후 돌아올 때)
