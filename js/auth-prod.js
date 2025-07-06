@@ -99,11 +99,11 @@ function showResetForm() {
 async function handleLogin(e) {
     e.preventDefault();
     
-    const email = document.getElementById('loginEmail').value.trim();
+    const id = document.getElementById('loginId').value.trim();
     const password = document.getElementById('loginPassword').value;
     
-    if (!email || !password) {
-        showToast('이메일과 비밀번호를 입력해주세요.', 'warning');
+    if (!id || !password) {
+        showToast('아이디와 비밀번호를 입력해주세요.', 'warning');
         return;
     }
     
@@ -113,12 +113,27 @@ async function handleLogin(e) {
     submitBtn.disabled = true;
     
     try {
+        // 1. 아이디로 프로필 정보(이메일) 조회
+        const { data: profile, error: profileError } = await window.supabaseClient
+            .from('profiles')
+            .select('email')
+            .eq('username', id)
+            .single();
+
+        if (profileError || !profile) {
+            throw new Error('아이디 또는 비밀번호가 올바르지 않습니다.');
+        }
+
+        // 2. 조회한 이메일로 로그인 시도
         const { data, error } = await window.supabaseClient.auth.signInWithPassword({
-            email: email,
+            email: profile.email,
             password: password
         });
         
-        if (error) throw error;
+        if (error) {
+             // signInWithPassword에서도 비밀번호 오류는 'Invalid login credentials'로 반환
+             throw new Error('아이디 또는 비밀번호가 올바르지 않습니다.');
+        }
         
         if (data.user) {
             showToast('로그인 성공!', 'success');
@@ -133,8 +148,8 @@ async function handleLogin(e) {
         }
     } catch (error) {
         console.error('로그인 오류:', error);
-        
-        showToast(error.message || '로그인 중 오류가 발생했습니다.', 'error');
+        // 모든 로그인 관련 에러를 하나의 메시지로 통일하여 보안 강화
+        showToast('아이디 또는 비밀번호가 올바르지 않습니다.', 'error');
     } finally {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
@@ -146,12 +161,13 @@ async function handleSignup(e) {
     e.preventDefault();
     
     const name = document.getElementById('signupName').value.trim();
+    const id = document.getElementById('signupId').value.trim();
     const email = document.getElementById('signupEmail').value.trim();
     const password = document.getElementById('signupPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
     const agreeTerms = document.getElementById('agreeTerms').checked;
     
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !id || !email || !password || !confirmPassword) {
         showToast('모든 필드를 입력해주세요.', 'warning');
         return;
     }
@@ -172,47 +188,76 @@ async function handleSignup(e) {
     submitBtn.disabled = true;
     
     try {
-        const { data, error } = await window.supabaseClient.auth.signUp({
+        // 1. 아이디(username) 중복 확인
+        const { data: existingUser } = await window.supabaseClient
+            .from('profiles')
+            .select('username')
+            .eq('username', id)
+            .single();
+
+        if (existingUser) {
+            throw new Error('이미 사용 중인 아이디입니다.');
+        }
+
+        // 2. 이메일로 회원가입
+        const { data: signUpData, error: signUpError } = await window.supabaseClient.auth.signUp({
             email: email,
             password: password,
             options: {
-                data: {
-                    full_name: name
-                },
                 emailRedirectTo: undefined,
             }
         });
         
-        if (error) throw error;
+        if (signUpError) {
+            // Supabase의 기본 오류 메시지를 그대로 사용하거나 여기서 재정의
+            throw signUpError;
+        }
         
-        if (data.user) {
-            // 이메일 확인 없이 바로 로그인
-            showToast('🎉 가입 성공! 로그인 중...', 'success');
+        // 3. profiles 테이블에 추가 정보(이름, 아이디) 업데이트
+        if (signUpData.user) {
+            const { error: updateError } = await window.supabaseClient
+                .from('profiles')
+                .update({ full_name: name, username: id })
+                .eq('id', signUpData.user.id);
+
+            if (updateError) {
+                console.error('프로필 업데이트 오류:', updateError);
+                throw new Error('프로필 정보 저장에 실패했습니다. 관리자에게 문의하세요.');
+            }
+            
+            showToast('🎉 가입이 완료되었습니다. 바로 로그인됩니다.', 'success');
+            
+            // 자동 로그인을 위해 signInWithPassword를 다시 호출할 필요 없음
+            // signUp 후 세션이 자동으로 설정되므로, 페이지 리디렉션만 수행
             setTimeout(() => {
-                // URL에 리다이렉트 파라미터가 있으면 해당 페이지로, 없으면 메인 페이지로
                 const urlParams = new URLSearchParams(window.location.search);
                 const redirectTo = urlParams.get('redirect') || '/index.html';
                 window.location.href = redirectTo;
-            }, 1000);
+            }, 1500);
+        } else {
+             throw new Error('회원가입에 실패했으나 사용자가 생성되지 않았습니다.');
         }
+
     } catch (error) {
         console.error('회원가입 오류:', error);
         
-        // 다양한 회원가입 오류 처리
-        if (error.message?.includes('already registered') || error.message?.includes('already exists')) {
-            showToast('이미 가입된 이메일입니다. 로그인을 시도해주세요.', 'warning');
-            setTimeout(() => {
-                showLoginForm();
-            }, 2000);
-        } else if (error.message?.includes('invalid email')) {
-            showToast('올바른 이메일 형식을 입력해주세요.', 'warning');
-        } else if (error.message?.includes('weak password') || error.message?.includes('Password')) {
-            showToast('비밀번호는 최소 6자 이상이어야 합니다.', 'warning');
-        } else if (error.message?.includes('rate limit')) {
-            showToast('너무 많은 요청을 보냈습니다. 잠시 후 다시 시도해주세요.', 'warning');
-        } else {
-            showToast(error.message || '회원가입 중 오류가 발생했습니다.', 'error');
+        let errorMessage = '회원가입 중 오류가 발생했습니다.';
+        if (error.message) {
+            if (error.message.includes('already registered') || error.message.includes('User already registered')) {
+                errorMessage = '이미 가입된 이메일입니다.';
+            } else if (error.message.includes('이미 사용 중인 아이디입니다.')) {
+                errorMessage = '이미 사용 중인 아이디입니다.';
+            } else if (error.message.includes('password should be at least 6 characters')) {
+                errorMessage = '비밀번호는 최소 6자 이상이어야 합니다.';
+            } else if (error.message.includes('rate limit')) {
+                errorMessage = '너무 많은 요청을 보냈습니다. 잠시 후 다시 시도해주세요.';
+            } else if(error.message.includes('profile_username_key')) {
+                errorMessage = '이미 사용 중인 아이디입니다.'; // 데이터베이스 제약조건 위반 시
+            } else {
+                errorMessage = error.message;
+            }
         }
+        showToast(errorMessage, 'error');
     } finally {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;

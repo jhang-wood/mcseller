@@ -772,35 +772,30 @@
                                             </p>
                                         </div>
 
-                                        <form id="loginForm">
+                                        <form id="loginForm" novalidate>
                                             <div class="mb-3">
-                                                <label
-                                                    for="loginEmail"
-                                                    class="form-label"
-                                                    >이메일</label
+                                                <label for="loginId" class="form-label"
+                                                    >아이디</label
                                                 >
                                                 <input
-                                                    type="email"
-                                                    class="form-control form-control-lg"
-                                                    id="loginEmail"
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="loginId"
+                                                    placeholder="아이디를 입력하세요"
                                                     required
                                                 />
                                             </div>
-
                                             <div class="mb-3">
-                                                <label
-                                                    for="loginPassword"
-                                                    class="form-label"
+                                                <label for="loginPassword" class="form-label"
                                                     >비밀번호</label
                                                 >
                                                 <input
                                                     type="password"
-                                                    class="form-control form-control-lg"
+                                                    class="form-control"
                                                     id="loginPassword"
                                                     required
                                                 />
                                             </div>
-
                                             <div class="mb-3 form-check">
                                                 <input
                                                     type="checkbox"
@@ -814,7 +809,6 @@
                                                     로그인 상태 유지
                                                 </label>
                                             </div>
-
                                             <button
                                                 type="submit"
                                                 class="btn btn-premium btn-lg w-100 mb-3"
@@ -876,44 +870,49 @@
                                             </p>
                                         </div>
 
-                                        <form id="signupForm">
+                                        <form id="signupForm" novalidate>
                                             <div class="mb-3">
-                                                <label
-                                                    for="signupName"
-                                                    class="form-label"
+                                                <label for="signupName" class="form-label"
                                                     >이름</label
                                                 >
                                                 <input
                                                     type="text"
-                                                    class="form-control form-control-lg"
+                                                    class="form-control"
                                                     id="signupName"
+                                                    placeholder="이름을 입력하세요"
                                                     required
                                                 />
                                             </div>
-
                                             <div class="mb-3">
-                                                <label
-                                                    for="signupEmail"
-                                                    class="form-label"
+                                                <label for="signupId" class="form-label"
+                                                    >아이디</label
+                                                >
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="signupId"
+                                                    placeholder="사용할 아이디를 입력하세요"
+                                                    required
+                                                />
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="signupEmail" class="form-label"
                                                     >이메일</label
                                                 >
                                                 <input
                                                     type="email"
-                                                    class="form-control form-control-lg"
+                                                    class="form-control"
                                                     id="signupEmail"
                                                     required
                                                 />
                                             </div>
-
                                             <div class="mb-3">
-                                                <label
-                                                    for="signupPassword"
-                                                    class="form-label"
+                                                <label for="signupPassword" class="form-label"
                                                     >비밀번호</label
                                                 >
                                                 <input
                                                     type="password"
-                                                    class="form-control form-control-lg"
+                                                    class="form-control"
                                                     id="signupPassword"
                                                     required
                                                     minlength="6"
@@ -922,21 +921,17 @@
                                                     최소 6자 이상 입력해주세요
                                                 </div>
                                             </div>
-
                                             <div class="mb-3">
-                                                <label
-                                                    for="confirmPassword"
-                                                    class="form-label"
+                                                <label for="confirmPassword" class="form-label"
                                                     >비밀번호 확인</label
                                                 >
                                                 <input
                                                     type="password"
-                                                    class="form-control form-control-lg"
+                                                    class="form-control"
                                                     id="confirmPassword"
                                                     required
                                                 />
                                             </div>
-
                                             <div class="mb-3 form-check">
                                                 <input
                                                     type="checkbox"
@@ -961,7 +956,6 @@
                                                     >에 동의합니다
                                                 </label>
                                             </div>
-
                                             <button
                                                 type="submit"
                                                 class="btn btn-primary btn-lg w-100 mb-3"
