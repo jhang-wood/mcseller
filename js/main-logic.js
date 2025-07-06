@@ -430,6 +430,66 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("MCSELLER 메인 로직 초기화 완료");
 });
 
+// AI Timer countdown
+function updateAiCountdown() {
+    const now = new Date();
+    const endOfDay = new Date(now);
+    endOfDay.setHours(23, 59, 59, 999);
+    const timeLeft = endOfDay.getTime() - now.getTime();
+    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+    // Update AI timer
+    const aiTimer = document.getElementById("ai-countdown");
+    if (aiTimer) {
+        aiTimer.innerHTML = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    }
+
+    // Update other timer displays if they exist
+    const timerElements = document.querySelectorAll(".timer");
+    timerElements.forEach((timer) => {
+        timer.innerHTML = `
+            <span class="hours">${hours.toString().padStart(2, "0")}</span>:
+            <span class="minutes">${minutes.toString().padStart(2, "0")}</span>:
+            <span class="seconds">${seconds.toString().padStart(2, "0")}</span>
+        `;
+    });
+}
+
+// Update countdown every second
+setInterval(updateAiCountdown, 1000);
+updateAiCountdown(); // Initial call
+
+// Service Worker 등록
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker
+        .register("/sw.js")
+        .then(function (registration) {
+            console.log("Service Worker 등록 성공:", registration.scope);
+            
+            // 업데이트 체크
+            registration.addEventListener("updatefound", () => {
+                const newWorker = registration.installing;
+                newWorker.addEventListener("statechange", () => {
+                    if (newWorker.state === "installed") {
+                        if (navigator.serviceWorker.controller) {
+                            console.log("새 콘텐츠를 사용할 수 있습니다.");
+                            if (confirm("새 버전이 사용 가능합니다. 페이지를 새로고침하시겠습니까?")) {
+                                window.location.reload();
+                            }
+                        } else {
+                            console.log("오프라인 사용을 위해 콘텐츠가 캐시되었습니다.");
+                        }
+                    }
+                });
+            });
+        })
+        .catch(function (error) {
+            console.log("Service Worker 등록 실패:", error);
+        });
+}
+
 // PWA 설치 관련
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
