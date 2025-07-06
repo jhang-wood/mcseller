@@ -1,0 +1,68 @@
+[Replit AI 작업 지시서]
+
+1. @Context (작업 맥락):
+
+    작업 대상 파일: index.html 및 관련 스크립트 파일 (js/modern-main.js 등)
+
+    핵심 작업: index.html에 어지럽게 흩어져 있는 모든 인라인 자바스크립트 코드를 하나의 새로운 파일로 통합하고, 구조적인 문제를 해결합니다.
+
+2. @Problem (문제 정의):
+
+    index.html 파일 하단의 <script> 태그 내부에 코드가 심각하게 중복되고, 이벤트 리스너가 여러 번 선언되어 서로 충돌하고 있습니다. 이 구조적 결함이 예측 불가능한 SyntaxError를 포함한 여러 오류를 유발하여 UI 렌더링을 완전히 막고 있습니다.
+
+3. @Instructions (단계별 상세 지시):
+
+[1단계: 코드 통합을 위한 새 파일 생성]
+
+    js/ 디렉토리 안에 main-logic.js 라는 이름의 새 자바스크립트 파일을 생성합니다.
+
+[2단계: index.html의 모든 인라인 스크립트 이전]
+
+    index.html 파일 가장 아래쪽에 있는 모든 <script>...</script> 블록 안의 자바스크립트 코드 전체를 복사합니다. (AOS.init 부터 마지막 }); 까지 전부)
+
+    복사한 코드를 방금 생성한 js/main-logic.js 파일에 붙여넣기 합니다.
+
+[3단계: js/main-logic.js 코드 재구성 (리팩토링)]
+
+    하나의 DOMContentLoaded 리스너로 통합: 파일 내에 흩어져 있는 여러 개의 document.addEventListener("DOMContentLoaded", ...) 구문을 단 하나로 합칩니다.
+
+    중복 함수 제거: updateNavigationUI와 같이 여러 번 선언된 함수들을 하나만 남기고 모두 삭제합니다.
+
+    코드 정리 및 순서 조정: 모든 코드를 아래의 논리적인 순서대로 재배치하고 정리합니다.
+
+        전역 변수 선언 (예: courseLandings)
+
+        핵심 함수 정의 (예: updateNavigationUI, openCourseLanding, closeLanding, handleAiMasterSignup 등)
+
+        단일 DOMContentLoaded 이벤트 리스너
+
+            이 리스너 안에서 AOS.init(), checkLoginStatus(), 스크롤 이벤트, 클릭 이벤트 등 모든 초기화 및 이벤트 관련 로직을 실행하도록 코드를 통합합니다.
+
+    기존 오류 수정: 이 과정에서 이전에 발견했던 openCourseLanding 함수 내의 불필요한 쉼표(,) 오류도 반드시 수정합니다.
+
+[4단계: index.html 정리]
+
+    index.html에서 2단계에서 복사했던 모든 인라인 자바스크립트 코드를 완전히 삭제합니다. <script> 태그 안이 비어있어야 합니다.
+
+    그 자리에, 새로 만든 파일을 불러오는 아래의 스크립트 태그 한 줄만 추가합니다. 다른 스크립트 파일(modern-main.js 등)보다 뒤에 위치해야 합니다.
+    HTML
+
+    <script src="js/main-logic.js"></script>
+
+    모든 변경 사항을 저장합니다.
+
+4. @Constraints (준수해야 할 제약 조건):
+
+    index.html의 HTML 구조나 CSS는 절대 수정하지 마십시오. 오직 <script> 태그 영역만 수정해야 합니다.
+
+    최종적으로 index.html에는 비어있는 <script> 태그가 남아있어서는 안 됩니다.
+
+5. @Verification (결과 확인 방법):
+
+    수정 후 페이지를 새로고침하면, 웹페이지의 모든 UI가 완벽하게 표시되어야 합니다.
+
+    브라우저 개발자 도구의 콘솔 창에 더 이상 Uncaught SyntaxError 오류가 나타나지 않아야 합니다.
+
+    스크롤 애니메이션, 무료강의 타이머, 강의 카드 클릭 시 팝업 등 모든 기능이 정상적으로 작동해야 합니다.
+
+    터미널에서 git status를 실행하면 deleted: ... (기존 인라인 스크립트 삭제), new file: js/main-logic.js 와 같이 변경 사항이 정상적으로 감지되어야 합니다.
