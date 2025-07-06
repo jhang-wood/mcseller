@@ -33,12 +33,14 @@
         if (!session || !session.user) {
             console.log('❌ 로그인 세션이 없음, 로그인 페이지로 이동');
             setTimeout(() => {
-                window.location.href = 'auth.html';
+                window.location.href = 'auth.html?redirect=' + encodeURIComponent(window.location.pathname);
             }, 1000); // 1초 후 이동
             return;
         }
         
-        console.log('✅ 사용자 인증 확인 완료:', session.user.email);
+        // 이메일 확인 체크 제거 - 바로 진행
+        
+        console.log('✅ 사용자 인증 완료:', session.user.email);
         
         // 전역 사용자 정보 설정
         window.currentUser = session.user;

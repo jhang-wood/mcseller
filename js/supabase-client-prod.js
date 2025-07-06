@@ -19,14 +19,15 @@ async function initializeSupabaseClient() {
     }
     
     try {
-        // Supabase 클라이언트 생성
+        // Supabase 클라이언트 생성 (이메일 확인 비활성화)
         const client = supabase.createClient(supabaseUrl, supabaseAnonKey, {
             auth: {
                 autoRefreshToken: true,
                 persistSession: true,
                 detectSessionInUrl: true,
                 storage: localStorage,
-                storageKey: 'mcseller-auth'
+                storageKey: 'mcseller-auth',
+                confirmEmail: false
             },
             global: {
                 headers: {

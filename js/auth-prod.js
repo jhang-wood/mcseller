@@ -133,6 +133,7 @@ async function handleLogin(e) {
         }
     } catch (error) {
         console.error('로그인 오류:', error);
+        
         showToast(error.message || '로그인 중 오류가 발생했습니다.', 'error');
     } finally {
         submitBtn.innerHTML = originalText;
@@ -184,26 +185,33 @@ async function handleSignup(e) {
         if (error) throw error;
         
         if (data.user) {
-            // 이메일 확인이 필요한 경우
-            if (data.user.email_confirmation_sent_at) {
-                showToast('가입 성공! 이메일을 확인해주세요.', 'success');
-                setTimeout(() => {
-                    showLoginForm();
-                }, 2000);
-            } else {
-                // 바로 로그인 가능한 경우
-                showToast('가입 성공! 로그인 중...', 'success');
-                setTimeout(() => {
-                    // URL에 리다이렉트 파라미터가 있으면 해당 페이지로, 없으면 메인 페이지로
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const redirectTo = urlParams.get('redirect') || '/index.html';
-                    window.location.href = redirectTo;
-                }, 1000);
-            }
+            // 이메일 확인 없이 바로 로그인
+            showToast('🎉 가입 성공! 로그인 중...', 'success');
+            setTimeout(() => {
+                // URL에 리다이렉트 파라미터가 있으면 해당 페이지로, 없으면 메인 페이지로
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirectTo = urlParams.get('redirect') || '/index.html';
+                window.location.href = redirectTo;
+            }, 1000);
         }
     } catch (error) {
         console.error('회원가입 오류:', error);
-        showToast(error.message || '회원가입 중 오류가 발생했습니다.', 'error');
+        
+        // 다양한 회원가입 오류 처리
+        if (error.message?.includes('already registered') || error.message?.includes('already exists')) {
+            showToast('이미 가입된 이메일입니다. 로그인을 시도해주세요.', 'warning');
+            setTimeout(() => {
+                showLoginForm();
+            }, 2000);
+        } else if (error.message?.includes('invalid email')) {
+            showToast('올바른 이메일 형식을 입력해주세요.', 'warning');
+        } else if (error.message?.includes('weak password') || error.message?.includes('Password')) {
+            showToast('비밀번호는 최소 6자 이상이어야 합니다.', 'warning');
+        } else if (error.message?.includes('rate limit')) {
+            showToast('너무 많은 요청을 보냈습니다. 잠시 후 다시 시도해주세요.', 'warning');
+        } else {
+            showToast(error.message || '회원가입 중 오류가 발생했습니다.', 'error');
+        }
     } finally {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
@@ -239,7 +247,20 @@ async function handlePasswordReset(e) {
         }, 2000);
     } catch (error) {
         console.error('비밀번호 재설정 오류:', error);
-        showToast(error.message || '비밀번호 재설정 중 오류가 발생했습니다.', 'error');
+        
+        // 비밀번호 재설정 오류 처리
+        if (error.message?.includes('invalid email')) {
+            showToast('올바른 이메일 형식을 입력해주세요.', 'warning');
+        } else if (error.message?.includes('not found') || error.message?.includes('user not found')) {
+            showToast('등록되지 않은 이메일입니다. 회원가입을 먼저 진행해주세요.', 'warning');
+            setTimeout(() => {
+                showSignupForm();
+            }, 2000);
+        } else if (error.message?.includes('rate limit')) {
+            showToast('너무 많은 요청을 보냈습니다. 잠시 후 다시 시도해주세요.', 'warning');
+        } else {
+            showToast(error.message || '비밀번호 재설정 중 오류가 발생했습니다.', 'error');
+        }
     } finally {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;

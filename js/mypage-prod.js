@@ -11,47 +11,103 @@ async function initializeMyPage() {
         });
     }
     
-    // 로그인 확인
-    const { data: { user } } = await window.supabaseClient.auth.getUser();
+    // 로그인 확인 (세션 기반으로 더 안정적)
+    const { data: { session }, error } = await window.supabaseClient.auth.getSession();
     
-    if (!user) {
-        alert('로그인이 필요합니다.');
-        window.location.href = '/auth.html';
+    if (error) {
+        console.error('세션 확인 오류:', error);
+        showAuthError('인증 오류가 발생했습니다. 다시 로그인해주세요.');
         return;
     }
     
-    // 사용자 정보 로드
-    await loadUserInfo(user);
+    if (!session || !session.user) {
+        showAuthError('로그인이 필요합니다.');
+        return;
+    }
     
-    // 구매한 콘텐츠 로드
-    await loadPurchasedContent();
+    // 이메일 확인 체크 제거 - 바로 진행
+    
+    try {
+        // 사용자 정보 로드
+        await loadUserInfo(session.user);
+        
+        // 구매한 콘텐츠 로드
+        await loadPurchasedContent();
+        
+        // 성공적으로 로드된 경우 UI 표시
+        document.body.style.opacity = '1';
+        
+    } catch (error) {
+        console.error('마이페이지 로드 오류:', error);
+        showAuthError('페이지 로드 중 오류가 발생했습니다. 새로고침을 시도해주세요.');
+    }
 }
+
+// 인증 오류 표시 함수
+function showAuthError(message) {
+    document.body.innerHTML = `
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="alert alert-warning text-center">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                        <h4>인증 필요</h4>
+                        <p>${message}</p>
+                        <a href="/auth.html" class="btn btn-primary">로그인하기</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// 이메일 확인 관련 함수 제거됨
 
 // 사용자 정보 로드
 async function loadUserInfo(user) {
     try {
         // 프로필 정보 조회
-        const { data: profile } = await window.supabaseClient
+        const { data: profile, error: profileError } = await window.supabaseClient
             .from('profiles')
             .select('*')
             .eq('id', user.id)
             .single();
         
-        // UI 업데이트
-        document.getElementById('userEmail').textContent = user.email;
-        document.getElementById('userName').textContent = profile?.full_name || '회원님';
-        document.getElementById('userPoints').textContent = `${(profile?.points || 0).toLocaleString()}원`;
+        if (profileError && profileError.code !== 'PGRST116') { // PGRST116은 행이 없음을 의미
+            console.warn('프로필 정보 조회 오류:', profileError);
+        }
+        
+        // UI 업데이트 (요소 존재 여부 확인)
+        const userEmailElement = document.getElementById('userEmail');
+        const userNameElement = document.getElementById('userName');
+        const userPointsElement = document.getElementById('userPoints');
+        const purchaseCountElement = document.getElementById('purchaseCount');
+        
+        if (userEmailElement) userEmailElement.textContent = user.email;
+        if (userNameElement) userNameElement.textContent = profile?.full_name || user.user_metadata?.full_name || '회원님';
+        if (userPointsElement) userPointsElement.textContent = `${(profile?.points || 0).toLocaleString()}원`;
         
         // 구매 건수 조회
-        const { count } = await window.supabaseClient
+        const { count, error: countError } = await window.supabaseClient
             .from('purchased_content')
             .select('*', { count: 'exact', head: true })
             .eq('user_id', user.id);
         
-        document.getElementById('purchaseCount').textContent = `${count || 0}개`;
+        if (countError) {
+            console.warn('구매 건수 조회 오류:', countError);
+        }
+        
+        if (purchaseCountElement) purchaseCountElement.textContent = `${count || 0}개`;
         
     } catch (error) {
-        console.error('사용자 정보 로드 오류:', error);
+        console.error('사용자 정보 로드 중 예상치 못한 오류:', error);
+        
+        // 기본 정보라도 표시
+        const userEmailElement = document.getElementById('userEmail');
+        const userNameElement = document.getElementById('userName');
+        
+        if (userEmailElement) userEmailElement.textContent = user.email;
+        if (userNameElement) userNameElement.textContent = user.user_metadata?.full_name || '회원님';
     }
 }
 
