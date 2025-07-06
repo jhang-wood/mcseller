@@ -3932,8 +3932,7 @@
         <!-- Supabase -->
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
         
-        <!-- 임시 디버깅 스크립트 -->
-        <script src="debug-ui.js"></script>
+        <!-- 디버깅 스크립트 제거됨 -->
         
         <!-- MCSELLER Scripts -->
         <script src="js/supabase-client.js"></script>
@@ -4118,9 +4117,8 @@
 
                 // 초기 상태 설정 (안전하게)
 
-                // checkAndUpdateUI 함수가 제거되어 더 이상 호출하지 않음
-                setTimeout(() => {
-                    console.log("UI 초기화는 main.js에서 처리됩니다.");
+                // UI 초기화는 main.js에서 자동으로 처리됩니다
+                console.log("UI 초기화는 main.js에서 처리됩니다.");
 
                     // Achievement 값 보호 - 2천만원으로 고정
 

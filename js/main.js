@@ -24,7 +24,8 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
     
-    waitForSupabase();
+    // 약간의 지연 후 시작하여 모든 스크립트가 로드되도록 함
+    setTimeout(waitForSupabase, 500);
 });
 
 function initializeMainPage() {
