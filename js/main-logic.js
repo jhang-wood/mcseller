@@ -325,30 +325,47 @@ function handleAiMasterSignup() {
 
 async function checkLoginStatus() {
     try {
+        // Supabase 클라이언트가 준비될 때까지 더 오래 대기
         if (!window.supabaseClient) {
-            console.log("Supabase 클라이언트를 기다리는 중...");
-            return false;
+            console.log("📡 Supabase 클라이언트 대기 중...");
+            let attempts = 0;
+            const maxAttempts = 50; // 5초 대기
+            
+            while (!window.supabaseClient && attempts < maxAttempts) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
+            if (!window.supabaseClient) {
+                console.warn("❌ Supabase 클라이언트를 찾을 수 없음 - 로그인 상태 확인 실패");
+                updateNavigationUI(null);
+                return false;
+            }
         }
         
+        console.log("🔍 메인페이지 로그인 상태 확인 중...");
         const { data: { session }, error } = await window.supabaseClient.auth.getSession();
         
         if (error) {
-            console.error("세션 확인 오류:", error);
+            console.error("❌ 세션 확인 오류:", error);
+            updateNavigationUI(null);
             return false;
         }
         
         if (session && session.user) {
-            console.log("✅ 로그인 상태 확인됨:", session.user.email);
+            console.log("✅ 메인페이지 로그인 상태 확인됨:", session.user.email);
             window.currentUser = session.user;
             updateNavigationUI(session.user);
             return session.user;
         } else {
-            console.log("❌ 로그인되지 않음");
+            console.log("📝 메인페이지 로그인되지 않음 - 게스트 모드");
+            window.currentUser = null;
             updateNavigationUI(null);
             return false;
         }
     } catch (error) {
-        console.error("로그인 상태 확인 중 오류:", error);
+        console.error("❌ 로그인 상태 확인 중 예상치 못한 오류:", error);
+        window.currentUser = null;
         updateNavigationUI(null);
         return false;
     }
@@ -380,19 +397,60 @@ async function logout() {
     }
 }
 
+// 메인페이지 인증 초기화
+async function initializeMainPageAuth() {
+    try {
+        console.log('🔄 메인페이지 인증 초기화 시작...');
+        
+        // Supabase 클라이언트 대기
+        if (!window.supabaseClient) {
+            console.log('⏳ Supabase 클라이언트 대기 중...');
+            await new Promise(resolve => {
+                const checkClient = () => {
+                    if (window.supabaseClient) {
+                        resolve();
+                    } else {
+                        setTimeout(checkClient, 100);
+                    }
+                };
+                checkClient();
+            });
+        }
+        
+        console.log('✅ Supabase 클라이언트 준비 완료');
+        
+        // 인증 상태 리스너 설정
+        setupAuthStateListener();
+        
+        // 초기 로그인 상태 확인
+        await checkLoginStatus();
+        
+        // 페이지 가시성 변화 감지 (탭 전환 등)
+        setupVisibilityChangeListener();
+        
+        console.log('✅ 메인페이지 인증 초기화 완료');
+        
+    } catch (error) {
+        console.error('❌ 메인페이지 인증 초기화 중 오류:', error);
+    }
+}
+
 // Supabase 인증 상태 변화 리스너 설정
 function setupAuthStateListener() {
     if (window.supabaseClient) {
+        console.log('🔄 인증 상태 리스너 설정...');
+        
         window.supabaseClient.auth.onAuthStateChange((event, session) => {
-            console.log("인증 상태 변화:", event, session?.user?.email);
+            console.log("🔄 메인페이지 인증 상태 변화:", event, session?.user?.email);
             
             if (event === 'SIGNED_IN' && session?.user) {
                 window.currentUser = session.user;
                 updateNavigationUI(session.user);
-                showToast("로그인되었습니다.", "success");
+                console.log("✅ 메인페이지에서 로그인 감지:", session.user.email);
             } else if (event === 'SIGNED_OUT') {
                 window.currentUser = null;
                 updateNavigationUI(null);
+                console.log("❌ 메인페이지에서 로그아웃 감지");
             }
         });
     }
@@ -406,6 +464,9 @@ document.addEventListener("DOMContentLoaded", function () {
         once: true,
         offset: 100,
     });
+
+    // Supabase 클라이언트 초기화 대기 및 인증 상태 확인
+    initializeMainPageAuth();
 
     // Achievement 값 보호 - 2천만원으로 고정
     setTimeout(() => {
@@ -534,6 +595,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
     console.log("MCSELLER 메인 로직 초기화 완료");
 });
+
+// 페이지 가시성 변화 감지 (탭 전환 대응)
+function setupVisibilityChangeListener() {
+    document.addEventListener('visibilitychange', async () => {
+        if (!document.hidden) {
+            // 페이지가 다시 보이게 되었을 때
+            console.log('🔄 페이지 포커스 복귀 - 인증 상태 재확인');
+            await checkLoginStatus();
+        }
+    });
+    
+    // 윈도우 포커스 이벤트도 감지
+    window.addEventListener('focus', async () => {
+        console.log('🔄 윈도우 포커스 복귀 - 인증 상태 재확인');
+        await checkLoginStatus();
+    });
+}
 
 // AI Timer countdown
 function updateAiCountdown() {

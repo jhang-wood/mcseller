@@ -7,7 +7,7 @@
 async function initializeSupabaseClient() {
     // ⚠️ 사용자가 제공한 실제 Supabase 프로젝트 정보로 교체하세요
     const SUPABASE_URL = "https://rpcctgtmtplfahwtnglq.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwY2N0Z3RtdHBsZmFod3RuZ2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEwNjUzMTEsImV4cCI6MjA2NjY0MTMxMX0.yv63jWBQIjbzRWh2w6fAu1vgs3W_wQvEL4ePnTD5Sss";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwY2N0Z3RtdHBsZmFod3RuZ2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUxOTA1MDksImV4cCI6MjA1MDc2NjUwOX0.7n3yEJCZLRTnFvAhD_Nq2oepgAAhcqFqH_rGQbAhBjo";
     
     const supabaseUrl = SUPABASE_URL;
     const supabaseAnonKey = SUPABASE_ANON_KEY;
