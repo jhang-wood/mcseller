@@ -141,9 +141,8 @@ async function handleLogin(e) {
             // 로그인 성공 후 메인 페이지로 이동
             setTimeout(() => {
                 // URL에 리다이렉트 파라미터가 있으면 해당 페이지로, 없으면 메인 페이지로
-                const urlParams = new URLSearchParams(window.location.search);
-                const redirectTo = urlParams.get('redirect') || '/index.html';
-                window.location.href = redirectTo;
+                const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/index.html';
+                window.location.href = redirectUrl;
             }, 1000);
         }
     } catch (error) {
@@ -193,7 +192,7 @@ async function handleSignup(e) {
             .from('profiles')
             .select('username')
             .eq('username', id)
-            .single();
+            .maybeSingle(); // 데이터가 없어도 오류 아님
 
         if (existingUser) {
             throw new Error('이미 사용 중인 아이디입니다.');
@@ -202,10 +201,8 @@ async function handleSignup(e) {
         // 2. 이메일로 회원가입
         const { data: signUpData, error: signUpError } = await window.supabaseClient.auth.signUp({
             email: email,
-            password: password,
-            options: {
-                emailRedirectTo: undefined,
-            }
+            password: password
+            // 이메일 확인 비활성화는 Supabase 프로젝트 설정에서 처리하는 것을 권장
         });
         
         if (signUpError) {
@@ -215,6 +212,9 @@ async function handleSignup(e) {
         
         // 3. profiles 테이블에 추가 정보(이름, 아이디) 업데이트
         if (signUpData.user) {
+            // 'handle_new_user' 트리거가 실행될 시간을 약간 기다려줌
+            await new Promise(r => setTimeout(r, 500)); 
+
             const { error: updateError } = await window.supabaseClient
                 .from('profiles')
                 .update({ full_name: name, username: id })
@@ -222,17 +222,16 @@ async function handleSignup(e) {
 
             if (updateError) {
                 console.error('프로필 업데이트 오류:', updateError);
+                // 여기서 가입된 사용자를 롤백하는 로직을 추가할 수 있으나, 복잡하므로 에러 알림 처리
                 throw new Error('프로필 정보 저장에 실패했습니다. 관리자에게 문의하세요.');
             }
             
             showToast('🎉 가입이 완료되었습니다. 바로 로그인됩니다.', 'success');
             
-            // 자동 로그인을 위해 signInWithPassword를 다시 호출할 필요 없음
             // signUp 후 세션이 자동으로 설정되므로, 페이지 리디렉션만 수행
             setTimeout(() => {
-                const urlParams = new URLSearchParams(window.location.search);
-                const redirectTo = urlParams.get('redirect') || '/index.html';
-                window.location.href = redirectTo;
+                const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/index.html';
+                window.location.href = redirectUrl;
             }, 1500);
         } else {
              throw new Error('회원가입에 실패했으나 사용자가 생성되지 않았습니다.');
@@ -243,18 +242,16 @@ async function handleSignup(e) {
         
         let errorMessage = '회원가입 중 오류가 발생했습니다.';
         if (error.message) {
-            if (error.message.includes('already registered') || error.message.includes('User already registered')) {
+            if (error.message.includes('User already registered')) {
                 errorMessage = '이미 가입된 이메일입니다.';
-            } else if (error.message.includes('이미 사용 중인 아이디입니다.')) {
+            } else if (error.message.includes('already being used') || error.message.includes('profiles_username_key')) {
                 errorMessage = '이미 사용 중인 아이디입니다.';
-            } else if (error.message.includes('password should be at least 6 characters')) {
+            } else if (error.message.includes('should be at least 6 characters')) {
                 errorMessage = '비밀번호는 최소 6자 이상이어야 합니다.';
             } else if (error.message.includes('rate limit')) {
                 errorMessage = '너무 많은 요청을 보냈습니다. 잠시 후 다시 시도해주세요.';
-            } else if(error.message.includes('profile_username_key')) {
-                errorMessage = '이미 사용 중인 아이디입니다.'; // 데이터베이스 제약조건 위반 시
             } else {
-                errorMessage = error.message;
+                errorMessage = error.message; // 직접 던진 오류 메시지 포함
             }
         }
         showToast(errorMessage, 'error');

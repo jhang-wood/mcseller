@@ -145,3 +145,21 @@ WHERE email = '관리자이메일@example.com';
 ## 연락처
 
 기술적 문제가 발생하면 개발팀에 문의하세요.
+
+## 추가 정보
+
+### 데이터베이스 스키마 수정
+
+1. **profiles 테이블의 username 컬럼에 UNIQUE 제약 조건 추가**
+   ```sql
+   -- 중요: 실행 전, 기존 데이터에 중복된 username이 없는지 먼저 확인하세요.
+   ALTER TABLE public.profiles
+   ADD CONSTRAINT profiles_username_key UNIQUE (username);
+
+   -- 2. username이 NULL인 경우를 허용하지 않도록 설정 (필요 시)
+   -- 모든 사용자가 아이디를 갖게 하려면 이 쿼리를 실행하세요.
+   -- ALTER TABLE public.profiles ALTER COLUMN username SET NOT NULL;
+
+   -- 3. username 검색 성능 향상을 위한 인덱스 추가
+   CREATE INDEX IF NOT EXISTS idx_profiles_username ON public.profiles(username);
+   ```
