@@ -204,7 +204,11 @@ Changelog:
   * Unified session management across all pages using protect-page.js
   * Added Supabase clients to content viewers (video-viewer.html, ebook-viewer.html)
   * Fixed main.js UI state management with proper element targeting
-  * Platform now has stable login/logout flow without redirect loops
+  * Removed duplicate UI manipulation from index.html inline scripts
+  * Fixed mobile-utils.js setupVibration function missing error
+  * Login now redirects to index.html instead of mypage.html for better UX
+  * Added real-time auth state change detection for seamless UI updates
+  * Platform now has stable login/logout flow with proper content display
 ```
 
 ## User Preferences

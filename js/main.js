@@ -28,6 +28,21 @@ document.addEventListener("DOMContentLoaded", function() {
     setTimeout(waitForSupabase, 500);
 });
 
+// 페이지 재로드 시에도 초기화 (로그인 후 돌아올 때)
+window.addEventListener('pageshow', function(event) {
+    // 뒤로가기나 새로고침으로 페이지에 돌아온 경우
+    if (event.persisted || window.performance.navigation.type === 2) {
+        console.log("페이지 재진입 감지 - 재초기화");
+        setTimeout(() => {
+            if (window.supabaseClient) {
+                updateUIAccordingToAuthState();
+            }
+        }, 100);
+    }
+});
+
+// 인증 상태 변경 감지를 setupAuthStateListener에서 처리
+
 function initializeMainPage() {
     console.log("✅ Supabase 준비 완료. 메인 페이지 로직을 초기화합니다.");
 
@@ -45,6 +60,26 @@ function initializeMainPage() {
 
     // PWA 및 성능 최적화
     initializePerformanceOptimizations();
+    
+    // 인증 상태 변경 리스너 설정
+    setupAuthStateListener();
+}
+
+// 인증 상태 변경 리스너 설정
+function setupAuthStateListener() {
+    if (window.supabaseClient) {
+        window.supabaseClient.auth.onAuthStateChange((event, session) => {
+            console.log('인증 상태 변경:', event, session?.user?.email);
+            
+            // 로그인/로그아웃 시 UI 즉시 업데이트
+            if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+                setTimeout(() => {
+                    updateUIAccordingToAuthState();
+                }, 100);
+            }
+        });
+        console.log("✅ 인증 상태 변경 리스너 설정 완료");
+    }
 }
 
 // ===================================================================================
@@ -60,68 +95,51 @@ async function updateUIAccordingToAuthState() {
         console.log("현재 세션 상태:", session ? "로그인됨" : "로그아웃됨");
         
         if (session && session.user) {
-            // 로그인 상태 UI - 실제 HTML ID에 맞춤
-            console.log("✅ 로그인 상태 UI 업데이트:", session.user.email);
-            
             // 로그인 상태 UI 업데이트
-            console.log("로그인 상태 UI 요소 검색 중...");
+            console.log("✅ 로그인됨:", session.user.email);
             
-            // 다양한 방법으로 요소 찾기
-            const loginInfo = document.getElementById("login-info") || 
-                             document.querySelector("#login-info") ||
-                             document.querySelector('[id="login-info"]');
-            
-            const profileDropdown = document.getElementById("profile-dropdown") ||
-                                  document.querySelector("#profile-dropdown") ||
-                                  document.querySelector('[id="profile-dropdown"]');
-            
-            const startButton = document.getElementById("start-button") ||
-                              document.querySelector("#start-button") ||
-                              document.querySelector('[id="start-button"]');
-            
-            console.log("찾은 요소들:", { loginInfo: !!loginInfo, profileDropdown: !!profileDropdown, startButton: !!startButton });
+            const loginInfo = document.getElementById("login-info");
+            const profileDropdown = document.getElementById("profile-dropdown");
+            const startButton = document.getElementById("start-button");
             
             // 로그인 상태: 로그인 버튼 숨기고 프로필 드롭다운 표시
-            if (loginInfo) {
-                loginInfo.style.display = 'none';  // 로그인 버튼 숨김
-                console.log("✅ login-info 숨김");
+            if (loginInfo) loginInfo.style.display = 'none';
+            if (profileDropdown) profileDropdown.style.display = 'block';
+            if (startButton) startButton.style.display = 'none';
+            
+            // 사용자 정보 업데이트
+            const profileText = document.querySelector("#profile-dropdown .dropdown-toggle");
+            const userEmailDisplay = document.querySelector("#profile-dropdown .text-muted");
+            const profileMypageLink = document.querySelector("#profile-dropdown a[href*='mypage'], #profile-dropdown a[href*='admin']");
+            
+            if (profileText) {
+                profileText.innerHTML = '<i class="fas fa-user me-2"></i>회원';
             }
             
-            if (profileDropdown) {
-                profileDropdown.style.display = 'block';  // 프로필 드롭다운 표시
-                console.log("✅ profile-dropdown 표시");
+            if (userEmailDisplay) {
+                userEmailDisplay.textContent = session.user.email;
             }
             
-            if (startButton) {
-                startButton.style.display = 'none';  // 시작하기 버튼 숨김
-                console.log("✅ start-button 숨김");
+            if (profileMypageLink) {
+                profileMypageLink.href = "mypage.html";
+                profileMypageLink.innerHTML = '<i class="fas fa-user me-2"></i>마이페이지';
             }
             
             // 전역 사용자 정보 설정
             window.currentUser = session.user;
 
         } else {
-            // 로그아웃 상태 UI
-            console.log("❌ 로그아웃 상태 UI 업데이트");
+            // 로그아웃 상태 UI 업데이트
+            console.log("❌ 로그아웃 상태");
             
-            // 로그아웃 상태: 로그인 버튼 표시하고 프로필 드롭다운 숨김
             const loginInfo = document.getElementById("login-info");
-            if (loginInfo) {
-                loginInfo.style.display = 'block';  // 로그인 버튼 표시
-                console.log("✅ 로그아웃 상태: login-info 표시");
-            }
-            
             const profileDropdown = document.getElementById("profile-dropdown");
-            if (profileDropdown) {
-                profileDropdown.style.display = 'none';  // 프로필 드롭다운 숨김
-                console.log("✅ 로그아웃 상태: profile-dropdown 숨김");
-            }
-            
             const startButton = document.getElementById("start-button");
-            if (startButton) {
-                startButton.style.display = 'block';  // 시작하기 버튼 표시
-                console.log("✅ 로그아웃 상태: start-button 표시");
-            }
+            
+            // 로그아웃 상태: 로그인 버튼과 시작하기 버튼 표시, 프로필 드롭다운 숨김
+            if (loginInfo) loginInfo.style.display = 'block';
+            if (profileDropdown) profileDropdown.style.display = 'none';
+            if (startButton) startButton.style.display = 'block';
             
             // 전역 사용자 정보 초기화
             window.currentUser = null;

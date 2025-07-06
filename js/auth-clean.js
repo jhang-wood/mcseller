@@ -148,11 +148,11 @@ async function handleLogin(e) {
             // 세션 저장 및 사용자 정보 전역 설정
             window.currentUser = data.user;
             
-            alert("로그인 성공! 마이페이지로 이동합니다.");
+            alert("로그인 성공! 메인 페이지로 이동합니다.");
             
             // 약간의 지연 후 이동하여 세션이 완전히 설정되도록 함
             setTimeout(() => {
-                window.location.href = "mypage.html";
+                window.location.href = "index.html";
             }, 500);
         } else {
             throw new Error("사용자 정보를 받을 수 없습니다.");

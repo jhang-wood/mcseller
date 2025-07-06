@@ -3975,58 +3975,15 @@
 
                 console.log("UI 업데이트:", user);
 
-                // 모든 요소 초기화
+                // UI 조작을 main.js로 위임 (중복 방지)
+                // 인라인 스크립트에서 UI 조작 제거
+                
+                // if (loginInfo) loginInfo.style.display = "none";
+                // if (profileDropdown) profileDropdown.style.display = "none";
+                // if (startButton) startButton.style.display = "none";
 
-                if (loginInfo) loginInfo.style.display = "none";
-
-                if (profileDropdown) profileDropdown.style.display = "none";
-
-                if (startButton) startButton.style.display = "none";
-
-                if (user) {
-                    // 로그인된 상태 - 프로필 드롭다운 표시
-
-                    if (profileDropdown) {
-                        profileDropdown.style.display = "block";
-
-                        // 프로필 텍스트 설정
-
-                        if (profileText) {
-                            profileText.textContent = user.isAdmin
-                                ? "관리자"
-                                : "회원";
-                        }
-
-                        // 사용자 이메일 표시
-
-                        if (userEmailDisplay) {
-                            userEmailDisplay.textContent =
-                                user.email || "user@test.com";
-                        }
-
-                        // 마이페이지 링크 설정
-
-                        if (profileMypageLink) {
-                            if (user.isAdmin) {
-                                profileMypageLink.href = "admin.html";
-
-                                profileMypageLink.innerHTML =
-                                    '<i class="fas fa-cog me-2"></i>관리자페이지';
-                            } else {
-                                profileMypageLink.href = "mypage.html";
-
-                                profileMypageLink.innerHTML =
-                                    '<i class="fas fa-user me-2"></i>마이페이지';
-                            }
-                        }
-                    }
-                } else {
-                    // 로그아웃된 상태 - 로그인 버튼과 시작하기 버튼 표시
-
-                    if (loginInfo) loginInfo.style.display = "block";
-
-                    if (startButton) startButton.style.display = "block";
-                }
+                // main.js의 updateUIAccordingToAuthState 함수에서 UI 업데이트 담당
+                console.log("인라인 스크립트 - 사용자 상태:", user ? "로그인됨" : "로그아웃됨");
             }
 
             // 부드러운 스크롤 기능 및 로그인 체크
