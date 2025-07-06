@@ -10,24 +10,6 @@ function initializeAuthPage() {
 
 // 기존 세션 확인
 async function checkExistingSession() {
-    if (window.location.hostname === "localhost" || 
-        window.location.hostname === "127.0.0.1" || 
-        window.location.hostname.includes("replit")) {
-        console.log("개발 환경에서 실행 중입니다.");
-        
-        // 테스트 사용자 확인
-        const testUser = localStorage.getItem('testUser');
-        if (testUser) {
-            console.log("테스트 사용자 발견:", JSON.parse(testUser));
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1000);
-            return;
-        } else {
-            console.log("테스트 모드: 로그아웃 상태");
-        }
-    }
-
     if (window.supabaseClient) {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
@@ -144,46 +126,6 @@ async function handleLogin(e) {
     submitBtn.disabled = true;
 
     try {
-        console.log("로그인 처리");
-        
-        // 개발 환경에서만 테스트 계정 확인
-        if (window.location.hostname === "localhost" || 
-            window.location.hostname === "127.0.0.1" || 
-            window.location.hostname.includes("replit")) {
-            
-            const TEST_ACCOUNTS = {
-                user: { email: 'user@test.com', password: '123456', isAdmin: false },
-                admin: { email: 'admin@test.com', password: 'admin123', isAdmin: true }
-            };
-            
-            const testAccount = Object.values(TEST_ACCOUNTS).find(
-                account => account.email === email && account.password === password
-            );
-
-            console.log("테스트 계정 확인:", email, password, testAccount);
-
-            if (testAccount) {
-                console.log("테스트 계정 로그인 성공");
-                localStorage.setItem('testUser', JSON.stringify({
-                    email: testAccount.email,
-                    isAdmin: testAccount.isAdmin,
-                    loginTime: new Date().toISOString()
-                }));
-
-                showToast(testAccount.isAdmin ? "관리자로 로그인되었습니다!" : "로그인 성공!", "success");
-
-                setTimeout(() => {
-                    if (testAccount.isAdmin) {
-                        window.location.href = 'admin.html';
-                    } else {
-                        window.location.href = 'mypage.html';
-                    }
-                }, 1000);
-                return;
-            }
-        }
-
-        // 프로덕션 환경에서는 Supabase 로그인만 사용
         if (!window.supabaseClient) {
             throw new Error('서비스 연결 오류');
         }
@@ -378,32 +320,13 @@ function setupSocialAuth() {
     document.getElementById('kakao-signup')?.addEventListener('click', handleKakaoLogin);
 }
 
-// 카카오 로그인 처리 (프로덕션 준비)
+// 카카오 로그인 처리 (프로덕션)
 async function handleKakaoLogin() {
     try {
-        // 개발 환경에서는 테스트 모드 지원
-        if ((window.location.hostname === "localhost" || 
-             window.location.hostname === "127.0.0.1" || 
-             window.location.hostname.includes("replit")) &&
-            !window.Kakao) {
-            console.log("테스트 모드: 카카오 로그인 처리");
-            showToast("테스트 모드에서 카카오 로그인이 완료되었습니다.", "success");
-            localStorage.setItem('testUser', JSON.stringify({
-                email: 'kakao@test.com',
-                isAdmin: false,
-                loginTime: new Date().toISOString()
-            }));
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1500);
-            return;
-        }
-
         if (!window.supabaseClient) {
             throw new Error('서비스 연결 오류');
         }
 
-        // 프로덕션에서는 Supabase OAuth 사용
         const { data, error } = await supabaseClient.auth.signInWithOAuth({
             provider: 'kakao',
             options: {

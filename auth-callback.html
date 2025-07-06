@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 처리 중... - MCSELLER</title>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+        .loading-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #ff9900;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        p {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <div class="spinner"></div>
+        <h2>로그인 처리 중...</h2>
+        <p>잠시만 기다려주세요.</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Supabase 클라이언트 초기화
+                const { createClient } = supabase;
+                const supabaseUrl = window.SUPABASE_URL;
+                const supabaseAnonKey = window.SUPABASE_ANON_KEY;
+                
+                if (!supabaseUrl || !supabaseAnonKey) {
+                    throw new Error('Supabase 설정이 필요합니다.');
+                }
+
+                const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+                
+                // 인증 상태 변경 처리
+                supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                    if (event === 'SIGNED_IN' && session) {
+                        // 로그인 성공 시 메인 페이지로 이동
+                        window.location.href = 'index.html';
+                    } else if (event === 'SIGNED_OUT') {
+                        // 로그아웃 시 로그인 페이지로 이동
+                        window.location.href = 'auth.html';
+                    }
+                });
+
+                // 현재 세션 확인
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                
+                if (error) {
+                    console.error('인증 오류:', error);
+                    alert('로그인 처리 중 오류가 발생했습니다.');
+                    window.location.href = 'auth.html';
+                } else if (session) {
+                    // 세션이 있으면 메인 페이지로 이동
+                    window.location.href = 'index.html';
+                } else {
+                    // 세션이 없으면 로그인 페이지로 이동
+                    setTimeout(() => {
+                        window.location.href = 'auth.html';
+                    }, 2000);
+                }
+            } catch (error) {
+                console.error('콜백 처리 오류:', error);
+                alert('로그인 처리 중 오류가 발생했습니다.');
+                window.location.href = 'auth.html';
+            }
+        });
+    </script>
+</body>
+</html>

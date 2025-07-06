@@ -108,18 +108,7 @@
             // 로그인 확인 (프로덕션 버전)
             let user = null;
             
-            // 개발 환경에서만 테스트 사용자 확인
-            if (window.location.hostname === "localhost" || 
-                window.location.hostname === "127.0.0.1" || 
-                window.location.hostname.includes("replit")) {
-                const testUser = localStorage.getItem('testUser');
-                if (testUser) {
-                    user = JSON.parse(testUser);
-                }
-            }
-            
-            // 프로덕션에서는 Supabase 사용자 확인
-            if (!user && window.getCurrentUser) {
+            if (window.getCurrentUser) {
                 user = await getCurrentUser();
             }
             
@@ -141,16 +130,6 @@
         });
 
         async function logout() {
-            // 개발 환경에서만 테스트 사용자 로그아웃
-            if ((window.location.hostname === "localhost" || 
-                 window.location.hostname === "127.0.0.1" || 
-                 window.location.hostname.includes("replit")) && 
-                localStorage.getItem('testUser')) {
-                localStorage.removeItem('testUser');
-                window.location.href = 'index.html';
-                return;
-            }
-            
             // Supabase 로그아웃
             if (window.signOut) {
                 await signOut();
