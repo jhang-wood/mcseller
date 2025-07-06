@@ -1302,45 +1302,8 @@
                     }, 2000);
                 };
 
-                // Form submission handlers (enhanced)
-                document
-                    .getElementById("loginForm")
-                    ?.addEventListener("submit", function (e) {
-                        e.preventDefault();
-                        const submitBtn = this.querySelector(
-                            'button[type="submit"]',
-                        );
-                        addLoadingState(submitBtn, this);
-
-                        // Your login logic here
-                        console.log("로그인 처리");
-                    });
-
-                document
-                    .getElementById("signupForm")
-                    ?.addEventListener("submit", function (e) {
-                        e.preventDefault();
-                        const submitBtn = this.querySelector(
-                            'button[type="submit"]',
-                        );
-                        addLoadingState(submitBtn, this);
-
-                        // Your signup logic here
-                        console.log("회원가입 처리");
-                    });
-
-                document
-                    .getElementById("resetForm")
-                    ?.addEventListener("submit", function (e) {
-                        e.preventDefault();
-                        const submitBtn = this.querySelector(
-                            'button[type="submit"]',
-                        );
-                        addLoadingState(submitBtn, this);
-
-                        // Your password reset logic here
-                        console.log("비밀번호 재설정 처리");
-                    });
+                // Form submission handlers are handled by auth.js
+                // Removed duplicate event listeners to prevent conflicts
 
                 // Kakao login handlers with enhanced feedback
                 const kakaoButtons = [

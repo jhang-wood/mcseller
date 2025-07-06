@@ -105,50 +105,54 @@ function showResetForm() {
 // 로그인 처리
 async function handleLogin(e) {
     e.preventDefault();
+    console.log("로그인 처리 시작");
+    
     const email = document.getElementById("loginEmail").value.trim();
     const password = document.getElementById("loginPassword").value;
     const rememberMe = document.getElementById("rememberMe").checked;
 
+    console.log("입력값 확인:", { email, password: password ? "입력됨" : "없음" });
+
     if (!email || !password) {
-        showToast("이메일과 비밀번호를 입력해주세요.", "warning");
+        alert("이메일과 비밀번호를 입력해주세요.");
         return;
     }
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML =
-        '<i class="fas fa-spinner fa-spin me-2"></i>로그인 중...';
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>로그인 중...';
     submitBtn.disabled = true;
 
     try {
-        const { data, error } =
-            await window.supabaseClient.auth.signInWithPassword({
-                email,
-                password,
-            });
+        console.log("Supabase 로그인 시도 중...");
+        const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+            email,
+            password,
+        });
+
+        console.log("로그인 응답:", { data, error });
 
         if (error) throw error;
 
         if (data.user) {
+            console.log("로그인 성공:", data.user.email);
             if (rememberMe) {
                 localStorage.setItem("rememberEmail", email);
             } else {
                 localStorage.removeItem("rememberEmail");
             }
-            showToast("성공적으로 로그인되었습니다!", "success");
-            setTimeout(() => {
-                window.location.href = "index.html";
-            }, 1500);
+            alert("성공적으로 로그인되었습니다!");
+            // 마이페이지로 이동
+            window.location.href = "mypage.html";
+        } else {
+            throw new Error("사용자 정보를 받을 수 없습니다.");
         }
     } catch (error) {
         console.error("로그인 오류:", error);
         if (error.message.includes("Invalid login credentials")) {
-            showToast("아이디 또는 비밀번호가 일치하지 않습니다.", "error");
+            alert("아이디 또는 비밀번호가 일치하지 않습니다.");
         } else {
-            showToast(
-                "로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
-                "error",
-            );
+            alert("로그인 중 오류가 발생했습니다: " + error.message);
         }
     } finally {
         submitBtn.innerHTML = originalText;
@@ -199,20 +203,10 @@ async function handleSignup(e) {
         if (error) throw error;
 
         if (data.user) {
-            // 이메일 인증이 활성화된 경우, 사용자에게 알려줍니다.
-            if (data.user.identities && data.user.identities.length > 0) {
-                showToast(
-                    "회원가입 성공! 이메일 인증 링크를 확인해주세요.",
-                    "info",
-                );
-                setTimeout(() => showLoginForm(), 3000);
-            } else {
-                showToast(
-                    "이미 가입된 이메일일 수 있습니다. 로그인해주세요.",
-                    "warning",
-                );
-                setTimeout(() => showLoginForm(), 3000);
-            }
+            console.log("회원가입 성공:", data.user);
+            // 회원가입 성공 시 메인페이지로 이동
+            alert("회원가입이 완료되었습니다! 메인페이지로 이동합니다.");
+            window.location.href = "index.html";
         }
     } catch (error) {
         console.error("회원가입 오류:", error);
