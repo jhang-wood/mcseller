@@ -127,7 +127,7 @@ async function loadAllUsers() {
         const { data: profiles, error } = await window.supabaseClient
             .from('profiles')
             .select('*')
-            .order('created_at', { ascending: false });
+            .order('updated_at', { ascending: false });
         
         if (error) throw error;
         
@@ -148,7 +148,7 @@ async function loadAllUsers() {
                     </select>
                 </td>
                 <td>${(user.points || 0).toLocaleString()}원</td>
-                <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                <td>${new Date(user.updated_at).toLocaleDateString()}</td>
                 <td>
                     <button class="btn btn-sm btn-primary" onclick="editUserPoints('${user.id}', ${user.points || 0})">
                         적립금 수정
@@ -190,7 +190,7 @@ async function searchUsers() {
                 <td>${user.full_name || '미설정'}</td>
                 <td>${user.role}</td>
                 <td>${(user.points || 0).toLocaleString()}원</td>
-                <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                <td>${new Date(user.updated_at).toLocaleDateString()}</td>
                 <td>
                     <button class="btn btn-sm btn-primary" onclick="editUserPoints('${user.id}', ${user.points || 0})">
                         적립금 수정
@@ -250,13 +250,15 @@ async function updateUserPoints(userId, newPoints) {
 // === 할인쿠폰 관리 ===
 async function loadCoupons() {
     try {
-        // 쿠폰 테이블이 없으면 생성
-        await ensureCouponsTable();
+        if (!(await checkTableExists('coupons'))) {
+            alert('쿠폰 테이블이 존재하지 않습니다. 관리자에게 문의하세요.');
+            return;
+        }
         
         const { data: coupons, error } = await window.supabaseClient
             .from('coupons')
             .select('*')
-            .order('created_at', { ascending: false });
+            .order('updated_at', { ascending: false });
         
         if (error) throw error;
         
@@ -491,7 +493,7 @@ async function loadContent() {
         const { data: contents, error } = await window.supabaseClient
             .from('contents')
             .select('*')
-            .order('created_at', { ascending: false });
+            .order('updated_at', { ascending: false });
         
         if (error) throw error;
         
@@ -638,4 +640,9 @@ async function logout() {
         console.error('로그아웃 오류:', error);
         alert('로그아웃에 실패했습니다.');
     }
+}
+
+async function checkTableExists(tableName) {
+    const { data, error } = await supabase.rpc('check_table_exists', { table_name: tableName });
+    return !error && data;
 } 
