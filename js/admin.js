@@ -250,9 +250,15 @@ async function updateUserPoints(userId, newPoints) {
 // === 할인쿠폰 관리 ===
 async function loadCoupons() {
     try {
-        if (!(await checkTableExists('coupons'))) {
-            alert('쿠폰 테이블이 존재하지 않습니다. 관리자에게 문의하세요.');
-            return;
+        // Try to check if table exists, but continue even if check fails
+        try {
+            const tableExists = await checkTableExists('coupons');
+            if (!tableExists) {
+                alert('쿠폰 테이블이 존재하지 않습니다. 관리자에게 문의하세요.');
+                return;
+            }
+        } catch (checkError) {
+            console.log('Table existence check failed, attempting to load coupons anyway:', checkError);
         }
         
         const { data: coupons, error } = await window.supabaseClient
@@ -301,10 +307,13 @@ async function loadCoupons() {
 async function ensureCouponsTable() {
     try {
         const { error } = await window.supabaseClient.rpc('create_coupons_table');
-        // 테이블이 이미 존재하면 오류 무시
+        if (error) {
+            console.log('RPC create_coupons_table failed:', error);
+            // If RPC function doesn't exist, we'll rely on manual table creation
+        }
     } catch (error) {
-        // 테이블 수동 생성 시도
-        console.log('쿠폰 테이블 확인 중...');
+        console.log('쿠폰 테이블 확인 중... RPC 함수가 없을 수 있습니다:', error);
+        // Table should be created manually in Supabase dashboard
     }
 }
 
@@ -432,13 +441,18 @@ async function addPoints() {
     
     try {
         // 현재 적립금 조회
-        const { data: user, error: getUserError } = await window.supabaseClient
+        const { data: users, error: getUserError } = await window.supabaseClient
             .from('profiles')
             .select('points')
-            .eq('email', email)
-            .single();
+            .eq('email', email);
         
         if (getUserError) throw getUserError;
+        
+        if (!users || users.length === 0) {
+            throw new Error('해당 이메일의 사용자를 찾을 수 없습니다.');
+        }
+        
+        const user = users[0];
         
         const newPoints = (user.points || 0) + amount;
         
@@ -493,7 +507,7 @@ async function loadContent() {
         const { data: contents, error } = await window.supabaseClient
             .from('contents')
             .select('*')
-            .order('updated_at', { ascending: false });
+            .order('created_at', { ascending: false });
         
         if (error) throw error;
         
@@ -643,6 +657,14 @@ async function logout() {
 }
 
 async function checkTableExists(tableName) {
-    const { data, error } = await supabase.rpc('check_table_exists', { table_name: tableName });
-    return !error && data;
+    try {
+        const { data, error } = await window.supabaseClient
+            .from(tableName)
+            .select('*')
+            .limit(1);
+        return !error;
+    } catch (error) {
+        console.log(`Table ${tableName} does not exist:`, error);
+        return false;
+    }
 } 
