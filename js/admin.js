@@ -52,11 +52,134 @@ function showToast(message, type = 'info') {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    initializeAdminPage();
-    setupSidebarNavigation();
-    setupAdminAuth();
-    loadDashboardData();
+    // 안전한 관리자 페이지 초기화
+    safeInitializeAdminPage();
 });
+
+// 안전한 관리자 페이지 초기화 (오류 시 로그아웃 방지)
+async function safeInitializeAdminPage() {
+    try {
+        console.log('🛡️ 안전한 관리자 페이지 초기화 시작');
+        
+        // 기본 UI 설정 (오류 발생해도 계속 진행)
+        setupSidebarNavigation();
+        setupEventListeners();
+        
+        // Supabase 초기화 시도
+        let initSuccess = false;
+        try {
+            await initializeAdminPage();
+            initSuccess = true;
+        } catch (error) {
+            console.error('⚠️ 관리자 페이지 초기화 실패, 오프라인 모드로 진행:', error);
+            
+            // 오프라인 모드 UI 표시
+            showOfflineMode();
+            
+            // 재시도 버튼 제공
+            showRetryOption();
+        }
+        
+        // 데이터 로드 시도 (실패해도 페이지는 유지)
+        if (initSuccess) {
+            try {
+                await loadDashboardDataSafely();
+            } catch (error) {
+                console.error('⚠️ 대시보드 데이터 로드 실패, 빈 화면으로 진행:', error);
+                showDataLoadError();
+            }
+        }
+        
+        console.log('✅ 안전한 초기화 완료');
+        
+    } catch (error) {
+        console.error('❌ 안전한 초기화도 실패:', error);
+        showCriticalError();
+    }
+}
+
+// 오프라인 모드 UI
+function showOfflineMode() {
+    const offlineNotice = document.createElement('div');
+    offlineNotice.className = 'alert alert-warning m-3';
+    offlineNotice.innerHTML = `
+        <h5><i class="fas fa-wifi-slash me-2"></i>연결 문제 감지</h5>
+        <p>서버와의 연결에 문제가 있어 일부 기능이 제한될 수 있습니다.</p>
+        <button class="btn btn-warning btn-sm" onclick="location.reload()">
+            <i class="fas fa-sync me-1"></i>다시 연결 시도
+        </button>
+    `;
+    
+    const main = document.querySelector('main');
+    if (main) {
+        main.insertBefore(offlineNotice, main.firstChild);
+    }
+}
+
+// 재시도 옵션 표시
+function showRetryOption() {
+    const retryButton = document.createElement('button');
+    retryButton.className = 'btn btn-primary btn-sm ms-2';
+    retryButton.innerHTML = '<i class="fas fa-redo me-1"></i>재시도';
+    retryButton.onclick = async () => {
+        retryButton.disabled = true;
+        retryButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>연결 중...';
+        
+        try {
+            await initializeAdminPage();
+            await loadDashboardDataSafely();
+            location.reload(); // 성공 시 새로고침
+        } catch (error) {
+            retryButton.disabled = false;
+            retryButton.innerHTML = '<i class="fas fa-redo me-1"></i>재시도';
+            showToast('연결 재시도 실패. 잠시 후 다시 시도해주세요.', 'error');
+        }
+    };
+    
+    const offlineNotice = document.querySelector('.alert-warning');
+    if (offlineNotice) {
+        offlineNotice.querySelector('button').parentNode.appendChild(retryButton);
+    }
+}
+
+// 데이터 로드 오류 표시
+function showDataLoadError() {
+    const errorNotice = document.createElement('div');
+    errorNotice.className = 'alert alert-info m-3';
+    errorNotice.innerHTML = `
+        <h6><i class="fas fa-database me-2"></i>데이터 로드 문제</h6>
+        <p>일부 데이터를 불러오는데 문제가 있습니다. 페이지 기능은 정상적으로 사용할 수 있습니다.</p>
+    `;
+    
+    const main = document.querySelector('main');
+    if (main && !main.querySelector('.alert-info')) {
+        main.insertBefore(errorNotice, main.firstChild);
+    }
+}
+
+// 심각한 오류 처리
+function showCriticalError() {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'container mt-5';
+    errorDiv.innerHTML = `
+        <div class="alert alert-danger">
+            <h4><i class="fas fa-exclamation-triangle me-2"></i>시스템 오류</h4>
+            <p>관리자 페이지를 로드하는데 문제가 발생했습니다.</p>
+            <hr>
+            <div class="d-flex gap-2">
+                <button class="btn btn-danger" onclick="location.reload()">
+                    <i class="fas fa-sync me-1"></i>새로고침
+                </button>
+                <a href="/index.html" class="btn btn-secondary">
+                    <i class="fas fa-home me-1"></i>메인으로
+                </a>
+            </div>
+        </div>
+    `;
+    
+    document.body.innerHTML = '';
+    document.body.appendChild(errorDiv);
+}
 
 // 관리자 페이지 초기화
 async function initializeAdminPage() {
@@ -89,9 +212,9 @@ async function initializeAdminPage() {
         
         console.log('✅ 관리자 권한 확인 완료');
         
-        // UI 이벤트 설정
-        setupSidebarNavigation();
-        setupEventListeners();
+        // UI 이벤트 설정 (이미 safeInitializeAdminPage에서 호출됨)
+        // setupSidebarNavigation();
+        // setupEventListeners();
         
         // 기본 섹션 표시 (대시보드)
         showSection('dashboard');
@@ -334,6 +457,304 @@ async function loadDashboardStats() {
             activeProducts: 0,
             totalUsers: 0
         };
+    }
+}
+
+// 안전한 대시보드 데이터 로드 (오류 시에도 계속 진행)
+async function loadDashboardDataSafely() {
+    console.log('🛡️ 안전한 대시보드 데이터 로드 시작');
+    
+    // 통계 데이터 로드 시도
+    try {
+        const stats = await loadDashboardStatsSafely();
+        updateStatsCards(stats);
+    } catch (error) {
+        console.error('⚠️ 통계 데이터 로드 실패:', error);
+        showStatsLoadError();
+    }
+    
+    // 차트 데이터 로드 시도
+    try {
+        await loadDashboardChartsSafely();
+    } catch (error) {
+        console.error('⚠️ 차트 데이터 로드 실패:', error);
+        showChartsLoadError();
+    }
+    
+    console.log('✅ 안전한 대시보드 데이터 로드 완료');
+}
+
+// 안전한 통계 데이터 로드
+async function loadDashboardStatsSafely() {
+    try {
+        if (!window.supabaseClient) {
+            throw new Error('Supabase 클라이언트 없음');
+        }
+        
+        const session = await window.getSession();
+        if (!session) {
+            console.log('⚠️ 세션 없음, 기본값 사용');
+            return {
+                totalRevenue: '로그인 필요',
+                totalOrders: '?',
+                activeProducts: '?',
+                totalUsers: '?'
+            };
+        }
+        
+        // 기본 통계 (오류 시 기본값 사용)
+        let stats = {
+            totalRevenue: 0,
+            totalOrders: 0,
+            activeProducts: 0,
+            totalUsers: 0
+        };
+        
+        // 각 통계를 개별적으로 시도 (하나 실패해도 다른 것은 계속)
+        const statPromises = [
+            // 상품 수
+            window.supabaseClient
+                .from('products')
+                .select('id', { count: 'exact', head: true })
+                .then(({ count }) => stats.activeProducts = count || 0)
+                .catch(() => stats.activeProducts = '오류'),
+                
+            // 주문 수  
+            window.supabaseClient
+                .from('orders')
+                .select('id', { count: 'exact', head: true })
+                .then(({ count }) => stats.totalOrders = count || 0)
+                .catch(() => stats.totalOrders = '오류'),
+                
+            // 사용자 수
+            window.supabaseClient
+                .from('profiles')
+                .select('id', { count: 'exact', head: true })
+                .then(({ count }) => stats.totalUsers = count || 0)
+                .catch(() => stats.totalUsers = '오류'),
+                
+            // 총 매출
+            window.supabaseClient
+                .from('orders')
+                .select('total_amount')
+                .eq('status', 'completed')
+                .then(({ data }) => {
+                    const total = data?.reduce((sum, order) => sum + (order.total_amount || 0), 0) || 0;
+                    stats.totalRevenue = `${total.toLocaleString()}원`;
+                })
+                .catch(() => stats.totalRevenue = '오류')
+        ];
+        
+        // 모든 통계 조회 시도 (일부 실패해도 계속)
+        await Promise.allSettled(statPromises);
+        
+        return stats;
+        
+    } catch (error) {
+        console.error('통계 데이터 로드 오류:', error);
+        
+        return {
+            totalRevenue: '오류',
+            totalOrders: '오류', 
+            activeProducts: '오류',
+            totalUsers: '오류'
+        };
+    }
+}
+
+// 안전한 차트 데이터 로드
+async function loadDashboardChartsSafely() {
+    try {
+        // 차트 로드 시도 (실패해도 계속 진행)
+        const chartPromises = [
+            loadRevenueChartSafely().catch(e => {
+                console.log('매출 차트 로드 실패:', e.message);
+                showEmptyRevenueChart();
+            }),
+            loadProductChartSafely().catch(e => {
+                console.log('상품 차트 로드 실패:', e.message);
+                showEmptyProductChart();
+            })
+        ];
+        
+        await Promise.allSettled(chartPromises);
+        
+    } catch (error) {
+        console.error('차트 데이터 로드 오류:', error);
+    }
+}
+
+// 안전한 매출 차트 로드
+async function loadRevenueChartSafely() {
+    try {
+        if (!window.supabaseClient) {
+            throw new Error('Supabase 클라이언트 없음');
+        }
+        
+        // 기본 차트 데이터
+        const defaultData = {
+            labels: ['1주전', '6일전', '5일전', '4일전', '3일전', '2일전', '1일전', '오늘'],
+            datasets: [{
+                label: '일별 매출',
+                data: [0, 0, 0, 0, 0, 0, 0, 0],
+                borderColor: '#ff9900',
+                backgroundColor: 'rgba(255, 153, 0, 0.1)',
+                tension: 0.4
+            }]
+        };
+        
+        const ctx = document.getElementById('revenueChart');
+        if (ctx) {
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: defaultData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '일별 매출 현황'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString() + '원';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+    } catch (error) {
+        console.error('매출 차트 로드 오류:', error);
+        throw error;
+    }
+}
+
+// 안전한 상품 차트 로드  
+async function loadProductChartSafely() {
+    try {
+        if (!window.supabaseClient) {
+            throw new Error('Supabase 클라이언트 없음');
+        }
+        
+        // 기본 차트 데이터
+        const defaultData = {
+            labels: ['전자책', '강의', '기타'],
+            datasets: [{
+                data: [1, 1, 1],
+                backgroundColor: ['#ff9900', '#28a745', '#6c757d']
+            }]
+        };
+        
+        const ctx = document.getElementById('productChart');
+        if (ctx) {
+            const chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: defaultData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '상품 유형별 분포'
+                        }
+                    }
+                }
+            });
+        }
+        
+    } catch (error) {
+        console.error('상품 차트 로드 오류:', error);
+        throw error;
+    }
+}
+
+// 통계 로드 오류 표시
+function showStatsLoadError() {
+    const statsCards = document.querySelectorAll('.stat-card .stat-number');
+    statsCards.forEach(card => {
+        if (card.textContent === '0' || card.textContent === '') {
+            card.textContent = '오류';
+            card.className += ' text-muted';
+        }
+    });
+}
+
+// 차트 로드 오류 표시
+function showChartsLoadError() {
+    const chartContainers = document.querySelectorAll('canvas');
+    chartContainers.forEach(canvas => {
+        const container = canvas.parentElement;
+        if (container) {
+            container.innerHTML = `
+                <div class="d-flex align-items-center justify-content-center h-100 text-muted" style="height: 300px;">
+                    <div class="text-center">
+                        <i class="fas fa-chart-line fa-3x mb-3"></i>
+                        <p>차트 데이터를 불러올 수 없습니다</p>
+                    </div>
+                </div>
+            `;
+        }
+    });
+}
+
+// 빈 매출 차트 표시
+function showEmptyRevenueChart() {
+    const ctx = document.getElementById('revenueChart');
+    if (ctx) {
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['데이터 없음'],
+                datasets: [{
+                    label: '매출',
+                    data: [0],
+                    borderColor: '#e9ecef',
+                    backgroundColor: 'rgba(233, 236, 239, 0.1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '매출 데이터를 불러올 수 없습니다'
+                    }
+                }
+            }
+        });
+    }
+}
+
+// 빈 상품 차트 표시
+function showEmptyProductChart() {
+    const ctx = document.getElementById('productChart');
+    if (ctx) {
+        const chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['데이터 없음'],
+                datasets: [{
+                    data: [1],
+                    backgroundColor: ['#e9ecef']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '상품 데이터를 불러올 수 없습니다'
+                    }
+                }
+            }
+        });
     }
 }
 

@@ -8,26 +8,41 @@ window.supabaseClient = null;
 window.currentUser = null;
 
 /**
- * Supabase 클라이언트 초기화
+ * Supabase 클라이언트 초기화 (강화된 안정성)
  */
 async function initializeSupabaseClient() {
     try {
         console.log('🚀 Supabase 클라이언트 초기화 시작...');
         
-        // 설정 파일 로드 대기
+        // 이미 초기화된 경우 반환
+        if (window.supabaseClient) {
+            console.log('✅ Supabase 클라이언트 이미 초기화됨');
+            return window.supabaseClient;
+        }
+        
+        // 설정 파일 로드 대기 (더 안정적인 방법)
         let config = window.SUPABASE_CONFIG;
         let retryCount = 0;
-        const maxRetries = 10;
+        const maxRetries = 20;
         
         while (!config && retryCount < maxRetries) {
             console.log('⏳ Supabase 설정 로드 대기 중...', retryCount + 1);
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 250));
             config = window.SUPABASE_CONFIG;
             retryCount++;
         }
         
         if (!config) {
-            throw new Error('Supabase 설정을 로드할 수 없습니다. js/supabase-config.js 파일을 확인하세요.');
+            // 백업 설정으로 재시도
+            console.log('⚠️ 백업 설정으로 재시도...');
+            config = {
+                url: "https://rpcctgtmtplfahwtnglq.supabase.co",
+                anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwY2N0Z3RtdHBsZmFod3RuZ2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEwNjUzMTEsImV4cCI6MjA2NjY0MTMxMX0.yv63jWBQIjbzRWh2w6fAu1vgs3W_wQvEL4ePnTD5Sss"
+            };
+            
+            if (!config.url || !config.anonKey) {
+                throw new Error('Supabase 설정을 로드할 수 없습니다. 관리자에게 문의하세요.');
+            }
         }
         
         // Supabase 클라이언트 생성 (향상된 설정)
