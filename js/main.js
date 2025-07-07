@@ -518,9 +518,46 @@ function setupNavigation() {
 // PWA 및 성능 최적화
 function initializePerformanceOptimizations() {
     if ("serviceWorker" in navigator) {
+        // Service Worker 등록 시 리다이렉트 오류 방지
         navigator.serviceWorker
-            .register("/sw.js")
-            .then((reg) => console.log("서비스 워커 등록 성공:", reg))
-            .catch((err) => console.log("서비스 워커 등록 실패:", err));
+            .register("/sw.js", {
+                scope: "/",
+                updateViaCache: "none"  // 캐시 우회하여 최신 SW 가져오기
+            })
+            .then((registration) => {
+                console.log("✅ 서비스 워커 등록 성공:", registration.scope);
+                
+                // 업데이트 감지
+                registration.addEventListener('updatefound', () => {
+                    console.log("🔄 새로운 서비스 워커 버전 감지");
+                    const newWorker = registration.installing;
+                    
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            console.log("🔄 새로운 서비스 워커 준비됨");
+                            // 사용자에게 새로고침 안내 (선택사항)
+                            if (confirm("새로운 버전이 있습니다. 페이지를 새로고침하시겠습니까?")) {
+                                window.location.reload();
+                            }
+                        }
+                    });
+                });
+            })
+            .catch((error) => {
+                console.warn("⚠️ 서비스 워커 등록 실패:", error);
+                // Service Worker 실패는 치명적이지 않으므로 계속 진행
+            });
+            
+        // Service Worker 메시지 수신
+        navigator.serviceWorker.addEventListener('message', event => {
+            console.log("📨 Service Worker 메시지:", event.data);
+        });
+        
+        // 컨트롤러 변경 감지
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            console.log("🔄 Service Worker 컨트롤러 변경됨");
+        });
+    } else {
+        console.log("📱 Service Worker를 지원하지 않는 브라우저입니다.");
     }
 }

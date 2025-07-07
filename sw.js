@@ -1,5 +1,5 @@
 // MCSELLER PWA Service Worker
-const CACHE_VERSION = 'v1.0.7';
+const CACHE_VERSION = 'v1.0.8';
 const CACHE_NAME = `mcseller-cache-${CACHE_VERSION}`;
 const STATIC_CACHE = `${CACHE_NAME}-static`;
 const DYNAMIC_CACHE = `${CACHE_NAME}-dynamic`;
@@ -70,7 +70,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // CDN 리소스 요청 처리
+  // CDN 리소스 요청 처리 (리다이렉트 지원)
   const isCdn = [
     'cdn.jsdelivr.net',
     'cdnjs.cloudflare.com',
@@ -82,11 +82,20 @@ self.addEventListener('fetch', event => {
     event.respondWith(
       caches.open(DYNAMIC_CACHE).then(cache => {
         return cache.match(request).then(cachedResponse => {
-          const networkFetch = fetch(request, { credentials: 'omit', mode: 'cors' }).then(networkResponse => {
-            if (networkResponse && networkResponse.status === 200) {
-              cache.put(request, networkResponse.clone());
+          const networkFetch = fetch(request, { 
+            credentials: 'omit', 
+            mode: 'cors',
+            redirect: 'follow'  // 리다이렉트 허용
+          }).then(networkResponse => {
+            if (networkResponse && networkResponse.status === 200 && networkResponse.type !== 'opaque') {
+              cache.put(request, networkResponse.clone()).catch(err => {
+                console.warn('캐시 저장 실패:', err);
+              });
             }
             return networkResponse;
+          }).catch(error => {
+            console.warn('CDN 리소스 로드 실패:', request.url, error);
+            return cachedResponse || new Response('', {status: 503, statusText: 'Network Error'});
           });
           return cachedResponse || networkFetch;
         });
@@ -95,29 +104,54 @@ self.addEventListener('fetch', event => {
     return;
   }
   
-  // Supabase, API, non-GET 요청은 네트워크 우선
+  // Supabase, API, non-GET 요청은 네트워크 우선 (리다이렉트 지원)
   if (url.hostname.includes('supabase.co') || url.pathname.startsWith('/api') || request.method !== 'GET') {
-    event.respondWith(fetch(request));
+    event.respondWith(
+      fetch(request, {
+        redirect: 'follow',  // 리다이렉트 허용
+        credentials: 'same-origin'
+      }).catch(error => {
+        console.warn('네트워크 요청 실패:', request.url, error);
+        return new Response('', {status: 503, statusText: 'Network Error'});
+      })
+    );
     return;
   }
 
-  // 로컬 정적 자원은 캐시 우선
+  // 로컬 정적 자원은 캐시 우선 (리다이렉트 지원)
   event.respondWith(
     caches.match(request).then(response => {
-      return response || fetch(request).then(fetchResponse => {
-        if (fetchResponse && fetchResponse.status === 200 && fetchResponse.type === 'basic') {
+      return response || fetch(request, {
+        redirect: 'follow',  // 리다이렉트 허용
+        credentials: 'same-origin'
+      }).then(fetchResponse => {
+        // 올바른 응답만 캐시에 저장
+        if (fetchResponse && 
+            fetchResponse.status === 200 && 
+            fetchResponse.type === 'basic' &&
+            !fetchResponse.redirected) {
           const responseToCache = fetchResponse.clone();
           caches.open(DYNAMIC_CACHE).then(cache => {
-            cache.put(request, responseToCache);
+            cache.put(request, responseToCache).catch(err => {
+              console.warn('캐시 저장 실패:', err);
+            });
           });
         }
         return fetchResponse;
-      });
-    }).catch(() => {
+      }).catch(error => {
+        console.warn('로컬 리소스 로드 실패:', request.url, error);
+        // 문서 요청인 경우 오프라인 페이지 반환
         if (request.destination === 'document') {
-          return caches.match('/offline.html');
+          return caches.match('/offline.html').then(offlineResponse => {
+            return offlineResponse || new Response('오프라인 상태입니다.', {
+              status: 503,
+              statusText: 'Offline',
+              headers: { 'Content-Type': 'text/html; charset=utf-8' }
+            });
+          });
         }
         return new Response('', {status: 503, statusText: 'Offline'});
+      });
     })
   );
 });
