@@ -133,23 +133,30 @@ async function checkAdminAccess() {
         // 사용자 정보 표시
         updateAdminUserInfo(session.user);
         
-        // 프로필 정보에서 관리자 권한 확인
+        // 관리자 권한 확인 (Supabase profiles 테이블 우선, 이메일 기반 백업)
         let isAdmin = false;
+        
+        // 1차: Supabase profiles 테이블에서 role 확인
         try {
+            console.log('🔍 Supabase profiles 테이블에서 관리자 권한 확인 중...', session.user.id);
             const { data: profile, error: profileError } = await window.supabaseClient
                 .from('profiles')
-                .select('role')
+                .select('role, email')
                 .eq('id', session.user.id)
                 .single();
             
+            console.log('📊 프로필 조회 결과:', profile, profileError);
+            
             if (profile && profile.role === 'admin') {
                 isAdmin = true;
-                console.log('🔑 데이터베이스에서 관리자 권한 확인됨');
+                console.log('🔑 Supabase profiles 테이블에서 관리자 권한 확인됨:', profile.email || session.user.email);
+            } else if (profile) {
+                console.log('👤 일반 사용자로 확인됨:', profile.role);
             }
         } catch (profileError) {
-            console.log('⚠️ 프로필 조회 실패, 이메일 기반 권한 확인 시도');
+            console.log('⚠️ 프로필 테이블 조회 실패:', profileError);
             
-            // 데이터베이스 확인 실패 시 이메일 기반 백업 체크
+            // 2차: 백업으로 이메일 기반 확인
             const adminEmails = [
                 'admin@mcseller.co.kr',
                 'qwg18@naver.com',
@@ -159,7 +166,9 @@ async function checkAdminAccess() {
             
             isAdmin = adminEmails.includes(session.user.email);
             if (isAdmin) {
-                console.log('🔑 이메일 기반 관리자 권한 확인됨');
+                console.log('🔑 이메일 기반 백업 관리자 권한 확인됨:', session.user.email);
+            } else {
+                console.log('👤 일반 사용자로 처리됨');
             }
         }
         

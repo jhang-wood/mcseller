@@ -148,33 +148,42 @@ async function handleLogin(e) {
             console.log('✅ 로그인 성공:', data.user.email);
             showToast('로그인 성공!', 'success');
             
-            // 관리자 권한 확인 (이메일 기반 우선, 프로필 테이블 보조)
-            const adminEmails = [
-                'admin@mcseller.co.kr',
-                'qwg18@naver.com',
-                'mcseller@gmail.com',
-                'rvd3855@gmail.com'
-            ];
+            // 관리자 권한 확인 (Supabase profiles 테이블 우선, 이메일 기반 백업)
+            let isAdmin = false;
             
-            let isAdmin = adminEmails.includes(data.user.email);
-            
-            if (isAdmin) {
-                console.log('🔑 이메일 기반 관리자 권한 확인됨:', data.user.email);
-            } else {
-                // 이메일 기반 확인 실패 시 프로필 테이블에서 권한 확인
-                try {
-                    const { data: profile, error: profileError } = await window.supabaseClient
-                        .from('profiles')
-                        .select('role')
-                        .eq('id', data.user.id)
-                        .single();
-                    
-                    if (profile && profile.role === 'admin') {
-                        isAdmin = true;
-                        console.log('🔑 데이터베이스에서 관리자 권한 확인됨');
-                    }
-                } catch (profileError) {
-                    console.log('⚠️ 프로필 조회도 실패, 일반 사용자로 처리');
+            // 1차: Supabase profiles 테이블에서 role 확인
+            try {
+                console.log('🔍 Supabase profiles 테이블에서 관리자 권한 확인 중...', data.user.id);
+                const { data: profile, error: profileError } = await window.supabaseClient
+                    .from('profiles')
+                    .select('role, email')
+                    .eq('id', data.user.id)
+                    .single();
+                
+                console.log('📊 프로필 조회 결과:', profile, profileError);
+                
+                if (profile && profile.role === 'admin') {
+                    isAdmin = true;
+                    console.log('🔑 Supabase profiles 테이블에서 관리자 권한 확인됨:', profile.email || data.user.email);
+                } else if (profile) {
+                    console.log('👤 일반 사용자로 확인됨:', profile.role);
+                }
+            } catch (profileError) {
+                console.log('⚠️ 프로필 테이블 조회 실패:', profileError);
+                
+                // 2차: 백업으로 이메일 기반 확인
+                const adminEmails = [
+                    'admin@mcseller.co.kr',
+                    'qwg18@naver.com',
+                    'mcseller@gmail.com',
+                    'rvd3855@gmail.com'
+                ];
+                
+                isAdmin = adminEmails.includes(data.user.email);
+                if (isAdmin) {
+                    console.log('🔑 이메일 기반 백업 관리자 권한 확인됨:', data.user.email);
+                } else {
+                    console.log('👤 일반 사용자로 처리됨');
                 }
             }
             
