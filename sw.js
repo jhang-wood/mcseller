@@ -1,5 +1,5 @@
 // MCSELLER PWA Service Worker
-const CACHE_NAME = 'mcseller-v1.0.0';
+const CACHE_NAME = 'mcseller-v1.0.1';
 const STATIC_CACHE = `${CACHE_NAME}-static`;
 const DYNAMIC_CACHE = `${CACHE_NAME}-dynamic`;
 
@@ -73,7 +73,9 @@ self.addEventListener('fetch', event => {
       event.request.method !== 'GET') {
     
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request, {
+        redirect: 'follow'  // redirect 모드 명시적 설정
+      })
         .catch(() => {
           // 네트워크 실패 시 오프라인 페이지 제공
           if (event.request.destination === 'document') {
@@ -92,7 +94,9 @@ self.addEventListener('fetch', event => {
           return response;
         }
         
-        return fetch(event.request)
+        return fetch(event.request, {
+          redirect: 'follow'  // redirect 모드 명시적 설정
+        })
           .then(fetchResponse => {
             if (!fetchResponse || fetchResponse.status !== 200 || fetchResponse.type !== 'basic') {
               return fetchResponse;

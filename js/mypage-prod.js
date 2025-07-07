@@ -110,6 +110,14 @@ async function loadUserInfo(user) {
             console.warn('프로필 정보 조회 오류:', profileError);
         }
         
+        // 관리자 권한 확인 및 리다이렉트 (마이페이지에서만)
+        if (profile && profile.role === 'admin') {
+            console.log("🔑 관리자 권한 감지 - 관리자 페이지로 리다이렉트");
+            alert('관리자 계정입니다. 관리자 페이지로 이동합니다.');
+            window.location.href = '/admin.html';
+            return;
+        }
+        
         // UI 업데이트 (실제 HTML ID와 일치하도록 수정)
         const userEmailElement = document.getElementById('user-email');
         const userPointsElement = document.getElementById('user-points');

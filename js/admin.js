@@ -37,33 +37,52 @@ async function initializeAdminPage() {
 // 관리자 권한 확인
 async function checkAdminAccess() {
     try {
-        // 임시 관리자 계정 확인
-        const isAdminUser = localStorage.getItem('adminUser') === 'true';
-        const adminEmail = localStorage.getItem('adminEmail');
-        
-        if (isAdminUser && adminEmail === 'mcseller.admin@gmail.com') {
-            return true;
+        // Supabase 클라이언트 대기
+        if (!window.supabaseClient) {
+            console.log('⏳ Supabase 클라이언트 대기 중...');
+            await new Promise(resolve => {
+                window.addEventListener('supabaseClientReady', resolve, { once: true });
+            });
         }
         
-        const user = await getCurrentUser();
-        if (!user) {
+        // 현재 로그인된 사용자 확인
+        const { data: { session }, error: sessionError } = await window.supabaseClient.auth.getSession();
+        
+        if (sessionError || !session || !session.user) {
+            console.log('❌ 로그인되지 않음 - 메인페이지로 리다이렉트');
+            alert('로그인이 필요합니다.');
+            window.location.href = '/auth.html?redirect=' + encodeURIComponent('/admin.html');
             return false;
         }
         
-        const { data, error } = await supabaseClient
-            .from('users')
+        // 프로필에서 관리자 권한 확인
+        const { data: profile, error: profileError } = await window.supabaseClient
+            .from('profiles')
             .select('role')
-            .eq('id', user.id)
+            .eq('id', session.user.id)
             .single();
         
-        if (error) {
-            console.error('관리자 권한 확인 오류:', error);
+        if (profileError) {
+            console.error('관리자 권한 확인 오류:', profileError);
+            alert('권한 확인 중 오류가 발생했습니다.');
+            window.location.href = '/index.html';
             return false;
         }
         
-        return data?.role === 'admin';
+        if (profile?.role !== 'admin') {
+            console.log('❌ 관리자 권한 없음 - 메인페이지로 리다이렉트');
+            alert('관리자 권한이 없습니다.');
+            window.location.href = '/index.html';
+            return false;
+        }
+        
+        console.log('✅ 관리자 권한 확인 완료:', session.user.email);
+        return true;
+        
     } catch (error) {
         console.error('관리자 접근 권한 확인 오류:', error);
+        alert('권한 확인 중 오류가 발생했습니다.');
+        window.location.href = '/index.html';
         return false;
     }
 }

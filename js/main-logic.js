@@ -355,6 +355,30 @@ async function checkLoginStatus() {
         if (session && session.user) {
             console.log("✅ 메인페이지 로그인 상태 확인됨:", session.user.email);
             window.currentUser = session.user;
+            
+            // 관리자 권한 확인 및 리다이렉트 (현재 페이지가 admin.html이 아닌 경우에만)
+            if (!window.location.pathname.includes('admin.html')) {
+                try {
+                    const { data: profile, error: profileError } = await window.supabaseClient
+                        .from('profiles')
+                        .select('role')
+                        .eq('id', session.user.id)
+                        .single();
+                    
+                    if (profile && profile.role === 'admin') {
+                        console.log("🔑 관리자 권한 감지 - 관리자 페이지로 리다이렉트");
+                        showToast('관리자 페이지로 이동합니다.', 'info');
+                        setTimeout(() => {
+                            window.location.href = '/admin.html';
+                        }, 1500);
+                        return session.user;
+                    }
+                } catch (profileError) {
+                    console.error("프로필 조회 오류:", profileError);
+                    // 프로필 조회 실패 시에는 일반 사용자로 처리
+                }
+            }
+            
             updateNavigationUI(session.user);
             return session.user;
         } else {

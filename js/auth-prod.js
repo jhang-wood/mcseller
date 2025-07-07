@@ -135,11 +135,32 @@ async function handleLogin(e) {
         if (data.user) {
             showToast('로그인 성공!', 'success');
             
-            // 로그인 성공 후 메인 페이지로 이동
-            setTimeout(() => {
-                // URL에 리다이렉트 파라미터가 있으면 해당 페이지로, 없으면 메인 페이지로
-                const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/index.html';
-                window.location.href = redirectUrl;
+            // 사용자 프로필 정보를 조회하여 관리자 권한 확인
+            setTimeout(async () => {
+                try {
+                    const { data: profile, error: profileError } = await window.supabaseClient
+                        .from('profiles')
+                        .select('role')
+                        .eq('id', data.user.id)
+                        .single();
+                    
+                    // 관리자 권한이 있는 경우 관리자 페이지로 이동
+                    if (profile && profile.role === 'admin') {
+                        showToast('관리자 페이지로 이동합니다.', 'info');
+                        window.location.href = '/admin.html';
+                        return;
+                    }
+                    
+                    // 일반 사용자는 마이페이지 또는 리다이렉트 URL로 이동
+                    const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/mypage.html';
+                    window.location.href = redirectUrl;
+                    
+                } catch (profileError) {
+                    console.error('프로필 조회 오류:', profileError);
+                    // 프로필 조회 실패 시 기본 페이지로 이동
+                    const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/mypage.html';
+                    window.location.href = redirectUrl;
+                }
             }, 1000);
         }
     } catch (error) {
