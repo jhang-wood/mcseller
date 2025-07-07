@@ -1,5 +1,5 @@
 // MCSELLER PWA Service Worker
-const CACHE_VERSION = 'v1.0.8';
+const CACHE_VERSION = 'v1.0.9';
 const CACHE_NAME = `mcseller-cache-${CACHE_VERSION}`;
 const STATIC_CACHE = `${CACHE_NAME}-static`;
 const DYNAMIC_CACHE = `${CACHE_NAME}-dynamic`;
@@ -64,8 +64,9 @@ self.addEventListener('fetch', event => {
   const request = event.request;
   const url = new URL(request.url);
   
-  // 관리자 페이지와 인증 페이지는 Service Worker 처리 제외
-  if (url.pathname === '/admin.html' || url.pathname === '/auth.html') {
+  // 중요한 페이지들은 Service Worker 처리 제외하여 안정성 확보
+  const excludedPaths = ['/admin.html', '/auth.html', '/index.html', '/'];
+  if (excludedPaths.includes(url.pathname)) {
     console.log('🚫 Service Worker 처리 제외:', url.pathname);
     return;
   }
@@ -80,35 +81,26 @@ self.addEventListener('fetch', event => {
 
   if (isCdn) {
     event.respondWith(
-      caches.open(DYNAMIC_CACHE).then(cache => {
-        return cache.match(request).then(cachedResponse => {
-          const networkFetch = fetch(request, { 
-            credentials: 'omit', 
-            mode: 'cors',
-            redirect: 'follow'  // 리다이렉트 허용
-          }).then(networkResponse => {
-            if (networkResponse && networkResponse.status === 200 && networkResponse.type !== 'opaque') {
-              cache.put(request, networkResponse.clone()).catch(err => {
-                console.warn('캐시 저장 실패:', err);
-              });
-            }
-            return networkResponse;
-          }).catch(error => {
-            console.warn('CDN 리소스 로드 실패:', request.url, error);
-            return cachedResponse || new Response('', {status: 503, statusText: 'Network Error'});
-          });
-          return cachedResponse || networkFetch;
-        });
+      fetch(request, { 
+        credentials: 'omit', 
+        mode: 'cors',
+        redirect: 'follow'
+      }).then(response => {
+        // CDN 리소스는 단순하게 반환만 하고 캐싱은 브라우저에 맡김
+        return response;
+      }).catch(error => {
+        console.warn('CDN 리소스 로드 실패:', request.url, error);
+        return new Response('', {status: 503, statusText: 'Network Error'});
       })
     );
     return;
   }
   
-  // Supabase, API, non-GET 요청은 네트워크 우선 (리다이렉트 지원)
+  // Supabase, API, non-GET 요청은 네트워크 직접 처리
   if (url.hostname.includes('supabase.co') || url.pathname.startsWith('/api') || request.method !== 'GET') {
     event.respondWith(
       fetch(request, {
-        redirect: 'follow',  // 리다이렉트 허용
+        redirect: 'follow',
         credentials: 'same-origin'
       }).catch(error => {
         console.warn('네트워크 요청 실패:', request.url, error);
@@ -118,40 +110,17 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // 로컬 정적 자원은 캐시 우선 (리다이렉트 지원)
+  // 기타 정적 자원들만 캐시 처리
   event.respondWith(
-    caches.match(request).then(response => {
-      return response || fetch(request, {
-        redirect: 'follow',  // 리다이렉트 허용
-        credentials: 'same-origin'
-      }).then(fetchResponse => {
-        // 올바른 응답만 캐시에 저장
-        if (fetchResponse && 
-            fetchResponse.status === 200 && 
-            fetchResponse.type === 'basic' &&
-            !fetchResponse.redirected) {
-          const responseToCache = fetchResponse.clone();
-          caches.open(DYNAMIC_CACHE).then(cache => {
-            cache.put(request, responseToCache).catch(err => {
-              console.warn('캐시 저장 실패:', err);
-            });
-          });
-        }
-        return fetchResponse;
-      }).catch(error => {
-        console.warn('로컬 리소스 로드 실패:', request.url, error);
-        // 문서 요청인 경우 오프라인 페이지 반환
-        if (request.destination === 'document') {
-          return caches.match('/offline.html').then(offlineResponse => {
-            return offlineResponse || new Response('오프라인 상태입니다.', {
-              status: 503,
-              statusText: 'Offline',
-              headers: { 'Content-Type': 'text/html; charset=utf-8' }
-            });
-          });
-        }
-        return new Response('', {status: 503, statusText: 'Offline'});
-      });
+    fetch(request, {
+      redirect: 'follow',
+      credentials: 'same-origin'
+    }).then(fetchResponse => {
+      // 성공적인 응답만 반환 (캐싱은 하지 않음)
+      return fetchResponse;
+    }).catch(error => {
+      console.warn('리소스 로드 실패:', request.url, error);
+      return new Response('', {status: 503, statusText: 'Offline'});
     })
   );
 });

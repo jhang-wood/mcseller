@@ -168,7 +168,8 @@ async function handleLogin(e) {
                 const adminEmails = [
                     'admin@mcseller.co.kr',
                     'qwg18@naver.com',
-                    'mcseller@gmail.com'
+                    'mcseller@gmail.com',
+                    'rvd3855@gmail.com'
                 ];
                 
                 isAdmin = adminEmails.includes(data.user.email);

@@ -153,7 +153,8 @@ async function checkAdminAccess() {
             const adminEmails = [
                 'admin@mcseller.co.kr',
                 'qwg18@naver.com',
-                'mcseller@gmail.com'
+                'mcseller@gmail.com',
+                'rvd3855@gmail.com'
             ];
             
             isAdmin = adminEmails.includes(session.user.email);
