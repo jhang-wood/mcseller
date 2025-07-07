@@ -1,5 +1,5 @@
 // MCSELLER PWA Service Worker
-const CACHE_NAME = 'mcseller-v1.0.1';
+const CACHE_NAME = 'mcseller-v1.0.2';
 const STATIC_CACHE = `${CACHE_NAME}-static`;
 const DYNAMIC_CACHE = `${CACHE_NAME}-dynamic`;
 
@@ -66,6 +66,18 @@ self.addEventListener('activate', event => {
 
 // Fetch 이벤트 - 네트워크 요청 인터셉트
 self.addEventListener('fetch', event => {
+  // auth.html 요청 처리
+  if (event.request.url.includes('auth.html')) {
+    event.respondWith(
+      fetch(event.request, {
+        redirect: 'follow',
+        credentials: 'include',
+        mode: 'cors'
+      }).catch(() => caches.match('/auth.html'))
+    );
+    return;
+  }
+
   // 교육 콘텐츠와 인증 관련 요청은 항상 네트워크 우선
   if (event.request.url.includes('supabase.co') || 
       event.request.url.includes('youtube.com') ||
@@ -74,7 +86,8 @@ self.addEventListener('fetch', event => {
     
     event.respondWith(
       fetch(event.request, {
-        redirect: 'follow'  // redirect 모드 명시적 설정
+        redirect: 'follow',
+        credentials: 'include'
       })
         .catch(() => {
           // 네트워크 실패 시 오프라인 페이지 제공
@@ -95,7 +108,8 @@ self.addEventListener('fetch', event => {
         }
         
         return fetch(event.request, {
-          redirect: 'follow'  // redirect 모드 명시적 설정
+          redirect: 'follow',
+          credentials: 'include'
         })
           .then(fetchResponse => {
             if (!fetchResponse || fetchResponse.status !== 200 || fetchResponse.type !== 'basic') {
