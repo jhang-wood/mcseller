@@ -1,5 +1,5 @@
 // MCSELLER PWA Service Worker
-const CACHE_NAME = 'mcseller-v1.0.3';
+const CACHE_NAME = 'mcseller-v1.0.4';
 const STATIC_CACHE = `${CACHE_NAME}-static`;
 const DYNAMIC_CACHE = `${CACHE_NAME}-dynamic`;
 
@@ -7,7 +7,6 @@ const DYNAMIC_CACHE = `${CACHE_NAME}-dynamic`;
 const STATIC_FILES = [
   '/',
   '/index.html',
-  '/auth.html',
   '/mypage.html',
   '/css/styles.css',
   '/js/main.js',
@@ -66,14 +65,9 @@ self.addEventListener('activate', event => {
 
 // Fetch 이벤트 - 네트워크 요청 인터셉트
 self.addEventListener('fetch', event => {
-  // auth.html 요청 처리
+  // auth.html 요청은 Service Worker에서 처리하지 않음 (리다이렉트 문제 방지)
   if (event.request.url.includes('auth.html')) {
-    event.respondWith(
-      fetch(event.request, {
-        redirect: 'follow'
-      }).catch(() => caches.match('/auth.html'))
-    );
-    return;
+    return; // Service Worker 처리 제외
   }
 
   // Supabase 요청 처리 - credentials 없이
