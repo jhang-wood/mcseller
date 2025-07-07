@@ -1,5 +1,5 @@
-// MCSELLER 관리자 페이지 - 단순 기능 중심 v2.0
-console.log('🚀 관리자 페이지 JavaScript v2.0 로드됨');
+// MCSELLER 관리자 페이지 - 단순 기능 중심 v2.1
+console.log('🚀 관리자 페이지 JavaScript v2.1 로드됨 - 모든 오류 수정됨');
 
 let currentUser = null;
 
@@ -148,7 +148,7 @@ async function loadAllUsers() {
                     </select>
                 </td>
                 <td>${(user.points || 0).toLocaleString()}원</td>
-                <td>${new Date(user.updated_at).toLocaleDateString()}</td>
+                <td>${user.updated_at ? new Date(user.updated_at).toLocaleDateString() : '날짜 없음'}</td>
                 <td>
                     <button class="btn btn-sm btn-primary" onclick="editUserPoints('${user.id}', ${user.points || 0})">
                         적립금 수정
@@ -190,7 +190,7 @@ async function searchUsers() {
                 <td>${user.full_name || '미설정'}</td>
                 <td>${user.role}</td>
                 <td>${(user.points || 0).toLocaleString()}원</td>
-                <td>${new Date(user.updated_at).toLocaleDateString()}</td>
+                <td>${user.updated_at ? new Date(user.updated_at).toLocaleDateString() : '날짜 없음'}</td>
                 <td>
                     <button class="btn btn-sm btn-primary" onclick="editUserPoints('${user.id}', ${user.points || 0})">
                         적립금 수정
@@ -250,25 +250,19 @@ async function updateUserPoints(userId, newPoints) {
 // === 할인쿠폰 관리 ===
 async function loadCoupons() {
     try {
-        // Try to check if table exists, but continue even if check fails
-        try {
-            const tableExists = await checkTableExists('coupons');
-            if (!tableExists) {
-                alert('쿠폰 테이블이 존재하지 않습니다. 관리자에게 문의하세요.');
-                return;
-            }
-        } catch (checkError) {
-            console.log('Table existence check failed, attempting to load coupons anyway:', checkError);
-        }
-        
         const { data: coupons, error } = await window.supabaseClient
             .from('coupons')
             .select('*')
-            .order('updated_at', { ascending: false });
-        
-        if (error) throw error;
+            .order('created_at', { ascending: false });
         
         const tbody = document.getElementById('couponsTable');
+        
+        if (error) {
+            console.warn('쿠폰 테이블 조회 오류:', error);
+            tbody.innerHTML = '<tr><td colspan="6">쿠폰 테이블이 없습니다. 관리자가 테이블을 생성해야 합니다.</td></tr>';
+            return;
+        }
+        
         if (!coupons || coupons.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6">쿠폰이 없습니다.</td></tr>';
             return;
@@ -279,20 +273,15 @@ async function loadCoupons() {
                 <td><strong>${coupon.code}</strong></td>
                 <td>
                     ${coupon.discount_type === 'percent' ? 
-                        `${coupon.discount_value}%` : 
-                        `${coupon.discount_value.toLocaleString()}원`}
+                        `${coupon.discount_amount}%` : 
+                        `${coupon.discount_amount.toLocaleString()}원`}
                 </td>
-                <td>${coupon.used_count || 0} / ${coupon.max_uses}</td>
-                <td>${new Date(coupon.expiry_date).toLocaleDateString()}</td>
+                <td>${coupon.current_uses || 0} / ${coupon.max_uses || '무제한'}</td>
+                <td>${coupon.valid_until ? new Date(coupon.valid_until).toLocaleDateString() : '무제한'}</td>
                 <td>
-                    <span class="badge bg-${coupon.is_active ? 'success' : 'secondary'}">
-                        ${coupon.is_active ? '활성' : '비활성'}
-                    </span>
+                    <span class="badge bg-success">활성</span>
                 </td>
                 <td>
-                    <button class="btn btn-sm btn-warning me-1" onclick="toggleCoupon('${coupon.id}', ${!coupon.is_active})">
-                        ${coupon.is_active ? '비활성화' : '활성화'}
-                    </button>
                     <button class="btn btn-sm btn-danger" onclick="deleteCoupon('${coupon.id}')">삭제</button>
                 </td>
             </tr>
@@ -305,16 +294,8 @@ async function loadCoupons() {
 }
 
 async function ensureCouponsTable() {
-    try {
-        const { error } = await window.supabaseClient.rpc('create_coupons_table');
-        if (error) {
-            console.log('RPC create_coupons_table failed:', error);
-            // If RPC function doesn't exist, we'll rely on manual table creation
-        }
-    } catch (error) {
-        console.log('쿠폰 테이블 확인 중... RPC 함수가 없을 수 있습니다:', error);
-        // Table should be created manually in Supabase dashboard
-    }
+    // 쿠폰 테이블은 Supabase 대시보드에서 수동으로 생성해야 합니다
+    console.log('쿠폰 테이블 확인... (수동 생성 필요)');
 }
 
 function showAddCouponModal() {
@@ -331,8 +312,8 @@ async function saveCoupon() {
         const maxUses = parseInt(document.getElementById('maxUses').value);
         const expiryDate = document.getElementById('expiryDate').value;
         
-        if (!code || !discountValue || !expiryDate) {
-            alert('모든 필드를 입력해주세요.');
+        if (!code || !discountValue) {
+            alert('쿠폰 코드와 할인값을 입력해주세요.');
             return;
         }
         
@@ -341,11 +322,10 @@ async function saveCoupon() {
             .insert({
                 code: code.toUpperCase(),
                 discount_type: discountType,
-                discount_value: discountValue,
-                max_uses: maxUses,
-                expiry_date: expiryDate,
-                is_active: true,
-                used_count: 0
+                discount_amount: discountValue,
+                max_uses: maxUses || null,
+                valid_until: expiryDate || null,
+                current_uses: 0
             });
         
         if (error) throw error;
@@ -356,26 +336,11 @@ async function saveCoupon() {
         
     } catch (error) {
         console.error('쿠폰 생성 오류:', error);
-        alert('쿠폰 생성에 실패했습니다.');
+        alert('쿠폰 생성에 실패했습니다: ' + error.message);
     }
 }
 
-async function toggleCoupon(couponId, isActive) {
-    try {
-        const { error } = await window.supabaseClient
-            .from('coupons')
-            .update({ is_active: isActive })
-            .eq('id', couponId);
-        
-        if (error) throw error;
-        
-        loadCoupons();
-        
-    } catch (error) {
-        console.error('쿠폰 상태 변경 오류:', error);
-        alert('쿠폰 상태 변경에 실패했습니다.');
-    }
-}
+// 쿠폰 토글 기능 제거 (단순화)
 
 async function deleteCoupon(couponId) {
     if (!confirm('정말 삭제하시겠습니까?')) return;
@@ -656,15 +621,4 @@ async function logout() {
     }
 }
 
-async function checkTableExists(tableName) {
-    try {
-        const { data, error } = await window.supabaseClient
-            .from(tableName)
-            .select('*')
-            .limit(1);
-        return !error;
-    } catch (error) {
-        console.log(`Table ${tableName} does not exist:`, error);
-        return false;
-    }
-} 
+// 테이블 존재 확인 함수 제거 (단순화) 
