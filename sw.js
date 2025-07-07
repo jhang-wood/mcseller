@@ -1,5 +1,5 @@
 // MCSELLER PWA Service Worker
-const CACHE_NAME = 'mcseller-v1.0.5';
+const CACHE_NAME = 'mcseller-v1.0.6';
 const STATIC_CACHE = `${CACHE_NAME}-static`;
 const DYNAMIC_CACHE = `${CACHE_NAME}-dynamic`;
 
@@ -67,8 +67,8 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const reqUrl = new URL(event.request.url);
 
-  // auth.html 요청은 Service Worker에서 처리하지 않음 (리다이렉트 문제 방지)
-  if (reqUrl.pathname.endsWith('/auth.html')) {
+  // auth.html과 admin.html 요청은 Service Worker에서 처리하지 않음 (세션/리다이렉트 문제 방지)
+  if (reqUrl.pathname.endsWith('/auth.html') || reqUrl.pathname.endsWith('/admin.html')) {
     return;
   }
 

@@ -147,19 +147,26 @@ async function handleLogin(e) {
                     // 관리자 권한이 있는 경우 관리자 페이지로 이동
                     if (profile && profile.role === 'admin') {
                         showToast('관리자 페이지로 이동합니다.', 'info');
-                        window.location.href = '/admin.html';
+                        // 세션이 완전히 저장될 시간을 더 충분히 줌
+                        setTimeout(() => {
+                            window.location.href = '/admin.html';
+                        }, 2000);
                         return;
                     }
                     
                     // 일반 사용자는 마이페이지 또는 리다이렉트 URL로 이동
                     const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/mypage.html';
-                    window.location.href = redirectUrl;
+                    setTimeout(() => {
+                        window.location.href = redirectUrl;
+                    }, 1500);
                     
                 } catch (profileError) {
                     console.error('프로필 조회 오류:', profileError);
                     // 프로필 조회 실패 시 기본 페이지로 이동
                     const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/mypage.html';
-                    window.location.href = redirectUrl;
+                    setTimeout(() => {
+                        window.location.href = redirectUrl;
+                    }, 1500);
                 }
             }, 1000);
         }

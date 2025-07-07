@@ -37,7 +37,15 @@ async function initializeSupabaseClient() {
                     auth: {
                         autoRefreshToken: true,
                         persistSession: true,
-                        detectSessionInUrl: true
+                        detectSessionInUrl: true,
+                        flowType: 'pkce',
+                        storage: window.localStorage,
+                        storageKey: 'sb-rpcctgtmtplfahwtnglq-auth-token'
+                    },
+                    global: {
+                        headers: {
+                            'X-Client-Info': 'mcseller-web'
+                        }
                     }
                 }
             };
@@ -130,7 +138,32 @@ async function getCurrentUser() {
 }
 
 /**
- * 현재 세션 가져오기
+ * 세션이 완전히 로드될 때까지 대기
+ */
+async function waitForSession(maxWaitTime = 3000) {
+    const startTime = Date.now();
+    
+    while (Date.now() - startTime < maxWaitTime) {
+        try {
+            const { data: { session }, error } = await window.supabaseClient.auth.getSession();
+            if (!error && session) {
+                console.log('✅ 세션 로드 완료:', session.user.email);
+                return session;
+            }
+        } catch (err) {
+            console.log('⏳ 세션 로드 중...');
+        }
+        
+        // 100ms 대기 후 재시도
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    console.log('⚠️ 세션 로드 타임아웃');
+    return null;
+}
+
+/**
+ * 현재 세션 가져오기 (재시도 로직 포함)
  */
 async function getSession() {
     if (!window.supabaseClient) {
@@ -139,9 +172,24 @@ async function getSession() {
     }
     
     try {
+        // 먼저 일반적인 방법으로 시도
         const { data: { session }, error } = await window.supabaseClient.auth.getSession();
-        if (error) throw error;
-        return session;
+        if (!error && session) {
+            return session;
+        }
+        
+        // 세션이 없으면 잠시 대기 후 재시도
+        console.log('🔄 세션 재로드 시도...');
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const { data: { session: retrySession }, error: retryError } = await window.supabaseClient.auth.getSession();
+        if (!retryError && retrySession) {
+            console.log('✅ 세션 재로드 성공');
+            return retrySession;
+        }
+        
+        if (retryError) throw retryError;
+        return null;
     } catch (error) {
         console.error('세션 가져오기 실패:', error);
         return null;
@@ -199,6 +247,7 @@ async function signOut() {
 // 전역 함수 노출
 window.getCurrentUser = getCurrentUser;
 window.getSession = getSession;
+window.waitForSession = waitForSession;
 window.checkPurchase = checkPurchase;
 window.signOut = signOut;
 

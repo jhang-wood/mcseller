@@ -60,32 +60,36 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 관리자 페이지 초기화
 async function initializeAdminPage() {
-    // 관리자 권한 확인
-    const isAdmin = await checkAdminAccess();
-    if (!isAdmin) {
-        window.location.href = 'index.html';
-        return;
-    }
+    console.log('🚀 관리자 페이지 초기화 시작');
     
-    // 사용자 정보 표시
-    const adminEmail = localStorage.getItem('adminEmail');
-    if (adminEmail) {
-        document.getElementById('admin-name').textContent = 'MCSELLER 관리자';
-    } else {
-        const user = await getCurrentUser();
-        if (user) {
-            document.getElementById('admin-name').textContent = user.email;
+    try {
+        // 페이지 로드 시 약간의 지연을 주어 모든 스크립트가 완전히 로드되도록 함
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // 관리자 접근 권한 확인
+        const hasAccess = await checkAdminAccess();
+        if (!hasAccess) {
+            return;
         }
+        
+        // 사이드바 네비게이션 설정
+        setupSidebarNavigation();
+        
+        // 기본 대시보드 표시
+        showSection('dashboard');
+        
+        console.log('✅ 관리자 페이지 초기화 완료');
+        
+    } catch (error) {
+        console.error('❌ 관리자 페이지 초기화 오류:', error);
+        showToast('페이지 초기화 중 오류가 발생했습니다.', 'error');
     }
-    
-    // 초기 섹션 로드
-    showSection('dashboard');
 }
 
 // 관리자 권한 확인
 async function checkAdminAccess() {
     try {
-        // Supabase 클라이언트 대기
+        // Supabase 클라이언트가 준비될 때까지 대기
         if (!window.supabaseClient) {
             console.log('⏳ Supabase 클라이언트 대기 중...');
             await new Promise(resolve => {
@@ -93,15 +97,21 @@ async function checkAdminAccess() {
             });
         }
         
-        // 현재 로그인된 사용자 확인
-        const { data: { session }, error: sessionError } = await window.supabaseClient.auth.getSession();
+        // 세션이 완전히 로드될 때까지 대기 (최대 5초)
+        console.log('🔄 세션 로드 대기 중...');
+        const session = await window.waitForSession(5000);
         
-        if (sessionError || !session || !session.user) {
+        if (!session || !session.user) {
             console.log('❌ 로그인되지 않음 - 메인페이지로 리다이렉트');
             alert('로그인이 필요합니다.');
             window.location.href = '/auth.html?redirect=' + encodeURIComponent('/admin.html');
             return false;
         }
+        
+        console.log('✅ 세션 확인 완료:', session.user.email);
+        
+        // 사용자 정보 표시
+        updateAdminUserInfo(session.user);
         
         // 프로필에서 관리자 권한 확인
         const { data: profile, error: profileError } = await window.supabaseClient
@@ -1571,5 +1581,23 @@ async function deleteDiscountCode(index) {
             console.error('할인 코드 삭제 오류:', error);
             showToast('할인 코드 삭제 중 오류가 발생했습니다.', 'error');
         }
+    }
+}
+
+// 사용자 정보 표시
+function updateAdminUserInfo(user) {
+    try {
+        // 관리자 이름 표시 (이메일에서 @ 앞부분 사용)
+        const adminNameElement = document.getElementById('admin-name');
+        if (adminNameElement) {
+            const displayName = user.user_metadata?.full_name || 
+                               user.email?.split('@')[0] || 
+                               '관리자';
+            adminNameElement.textContent = displayName;
+        }
+        
+        console.log('✅ 관리자 정보 표시 완료:', user.email);
+    } catch (error) {
+        console.error('관리자 정보 표시 오류:', error);
     }
 }
