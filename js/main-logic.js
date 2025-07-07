@@ -358,25 +358,47 @@ async function checkLoginStatus() {
             
             // 관리자 권한 확인 및 리다이렉트 (현재 페이지가 admin.html이 아닌 경우에만)
             if (!window.location.pathname.includes('admin.html')) {
-                try {
-                    const { data: profile, error: profileError } = await window.supabaseClient
-                        .from('profiles')
-                        .select('role')
-                        .eq('id', session.user.id)
-                        .single();
-                    
-                    if (profile && profile.role === 'admin') {
-                        console.log("🔑 관리자 권한 감지 - 관리자 페이지로 리다이렉트");
-                        showToast('관리자 페이지로 이동합니다.', 'info');
-                        setTimeout(() => {
-                            window.location.href = '/admin.html';
-                        }, 1500);
-                        return session.user;
+                console.log('🔍 main-logic.js에서 관리자 권한 확인 - 사용자:', session.user.email);
+                
+                // 관리자 이메일 목록 (1차 확인)
+                const adminEmails = [
+                    'admin@mcseller.co.kr',
+                    'qwg18@naver.com',
+                    'mcseller@gmail.com',
+                    'rvd3855@gmail.com'
+                ];
+                
+                let isAdmin = adminEmails.includes(session.user.email);
+                console.log('📧 이메일 기반 관리자 확인:', isAdmin);
+                
+                // 추가로 Supabase profiles 테이블에서도 확인 (2차 확인)
+                if (!isAdmin) {
+                    try {
+                        const { data: profile, error: profileError } = await window.supabaseClient
+                            .from('profiles')
+                            .select('role')
+                            .eq('id', session.user.id)
+                            .single();
+                        
+                        if (profile && profile.role === 'admin') {
+                            isAdmin = true;
+                            console.log('🔑 Supabase profiles 테이블에서 관리자 권한 확인됨');
+                        }
+                    } catch (profileError) {
+                        console.log('⚠️ 프로필 테이블 조회 실패 (무시):', profileError);
                     }
-                } catch (profileError) {
-                    console.error("프로필 조회 오류:", profileError);
-                    // 프로필 조회 실패 시에는 일반 사용자로 처리
                 }
+                
+                if (isAdmin) {
+                    console.log("🔑 관리자 권한 감지 - 관리자 페이지로 리다이렉트");
+                    showToast('관리자 페이지로 이동합니다.', 'info');
+                    setTimeout(() => {
+                        window.location.href = '/admin.html';
+                    }, 1500);
+                    return session.user;
+                }
+                
+                console.log('👤 일반 사용자 확인 - 메인페이지 계속 진행');
             }
             
             updateNavigationUI(session.user);
