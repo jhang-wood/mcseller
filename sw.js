@@ -1,5 +1,5 @@
 // MCSELLER PWA Service Worker
-const CACHE_VERSION = 'v1.0.9';
+const CACHE_VERSION = 'v1.1.0';
 const CACHE_NAME = `mcseller-cache-${CACHE_VERSION}`;
 const STATIC_CACHE = `${CACHE_NAME}-static`;
 const DYNAMIC_CACHE = `${CACHE_NAME}-dynamic`;
@@ -64,65 +64,82 @@ self.addEventListener('fetch', event => {
   const request = event.request;
   const url = new URL(request.url);
   
-  // 중요한 페이지들은 Service Worker 처리 제외하여 안정성 확보
-  const excludedPaths = ['/admin.html', '/auth.html', '/index.html', '/'];
-  if (excludedPaths.includes(url.pathname)) {
+  // 모든 HTML 페이지는 Service Worker 처리 제외 (안정성 최우선)
+  const excludedPaths = [
+    '/admin.html', 
+    '/auth.html', 
+    '/index.html', 
+    '/mypage.html',
+    '/payment.html',
+    '/product-detail.html',
+    '/ebook-viewer.html',
+    '/video-viewer.html',
+    '/payment-success.html',
+    '/payment-fail.html',
+    '/'
+  ];
+  
+  // HTML 파일이거나 제외 경로인 경우 네트워크 직접 처리
+  if (excludedPaths.includes(url.pathname) || url.pathname.endsWith('.html')) {
     console.log('🚫 Service Worker 처리 제외:', url.pathname);
     return;
   }
 
-  // CDN 리소스 요청 처리 (리다이렉트 지원)
+  // CDN 리소스는 단순 네트워크 요청
   const isCdn = [
     'cdn.jsdelivr.net',
     'cdnjs.cloudflare.com',
     'fonts.googleapis.com',
-    'fonts.gstatic.com'
-  ].some(domain => url.hostname.endsWith(domain));
+    'fonts.gstatic.com',
+    'unpkg.com',
+    'via.placeholder.com'
+  ].some(domain => url.hostname.includes(domain));
 
   if (isCdn) {
-    event.respondWith(
-      fetch(request, { 
-        credentials: 'omit', 
-        mode: 'cors',
-        redirect: 'follow'
-      }).then(response => {
-        // CDN 리소스는 단순하게 반환만 하고 캐싱은 브라우저에 맡김
-        return response;
-      }).catch(error => {
-        console.warn('CDN 리소스 로드 실패:', request.url, error);
-        return new Response('', {status: 503, statusText: 'Network Error'});
-      })
-    );
+    console.log('🌐 CDN 리소스 직접 로드:', url.hostname);
     return;
   }
   
-  // Supabase, API, non-GET 요청은 네트워크 직접 처리
-  if (url.hostname.includes('supabase.co') || url.pathname.startsWith('/api') || request.method !== 'GET') {
-    event.respondWith(
-      fetch(request, {
-        redirect: 'follow',
-        credentials: 'same-origin'
-      }).catch(error => {
-        console.warn('네트워크 요청 실패:', request.url, error);
-        return new Response('', {status: 503, statusText: 'Network Error'});
-      })
-    );
+  // Supabase API는 네트워크 직접 처리
+  if (url.hostname.includes('supabase.co')) {
+    console.log('🔑 Supabase API 직접 처리:', url.pathname);
     return;
   }
 
-  // 기타 정적 자원들만 캐시 처리
-  event.respondWith(
-    fetch(request, {
-      redirect: 'follow',
-      credentials: 'same-origin'
-    }).then(fetchResponse => {
-      // 성공적인 응답만 반환 (캐싱은 하지 않음)
-      return fetchResponse;
-    }).catch(error => {
-      console.warn('리소스 로드 실패:', request.url, error);
-      return new Response('', {status: 503, statusText: 'Offline'});
-    })
-  );
+  // 나머지 정적 리소스만 캐시 처리 (CSS, JS, 이미지 등)
+  if (request.method === 'GET' && !url.pathname.startsWith('/api')) {
+    event.respondWith(
+      caches.match(request).then(cachedResponse => {
+        // 캐시가 있으면 캐시 반환, 없으면 네트워크
+        if (cachedResponse) {
+          console.log('📦 캐시에서 로드:', url.pathname);
+          return cachedResponse;
+        }
+        
+        // 네트워크에서 가져오기
+        return fetch(request).then(networkResponse => {
+          // 성공적인 응답만 캐시에 저장
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches.open(DYNAMIC_CACHE).then(cache => {
+              cache.put(request, responseToCache).catch(err => {
+                console.warn('캐시 저장 실패:', err);
+              });
+            });
+          }
+          return networkResponse;
+        }).catch(error => {
+          console.error('네트워크 요청 실패:', url.pathname, error);
+          // 오프라인 폴백
+          return new Response('오프라인 상태입니다', {
+            status: 503,
+            statusText: 'Service Unavailable',
+            headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+          });
+        });
+      })
+    );
+  }
 });
 
 // 백그라운드 동기화

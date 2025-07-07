@@ -44,9 +44,8 @@ async function initializeMyPage() {
         console.log('📚 구매 콘텐츠 로딩 중...');
         await loadPurchasedContent();
         
-        // 모든 로딩 완료 - UI 표시
+        // 모든 로딩 완료
         console.log('✅ 마이페이지 로딩 완료');
-        document.body.style.opacity = '1';
         
         // 전역 사용자 정보 설정
         window.currentUser = session.user;
