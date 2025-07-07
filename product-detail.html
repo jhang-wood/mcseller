@@ -355,13 +355,15 @@
         </div>
     </div>
 
-    <!-- Kakao Chat Widget -->
-    <div id="kakao-chat-widget">
-        <div id="chat-button" class="chat-button">
-            <i class="fas fa-comment"></i>
-            <span>문의하기</span>
-        </div>
-    </div>
+    <!-- Kakao Channel Button -->
+    <a
+        href="http://pf.kakao.com/_pWbgxj"
+        target="_blank"
+        class="kakao-chat-btn"
+        title="카카오톡 채널 문의"
+    >
+        <i class="fas fa-comment"></i>
+    </a>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -382,10 +384,42 @@
             window.location.href = 'index.html';
         }
         
-        // 채팅 버튼 클릭 이벤트
-        document.getElementById('chat-button').addEventListener('click', function() {
-            alert('고객지원 채팅이 곧 연결됩니다. 카카오톡을 확인해 주세요.');
-        });
+        // CSS for Kakao Channel Button
+        const style = document.createElement('style');
+        style.textContent = `
+            .kakao-chat-btn {
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                width: 60px;
+                height: 60px;
+                background: linear-gradient(90deg, #ff9900, #ffe259);
+                border: none;
+                border-radius: 50%;
+                color: #111111;
+                font-size: 1.3rem;
+                box-shadow: 0 8px 25px rgba(255, 153, 0, 0.4);
+                transition: all 0.3s ease;
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
+            }
+
+            .kakao-chat-btn:hover {
+                transform: scale(1.1) translateY(-3px);
+                box-shadow: 0 12px 35px rgba(255, 153, 0, 0.5);
+                color: #111111;
+                text-decoration: none;
+            }
+
+            .kakao-chat-btn:focus {
+                color: #111111;
+                text-decoration: none;
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>

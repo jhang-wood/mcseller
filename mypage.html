@@ -652,8 +652,8 @@
                 margin-left: 10px;
             }
 
-            /* Floating Action Button */
-            .fab {
+            /* Kakao Channel Button */
+            .kakao-chat-btn {
                 position: fixed;
                 bottom: 30px;
                 right: 30px;
@@ -663,16 +663,26 @@
                 border: none;
                 border-radius: 50%;
                 color: var(--dark);
-                font-size: 1.5rem;
+                font-size: 1.3rem;
                 box-shadow: 0 8px 25px rgba(255, 153, 0, 0.4);
                 transition: all 0.3s ease;
                 z-index: 1000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
             }
 
-            .fab:hover {
+            .kakao-chat-btn:hover {
                 transform: scale(1.1) translateY(-3px);
                 box-shadow: 0 12px 35px rgba(255, 153, 0, 0.5);
                 color: var(--dark);
+                text-decoration: none;
+            }
+
+            .kakao-chat-btn:focus {
+                color: var(--dark);
+                text-decoration: none;
             }
 
             /* Enhanced Animations */
@@ -968,14 +978,15 @@
             </div>
         </div>
 
-        <!-- Floating Action Button -->
-        <button
-            class="fab tooltip-custom"
-            data-tooltip="새 강의 추천"
-            onclick="window.location.href='index.html#courses'"
+        <!-- Kakao Channel Button -->
+        <a
+            href="http://pf.kakao.com/_pWbgxj"
+            target="_blank"
+            class="kakao-chat-btn tooltip-custom"
+            data-tooltip="카카오톡 채널 문의"
         >
-            <i class="fas fa-plus"></i>
-        </button>
+            <i class="fas fa-comment"></i>
+        </a>
 
         <script src="js/supabase-config.js"></script>
         <script src="js/supabase-client.js"></script>
@@ -1281,12 +1292,12 @@
                     }, duration);
                 };
 
-                // Enhanced FAB functionality
-                const enhanceFAB = () => {
-                    const fab = document.querySelector(".fab");
+                // Enhanced Kakao Chat Button functionality
+                const enhanceKakaoButton = () => {
+                    const kakaoBtn = document.querySelector(".kakao-chat-btn");
                     let isScrolled = false;
 
-                    // Hide/show FAB based on scroll
+                    // Hide/show button based on scroll
                     window.addEventListener("scroll", () => {
                         const scrollTop =
                             window.pageYOffset ||
@@ -1294,26 +1305,32 @@
 
                         if (scrollTop > 200 && !isScrolled) {
                             isScrolled = true;
-                            fab.style.transform = "scale(1.2)";
+                            kakaoBtn.style.transform = "scale(1.2)";
                             setTimeout(() => {
-                                fab.style.transform = "scale(1)";
+                                kakaoBtn.style.transform = "scale(1)";
                             }, 200);
                         } else if (scrollTop <= 200 && isScrolled) {
                             isScrolled = false;
-                            fab.style.transform = "scale(0.8)";
+                            kakaoBtn.style.transform = "scale(0.8)";
                             setTimeout(() => {
-                                fab.style.transform = "scale(1)";
+                                kakaoBtn.style.transform = "scale(1)";
                             }, 200);
                         }
                     });
 
                     // Add pulse animation on hover
-                    fab.addEventListener("mouseenter", function () {
+                    kakaoBtn.addEventListener("mouseenter", function () {
                         this.style.animation = "pulse 1s infinite";
                     });
 
-                    fab.addEventListener("mouseleave", function () {
+                    kakaoBtn.addEventListener("mouseleave", function () {
                         this.style.animation = "none";
+                    });
+
+                    // Add click tracking
+                    kakaoBtn.addEventListener("click", function () {
+                        console.log("카카오톡 채널 버튼 클릭됨");
+                        showNotification("카카오톡 채널로 이동합니다! 💬", "info", 2000);
                     });
                 };
 
@@ -1323,7 +1340,7 @@
                 setTimeout(updateStats, 600);
                 enhanceCourseCards();
                 enhanceUserInfo();
-                enhanceFAB();
+                enhanceKakaoButton();
 
                 // Add keyboard shortcuts
                 document.addEventListener("keydown", function (e) {
