@@ -1,4 +1,5 @@
-// MCSELLER 관리자 페이지 - 단순 기능 중심
+// MCSELLER 관리자 페이지 - 단순 기능 중심 v2.0
+console.log('🚀 관리자 페이지 JavaScript v2.0 로드됨');
 
 let currentUser = null;
 
@@ -8,10 +9,20 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // Supabase 클라이언트 대기
     if (!window.supabaseClient) {
+        console.log('⏳ Supabase 클라이언트 대기 중...');
         await new Promise(resolve => {
-            window.addEventListener('supabaseClientReady', resolve, { once: true });
+            const checkClient = () => {
+                if (window.supabaseClient) {
+                    resolve();
+                } else {
+                    setTimeout(checkClient, 100);
+                }
+            };
+            checkClient();
         });
     }
+    
+    console.log('✅ Supabase 클라이언트 로드됨');
     
     // 관리자 권한 확인
     const isAdmin = await checkAdminAccess();
@@ -22,6 +33,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // 기본 섹션 로드
     loadSection('users');
+    
+    console.log('✅ 관리자 페이지 초기화 완료');
 });
 
 // 관리자 권한 확인
