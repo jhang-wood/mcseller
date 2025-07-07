@@ -53,6 +53,26 @@ async function initializeMyPage() {
         // 실시간 인증 상태 감지 설정
         setupAuthStateListener();
         
+        // 관리자 권한 확인 및 리다이렉트 (현재 페이지가 admin.html이 아닌 경우에만)
+        if (!window.location.pathname.includes('admin.html')) {
+            try {
+                const { data: profile, error: profileError } = await window.supabaseClient
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', session.user.id)
+                    .single();
+                
+                if (profile && profile.role === 'admin') {
+                    // 관리자 페이지로 리다이렉트
+                    alert('관리자 계정입니다. 관리자 페이지로 이동합니다.');
+                    window.location.href = '/admin.html';
+                    return;
+                }
+            } catch (profileError) {
+                // 프로필 조회 실패 시에는 일반 사용자로 처리
+            }
+        }
+        
     } catch (error) {
         console.error('❌ 마이페이지 초기화 중 오류:', error);
         showAuthError('페이지 로드 중 오류가 발생했습니다.');
