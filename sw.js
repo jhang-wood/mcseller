@@ -1,5 +1,5 @@
 // MCSELLER PWA Service Worker
-const CACHE_NAME = 'mcseller-v1.0.2';
+const CACHE_NAME = 'mcseller-v1.0.3';
 const STATIC_CACHE = `${CACHE_NAME}-static`;
 const DYNAMIC_CACHE = `${CACHE_NAME}-dynamic`;
 
@@ -70,31 +70,60 @@ self.addEventListener('fetch', event => {
   if (event.request.url.includes('auth.html')) {
     event.respondWith(
       fetch(event.request, {
-        redirect: 'follow',
-        credentials: 'include',
-        mode: 'cors'
+        redirect: 'follow'
       }).catch(() => caches.match('/auth.html'))
     );
     return;
   }
 
-  // 교육 콘텐츠와 인증 관련 요청은 항상 네트워크 우선
-  if (event.request.url.includes('supabase.co') || 
-      event.request.url.includes('youtube.com') ||
+  // Supabase 요청 처리 - credentials 없이
+  if (event.request.url.includes('supabase.co')) {
+    event.respondWith(
+      fetch(event.request, {
+        redirect: 'follow',
+        mode: 'cors'
+      }).catch(() => {
+        // 네트워크 실패 시 오프라인 페이지 제공
+        if (event.request.destination === 'document') {
+          return caches.match('/offline.html');
+        }
+      })
+    );
+    return;
+  }
+
+  // 외부 CDN 요청 (Google Fonts, Bootstrap 등) - credentials 없이
+  if (event.request.url.includes('googleapis.com') || 
+      event.request.url.includes('gstatic.com') ||
+      event.request.url.includes('jsdelivr.net') ||
+      event.request.url.includes('cdnjs.cloudflare.com')) {
+    
+    event.respondWith(
+      fetch(event.request, {
+        redirect: 'follow',
+        mode: 'cors'
+      }).catch(() => {
+        // CDN 실패 시 캐시에서 찾기
+        return caches.match(event.request);
+      })
+    );
+    return;
+  }
+
+  // YouTube 및 기타 API 요청
+  if (event.request.url.includes('youtube.com') ||
       event.request.url.includes('api') ||
       event.request.method !== 'GET') {
     
     event.respondWith(
       fetch(event.request, {
-        redirect: 'follow',
-        credentials: 'include'
+        redirect: 'follow'
+      }).catch(() => {
+        // 네트워크 실패 시 오프라인 페이지 제공
+        if (event.request.destination === 'document') {
+          return caches.match('/offline.html');
+        }
       })
-        .catch(() => {
-          // 네트워크 실패 시 오프라인 페이지 제공
-          if (event.request.destination === 'document') {
-            return caches.match('/offline.html');
-          }
-        })
     );
     return;
   }
@@ -108,8 +137,7 @@ self.addEventListener('fetch', event => {
         }
         
         return fetch(event.request, {
-          redirect: 'follow',
-          credentials: 'include'
+          redirect: 'follow'
         })
           .then(fetchResponse => {
             if (!fetchResponse || fetchResponse.status !== 200 || fetchResponse.type !== 'basic') {
