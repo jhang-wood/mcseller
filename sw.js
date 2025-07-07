@@ -1,5 +1,5 @@
 // MCSELLER PWA Service Worker
-const CACHE_NAME = 'mcseller-v1.0.4';
+const CACHE_NAME = 'mcseller-v1.0.5';
 const STATIC_CACHE = `${CACHE_NAME}-static`;
 const DYNAMIC_CACHE = `${CACHE_NAME}-dynamic`;
 
@@ -65,102 +65,62 @@ self.addEventListener('activate', event => {
 
 // Fetch 이벤트 - 네트워크 요청 인터셉트
 self.addEventListener('fetch', event => {
+  const reqUrl = new URL(event.request.url);
+
   // auth.html 요청은 Service Worker에서 처리하지 않음 (리다이렉트 문제 방지)
-  if (event.request.url.includes('auth.html')) {
-    return; // Service Worker 처리 제외
-  }
-
-  // Supabase 요청 처리 - credentials 없이
-  if (event.request.url.includes('supabase.co')) {
-    event.respondWith(
-      fetch(event.request, {
-        redirect: 'follow',
-        mode: 'cors'
-      }).catch(() => {
-        // 네트워크 실패 시 오프라인 페이지 제공
-        if (event.request.destination === 'document') {
-          return caches.match('/offline.html');
-        }
-      })
-    );
+  if (reqUrl.pathname.endsWith('/auth.html')) {
     return;
   }
 
-  // 외부 CDN 요청 (Google Fonts, Bootstrap 등) - credentials 없이
-  if (event.request.url.includes('googleapis.com') || 
-      event.request.url.includes('gstatic.com') ||
-      event.request.url.includes('jsdelivr.net') ||
-      event.request.url.includes('cdnjs.cloudflare.com')) {
-    
-    event.respondWith(
-      fetch(event.request, {
-        redirect: 'follow',
-        mode: 'cors'
-      }).catch(() => {
-        // CDN 실패 시 캐시에서 찾기
-        return caches.match(event.request);
-      })
-    );
-    return;
-  }
+  // CDN 리소스 요청 처리
+  const isCdn = [
+    'cdn.jsdelivr.net',
+    'cdnjs.cloudflare.com',
+    'fonts.googleapis.com',
+    'fonts.gstatic.com'
+  ].some(domain => reqUrl.hostname.endsWith(domain));
 
-  // YouTube 및 기타 API 요청
-  if (event.request.url.includes('youtube.com') ||
-      event.request.url.includes('api') ||
-      event.request.method !== 'GET') {
-    
+  if (isCdn) {
     event.respondWith(
-      fetch(event.request, {
-        redirect: 'follow'
-      }).catch(() => {
-        // 네트워크 실패 시 오프라인 페이지 제공
-        if (event.request.destination === 'document') {
-          return caches.match('/offline.html');
-        }
-      })
-    );
-    return;
-  }
-
-  // 정적 파일들은 캐시 우선 전략
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response;
-        }
-        
-        return fetch(event.request, {
-          redirect: 'follow'
-        })
-          .then(fetchResponse => {
-            if (!fetchResponse || fetchResponse.status !== 200 || fetchResponse.type !== 'basic') {
-              return fetchResponse;
+      caches.open(DYNAMIC_CACHE).then(cache => {
+        return cache.match(event.request).then(cachedResponse => {
+          const networkFetch = fetch(event.request, { credentials: 'omit', mode: 'cors' }).then(networkResponse => {
+            if (networkResponse && networkResponse.status === 200) {
+              cache.put(event.request, networkResponse.clone());
             }
-            
-            // 동적 캐싱
-            const responseToCache = fetchResponse.clone();
-            caches.open(DYNAMIC_CACHE)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-            
-            return fetchResponse;
+            return networkResponse;
           });
+          return cachedResponse || networkFetch;
+        });
       })
-      .catch(() => {
-        // 완전 오프라인 상태
+    );
+    return;
+  }
+  
+  // Supabase, API, non-GET 요청은 네트워크 우선
+  if (reqUrl.hostname.includes('supabase.co') || reqUrl.pathname.startsWith('/api') || event.request.method !== 'GET') {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // 로컬 정적 자원은 캐시 우선
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request).then(fetchResponse => {
+        if (fetchResponse && fetchResponse.status === 200 && fetchResponse.type === 'basic') {
+          const responseToCache = fetchResponse.clone();
+          caches.open(DYNAMIC_CACHE).then(cache => {
+            cache.put(event.request, responseToCache);
+          });
+        }
+        return fetchResponse;
+      });
+    }).catch(() => {
         if (event.request.destination === 'document') {
           return caches.match('/offline.html');
         }
-        
-        // 이미지 요청 실패 시 기본 이미지
-        if (event.request.destination === 'image') {
-          return new Response('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="150" viewBox="0 0 200 150"><rect width="200" height="150" fill="#f0f0f0"/><text x="100" y="75" text-anchor="middle" font-family="Arial" font-size="14" fill="#999">오프라인</text></svg>', {
-            headers: { 'Content-Type': 'image/svg+xml' }
-          });
-        }
-      })
+        return new Response('', {status: 503, statusText: 'Offline'});
+    })
   );
 });
 
