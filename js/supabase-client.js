@@ -8,57 +8,59 @@ let supabaseClient = null;
 
 // Supabase 클라이언트 초기화 함수
 async function initializeSupabaseClient() {
+    console.log('🔄 Supabase 클라이언트 초기화 시작...');
+    
     try {
-        console.log('🔄 Supabase 클라이언트 초기화 시작...');
-
-        // Supabase 라이브러리 로드 대기
-        if (typeof supabase === 'undefined') {
-            console.log('⏳ Supabase 라이브러리 대기 중...');
-            await new Promise(resolve => {
-                const checkInterval = setInterval(() => {
-                    if (typeof supabase !== 'undefined') {
-                        clearInterval(checkInterval);
-                        resolve();
-                    }
-                }, 100);
-            });
-            console.log('✅ Supabase 라이브러리 로드 완료');
+        // 환경변수 로드 시도
+        let config;
+        if (typeof loadEnvironmentConfig === 'function') {
+            try {
+                config = await loadEnvironmentConfig();
+                console.log('✅ 환경변수 로드 성공');
+            } catch (envError) {
+                console.log('⚠️ 환경변수 로드 실패, 기본 설정 사용:', envError.message);
+                config = null;
+            }
+        } else {
+            console.log('⚠️ 환경변수 로더 없음 - 기본 설정 사용');
+            config = null;
         }
         
-        // 설정 파일이 로드되었는지 확인, 없으면 기본 설정 사용
-        let config;
-        if (!window.SUPABASE_CONFIG) {
-            console.warn('⚠️ 환경변수 설정이 없음 - 기본 설정 사용');
-            // 기본 설정 (실제 프로덕션 값)
+        // 기본 설정 (환경변수가 없을 때)
+        if (!config) {
+            console.log('⚠️ 환경변수 설정이 없음 - 기본 설정 사용');
             config = {
                 url: 'https://rpcctgtmtplfahwtnglq.supabase.co',
-                anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwY2N0Z3RtdHBsZmFod3RuZ2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUzNzE3MDgsImV4cCI6MjA1MDk0NzcwOH0.Qk7QkQONlQZLdIZFkL8gqQl4RQGLvI8Nt_l9iAhYGKI',
-                options: {
-                    auth: {
-                        autoRefreshToken: true,
-                        persistSession: true,
-                        detectSessionInUrl: true,
-                        flowType: 'pkce',
-                        storage: window.localStorage,
-                        storageKey: 'sb-rpcctgtmtplfahwtnglq-auth-token'
-                    },
-                    global: {
-                        headers: {
-                            'X-Client-Info': 'mcseller-web'
-                        }
-                    }
-                }
+                anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwY2N0Z3RtdHBsZmFod3RuZ2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4MDIzMTIsImV4cCI6MjA2NjM3ODMxMn0.HQAQcjJNRy7YI_l9YVq6QCY8Hcx2Jx5LbNQGpbYOyJo'
             };
-        } else {
-            // 설정 검증
-            if (!window.validateSupabaseConfig()) {
-                throw new Error('Invalid Supabase configuration');
-            }
-            config = window.SUPABASE_CONFIG;
         }
         
-        // Supabase 클라이언트 생성
-        supabaseClient = supabase.createClient(config.url, config.anonKey, config.options);
+        // Supabase 클라이언트 생성 (세션 지속성 강화)
+        const supabaseClient = supabase.createClient(config.url, config.anonKey, {
+            auth: {
+                flowType: 'pkce',
+                storage: window.localStorage,
+                storageKey: 'supabase.auth.token',
+                persistSession: true,
+                detectSessionInUrl: true,
+                autoRefreshToken: true,
+                debug: true
+            },
+            global: {
+                headers: {
+                    'apikey': config.anonKey,
+                    'Authorization': `Bearer ${config.anonKey}`
+                }
+            },
+            db: {
+                schema: 'public'
+            },
+            realtime: {
+                params: {
+                    eventsPerSecond: 10
+                }
+            }
+        });
         
         // 전역 변수로 설정
         window.supabaseClient = supabaseClient;
@@ -66,6 +68,9 @@ async function initializeSupabaseClient() {
         console.log('✅ Supabase 클라이언트 초기화 완료');
         console.log('📍 프로젝트 URL:', config.url);
         console.log('🔑 Anon Key 길이:', config.anonKey.length);
+        
+        // 초기 세션 확인 및 토큰 설정
+        await setupInitialSession(supabaseClient);
         
         // 초기화 완료 이벤트 발생
         window.dispatchEvent(new Event('supabaseClientReady'));
@@ -99,12 +104,76 @@ async function initializeSupabaseClient() {
     }
 }
 
+// 초기 세션 설정
+async function setupInitialSession(supabaseClient) {
+    try {
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+        
+        if (error) {
+            console.error('초기 세션 로드 오류:', error);
+            return;
+        }
+        
+        if (session) {
+            console.log('✅ 초기 세션 확인됨:', session.user.email);
+            
+            // 인증 토큰을 헤더에 설정
+            if (session.access_token) {
+                // 전역 fetch 요청에 인증 토큰 자동 포함
+                const originalFetch = window.fetch;
+                window.fetch = function(...args) {
+                    const [url, options = {}] = args;
+                    
+                    // Supabase API 요청인 경우 토큰 추가
+                    if (typeof url === 'string' && url.includes('supabase.co')) {
+                        options.headers = {
+                            ...options.headers,
+                            'Authorization': `Bearer ${session.access_token}`,
+                            'apikey': supabaseClient.supabaseKey
+                        };
+                    }
+                    
+                    return originalFetch.apply(this, [url, options]);
+                };
+                
+                console.log('✅ 인증 토큰 자동 포함 설정 완료');
+            }
+        } else {
+            console.log('ℹ️ 초기 세션 없음');
+        }
+    } catch (error) {
+        console.error('초기 세션 설정 오류:', error);
+    }
+}
+
 // 전역 인증 상태 리스너
 function setupGlobalAuthListener() {
     if (!window.supabaseClient) return;
     
-    window.supabaseClient.auth.onAuthStateChange((event, session) => {
+    window.supabaseClient.auth.onAuthStateChange(async (event, session) => {
         console.log('🔄 전역 인증 상태 변화:', event);
+        
+        // 세션이 변경될 때마다 토큰 업데이트
+        if (session && session.access_token) {
+            // 전역 fetch 요청에 인증 토큰 자동 포함
+            const originalFetch = window.fetch;
+            window.fetch = function(...args) {
+                const [url, options = {}] = args;
+                
+                // Supabase API 요청인 경우 토큰 추가
+                if (typeof url === 'string' && url.includes('supabase.co')) {
+                    options.headers = {
+                        ...options.headers,
+                        'Authorization': `Bearer ${session.access_token}`,
+                        'apikey': window.supabaseClient.supabaseKey
+                    };
+                }
+                
+                return originalFetch.apply(this, [url, options]);
+            };
+            
+            console.log('✅ 인증 토큰 업데이트 완료');
+        }
         
         // 전역 이벤트 발생
         window.dispatchEvent(new CustomEvent('authStateChange', {
@@ -140,25 +209,47 @@ async function getCurrentUser() {
 /**
  * 세션이 완전히 로드될 때까지 대기
  */
-async function waitForSession(maxWaitTime = 3000) {
+async function waitForSession(maxWaitTime = 10000) {
     const startTime = Date.now();
+    let retryCount = 0;
+    const maxRetries = 20;
     
-    while (Date.now() - startTime < maxWaitTime) {
+    console.log('🔄 세션 로드 대기 시작... (최대', maxWaitTime/1000, '초)');
+    
+    while (Date.now() - startTime < maxWaitTime && retryCount < maxRetries) {
         try {
+            // Supabase 클라이언트가 준비되었는지 확인
+            if (!window.supabaseClient) {
+                console.log('⏳ Supabase 클라이언트 대기 중...');
+                await new Promise(resolve => setTimeout(resolve, 500));
+                retryCount++;
+                continue;
+            }
+            
             const { data: { session }, error } = await window.supabaseClient.auth.getSession();
-            if (!error && session) {
+            
+            if (!error && session && session.user) {
                 console.log('✅ 세션 로드 완료:', session.user.email);
+                console.log('🔑 액세스 토큰 길이:', session.access_token?.length || 0);
                 return session;
             }
+            
+            if (error) {
+                console.log('⚠️ 세션 로드 오류:', error.message);
+            } else {
+                console.log('⏳ 세션 대기 중... (시도', retryCount + 1, '/', maxRetries, ')');
+            }
+            
         } catch (err) {
-            console.log('⏳ 세션 로드 중...');
+            console.log('⏳ 세션 로드 재시도 중...', err.message);
         }
         
-        // 100ms 대기 후 재시도
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // 500ms 대기 후 재시도
+        await new Promise(resolve => setTimeout(resolve, 500));
+        retryCount++;
     }
     
-    console.log('⚠️ 세션 로드 타임아웃');
+    console.log('⚠️ 세션 로드 타임아웃 또는 최대 재시도 횟수 초과');
     return null;
 }
 

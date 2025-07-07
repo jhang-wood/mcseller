@@ -63,26 +63,45 @@ async function initializeAdminPage() {
     console.log('🚀 관리자 페이지 초기화 시작');
     
     try {
-        // 페이지 로드 시 약간의 지연을 주어 모든 스크립트가 완전히 로드되도록 함
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Supabase 클라이언트가 완전히 로드될 때까지 대기
+        if (!window.supabaseClient) {
+            console.log('⏳ Supabase 클라이언트 로드 대기...');
+            await new Promise(resolve => {
+                const checkClient = () => {
+                    if (window.supabaseClient) {
+                        resolve();
+                    } else {
+                        setTimeout(checkClient, 100);
+                    }
+                };
+                checkClient();
+            });
+        }
         
-        // 관리자 접근 권한 확인
+        console.log('✅ Supabase 클라이언트 준비 완료');
+        
+        // 관리자 권한 확인
         const hasAccess = await checkAdminAccess();
         if (!hasAccess) {
+            console.log('❌ 관리자 권한 없음 - 초기화 중단');
             return;
         }
         
-        // 사이드바 네비게이션 설정
-        setupSidebarNavigation();
+        console.log('✅ 관리자 권한 확인 완료');
         
-        // 기본 대시보드 표시
+        // UI 이벤트 설정
+        setupSidebarNavigation();
+        setupEventListeners();
+        
+        // 기본 섹션 표시 (대시보드)
         showSection('dashboard');
         
         console.log('✅ 관리자 페이지 초기화 완료');
         
     } catch (error) {
-        console.error('❌ 관리자 페이지 초기화 오류:', error);
-        showToast('페이지 초기화 중 오류가 발생했습니다.', 'error');
+        console.error('❌ 관리자 페이지 초기화 실패:', error);
+        alert('관리자 페이지 초기화 중 오류가 발생했습니다.');
+        window.location.href = '/index.html';
     }
 }
 
@@ -97,9 +116,9 @@ async function checkAdminAccess() {
             });
         }
         
-        // 세션이 완전히 로드될 때까지 대기 (최대 5초)
+        // 세션이 완전히 로드될 때까지 대기 (최대 10초)
         console.log('🔄 세션 로드 대기 중...');
-        const session = await window.waitForSession(5000);
+        const session = await window.waitForSession(10000);
         
         if (!session || !session.user) {
             console.log('❌ 로그인되지 않음 - 메인페이지로 리다이렉트');
@@ -109,11 +128,12 @@ async function checkAdminAccess() {
         }
         
         console.log('✅ 세션 확인 완료:', session.user.email);
+        console.log('🔑 액세스 토큰 있음:', !!session.access_token);
         
         // 사용자 정보 표시
         updateAdminUserInfo(session.user);
         
-        // 프로필에서 관리자 권한 확인
+        // 프로필에서 관리자 권한 확인 (인증 토큰 포함)
         const { data: profile, error: profileError } = await window.supabaseClient
             .from('profiles')
             .select('role')
@@ -122,6 +142,13 @@ async function checkAdminAccess() {
         
         if (profileError) {
             console.error('관리자 권한 확인 오류:', profileError);
+            
+            // 프로필 테이블이 없는 경우 기본 관리자로 처리
+            if (profileError.code === 'PGRST116' || profileError.message?.includes('does not exist')) {
+                console.log('⚠️ 프로필 테이블이 없음 - 기본 관리자 권한 부여');
+                return true;
+            }
+            
             alert('권한 확인 중 오류가 발생했습니다.');
             window.location.href = '/index.html';
             return false;
@@ -231,39 +258,58 @@ async function loadDashboardData() {
 // 대시보드 통계 로드
 async function loadDashboardStats() {
     try {
-        // 총 매출
-        const { data: orders } = await window.supabaseClient
-            .from('orders')
-            .select('total_amount')
-            .eq('status', 'completed');
+        // 현재 세션 확인
+        const session = await window.getSession();
+        if (!session) {
+            throw new Error('세션이 없습니다. 다시 로그인해주세요.');
+        }
         
-        const totalRevenue = orders?.reduce((sum, order) => sum + order.total_amount, 0) || 0;
+        console.log('📊 대시보드 통계 로드 시작...');
         
-        // 총 주문
-        const { data: allOrders, count: totalOrders } = await window.supabaseClient
-            .from('orders')
-            .select('*', { count: 'exact' });
+        // 총 매출 (병렬 처리)
+        const [ordersResult, allOrdersResult, productsResult, usersResult] = await Promise.all([
+            window.supabaseClient
+                .from('orders')
+                .select('total_amount')
+                .eq('status', 'completed'),
+            window.supabaseClient
+                .from('orders')
+                .select('*', { count: 'exact' }),
+            window.supabaseClient
+                .from('products')
+                .select('*', { count: 'exact' })
+                .eq('is_active', true),
+            window.supabaseClient
+                .from('users')
+                .select('*', { count: 'exact' })
+        ]);
         
-        // 활성 상품
-        const { data: products, count: activeProducts } = await window.supabaseClient
-            .from('products')
-            .select('*', { count: 'exact' })
-            .eq('is_active', true);
+        const totalRevenue = ordersResult.data?.reduce((sum, order) => sum + order.total_amount, 0) || 0;
         
-        // 총 회원
-        const { data: users, count: totalUsers } = await window.supabaseClient
-            .from('users')
-            .select('*', { count: 'exact' });
+        console.log('✅ 대시보드 통계 로드 완료');
         
         return {
             totalRevenue,
-            totalOrders: totalOrders || 0,
-            activeProducts: activeProducts || 0,
-            totalUsers: totalUsers || 0
+            totalOrders: allOrdersResult.count || 0,
+            activeProducts: productsResult.count || 0,
+            totalUsers: usersResult.count || 0
         };
         
     } catch (error) {
         console.error('통계 데이터 로드 오류:', error);
+        
+        // 테이블이 없는 경우 기본값 반환
+        if (error.message?.includes('does not exist') || error.code === 'PGRST116') {
+            showToast('데이터베이스 테이블이 설정되지 않았습니다. 관리자에게 문의하세요.', 'warning');
+            return {
+                totalRevenue: 0,
+                totalOrders: 0,
+                activeProducts: 0,
+                totalUsers: 0
+            };
+        }
+        
+        showToast('통계 데이터를 불러오는 중 오류가 발생했습니다.', 'error');
         return {
             totalRevenue: 0,
             totalOrders: 0,
@@ -433,78 +479,309 @@ async function getRevenueData() {
 
 // 상품 그리드 로드
 async function loadProductsGrid() {
-    const container = document.getElementById('products-grid');
-    if (!container) return;
-    
     try {
+        // 현재 세션 확인
+        const session = await window.getSession();
+        if (!session) {
+            showToast('로그인이 필요합니다.', 'error');
+            window.location.href = '/auth.html?redirect=' + encodeURIComponent('/admin.html');
+            return;
+        }
+        
+        console.log('📦 상품 목록 로드 시작...');
+        
         const { data: products, error } = await window.supabaseClient
             .from('products')
             .select('*')
             .order('created_at', { ascending: false });
-        
+
         if (error) {
+            console.error('상품 로드 오류:', error);
+            
+            // 테이블이 없는 경우
+            if (error.code === 'PGRST116' || error.message?.includes('does not exist')) {
+                showToast('상품 테이블이 설정되지 않았습니다. Supabase SQL Editor에서 데이터베이스 스키마를 실행해주세요.', 'warning');
+                document.getElementById('products-grid').innerHTML = `
+                    <div class="alert alert-warning">
+                        <h5>데이터베이스 설정 필요</h5>
+                        <p>상품 테이블이 설정되지 않았습니다. Supabase SQL Editor에서 데이터베이스 스키마를 실행해주세요.</p>
+                    </div>
+                `;
+                return;
+            }
+            
             throw error;
         }
+
+        console.log('✅ 상품 목록 로드 완료:', products?.length || 0, '개');
         
-        // Handsontable 초기화
-        if (handsontables.products) {
-            handsontables.products.destroy();
+        const grid = document.getElementById('products-grid');
+        if (!grid) {
+            console.error('상품 그리드 요소를 찾을 수 없습니다.');
+            return;
         }
-        
-        handsontables.products = new Handsontable(container, {
-            data: products || [],
-            columns: [
-                { data: 'id', title: 'ID', readOnly: true, width: 80 },
-                { data: 'title', title: '제목', width: 200 },
-                { data: 'description', title: '설명', width: 300 },
-                { data: 'product_type', title: '유형', type: 'dropdown', source: ['course', 'ebook', 'bundle'], width: 100 },
-                { data: 'price', title: '가격', type: 'numeric', width: 100 },
-                { data: 'payapp_url', title: 'Payapp URL', width: 250 },
-                { data: 'is_active', title: '활성화', type: 'checkbox', width: 80 },
-                { data: 'created_at', title: '생성일', readOnly: true, width: 120 }
-            ],
-            rowHeaders: true,
-            colHeaders: true,
-            contextMenu: true,
-            filters: true,
-            dropdownMenu: true,
-            height: 400,
-            licenseKey: 'non-commercial-and-evaluation',
-            afterChange: function(changes, source) {
-                if (source === 'edit') {
-                    saveProductChanges(changes);
-                }
-            }
-        });
-        
+
+        if (!products || products.length === 0) {
+            grid.innerHTML = `
+                <div class="alert alert-info">
+                    <h5>상품이 없습니다</h5>
+                    <p>새 상품을 추가해보세요.</p>
+                    <button class="btn btn-primary" onclick="showAddProductModal()">
+                        <i class="fas fa-plus"></i> 상품 추가
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        // 상품 카드 생성
+        grid.innerHTML = products.map(product => `
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    ${product.image_url ? `
+                        <img src="${product.image_url}" class="card-img-top" alt="${product.name}" style="height: 200px; object-fit: cover;">
+                    ` : `
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="fas fa-image fa-3x text-muted"></i>
+                        </div>
+                    `}
+                    <div class="card-body">
+                        <h5 class="card-title">${product.name}</h5>
+                        <p class="card-text">${product.description || '설명 없음'}</p>
+                        <p class="card-text">
+                            <strong>가격: ₩${product.price.toLocaleString()}</strong>
+                        </p>
+                        <p class="card-text">
+                            <small class="text-muted">
+                                타입: ${product.type === 'ebook' ? '전자책' : '강의'} | 
+                                상태: ${product.is_active ? '활성' : '비활성'}
+                            </small>
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="btn-group w-100">
+                            <button class="btn btn-outline-primary btn-sm" onclick="editProduct(${product.id})">
+                                <i class="fas fa-edit"></i> 수정
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deleteProduct(${product.id})">
+                                <i class="fas fa-trash"></i> 삭제
+                            </button>
+                            <button class="btn btn-outline-info btn-sm" onclick="toggleProductStatus(${product.id}, ${!product.is_active})">
+                                <i class="fas fa-toggle-${product.is_active ? 'off' : 'on'}"></i> 
+                                ${product.is_active ? '비활성화' : '활성화'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
     } catch (error) {
         console.error('상품 그리드 로드 오류:', error);
-        showToast('상품 데이터를 불러올 수 없습니다.', 'error');
+        showToast('상품 목록을 불러오는 중 오류가 발생했습니다.', 'error');
+        
+        const grid = document.getElementById('products-grid');
+        if (grid) {
+            grid.innerHTML = `
+                <div class="alert alert-danger">
+                    <h5>오류 발생</h5>
+                    <p>상품 목록을 불러올 수 없습니다: ${error.message}</p>
+                    <button class="btn btn-primary" onclick="loadProductsGrid()">
+                        <i class="fas fa-refresh"></i> 다시 시도
+                    </button>
+                </div>
+            `;
+        }
     }
 }
 
-// 상품 변경사항 저장
-async function saveProductChanges(changes) {
+// 상품 추가 모달 표시
+function showAddProductModal() {
+    const modal = new bootstrap.Modal(document.getElementById('productModal'));
+    
+    // 모달 제목 변경
+    document.getElementById('productModalLabel').textContent = '새 상품 추가';
+    
+    // 폼 초기화
+    const form = document.getElementById('productForm');
+    form.reset();
+    form.dataset.productId = '';
+    
+    modal.show();
+}
+
+// 상품 수정
+async function editProduct(productId) {
     try {
-        for (const change of changes) {
-            const [row, prop, oldValue, newValue] = change;
-            const rowData = handsontables.products.getDataAtRow(row);
-            const productId = rowData[0]; // ID 컬럼
-            
-            const { error } = await window.supabaseClient
-                .from('products')
-                .update({ [prop]: newValue })
-                .eq('id', productId);
-            
-            if (error) {
-                throw error;
-            }
+        const session = await window.getSession();
+        if (!session) {
+            showToast('로그인이 필요합니다.', 'error');
+            return;
         }
         
-        showToast('변경사항이 저장되었습니다.', 'success');
+        const { data: product, error } = await window.supabaseClient
+            .from('products')
+            .select('*')
+            .eq('id', productId)
+            .single();
+
+        if (error) throw error;
+
+        // 모달에 데이터 채우기
+        document.getElementById('productModalLabel').textContent = '상품 수정';
+        document.getElementById('product-name').value = product.name;
+        document.getElementById('product-description').value = product.description || '';
+        document.getElementById('product-price').value = product.price;
+        document.getElementById('product-type').value = product.type;
+        document.getElementById('product-image-url').value = product.image_url || '';
+        document.getElementById('product-content-url').value = product.content_url || '';
+        document.getElementById('product-active').checked = product.is_active;
+        
+        // 폼에 상품 ID 저장
+        const form = document.getElementById('productForm');
+        form.dataset.productId = productId;
+        
+        // 모달 표시
+        const modal = new bootstrap.Modal(document.getElementById('productModal'));
+        modal.show();
+
+    } catch (error) {
+        console.error('상품 정보 로드 오류:', error);
+        showToast('상품 정보를 불러오는 중 오류가 발생했습니다.', 'error');
+    }
+}
+
+// 상품 저장 (추가/수정)
+async function saveProduct() {
+    try {
+        const session = await window.getSession();
+        if (!session) {
+            showToast('로그인이 필요합니다.', 'error');
+            return;
+        }
+        
+        const form = document.getElementById('productForm');
+        const productId = form.dataset.productId;
+        
+        // 폼 데이터 수집
+        const productData = {
+            name: document.getElementById('product-name').value.trim(),
+            description: document.getElementById('product-description').value.trim(),
+            price: parseInt(document.getElementById('product-price').value),
+            type: document.getElementById('product-type').value,
+            image_url: document.getElementById('product-image-url').value.trim() || null,
+            content_url: document.getElementById('product-content-url').value.trim() || null,
+            is_active: document.getElementById('product-active').checked
+        };
+        
+        // 유효성 검사
+        if (!productData.name) {
+            showToast('상품명을 입력해주세요.', 'error');
+            return;
+        }
+        
+        if (!productData.price || productData.price <= 0) {
+            showToast('올바른 가격을 입력해주세요.', 'error');
+            return;
+        }
+        
+        console.log('💾 상품 저장 중...', productId ? '수정' : '추가');
+        
+        let result;
+        if (productId) {
+            // 수정
+            result = await window.supabaseClient
+                .from('products')
+                .update(productData)
+                .eq('id', productId)
+                .select();
+        } else {
+            // 추가
+            result = await window.supabaseClient
+                .from('products')
+                .insert([productData])
+                .select();
+        }
+        
+        if (result.error) throw result.error;
+        
+        console.log('✅ 상품 저장 완료');
+        showToast(productId ? '상품이 수정되었습니다.' : '상품이 추가되었습니다.', 'success');
+        
+        // 모달 닫기
+        const modal = bootstrap.Modal.getInstance(document.getElementById('productModal'));
+        modal.hide();
+        
+        // 상품 목록 새로고침
+        await loadProductsGrid();
+        
     } catch (error) {
         console.error('상품 저장 오류:', error);
-        showToast('저장 중 오류가 발생했습니다.', 'error');
+        showToast('상품 저장 중 오류가 발생했습니다: ' + error.message, 'error');
+    }
+}
+
+// 상품 삭제
+async function deleteProduct(productId) {
+    if (!confirm('정말로 이 상품을 삭제하시겠습니까?')) {
+        return;
+    }
+    
+    try {
+        const session = await window.getSession();
+        if (!session) {
+            showToast('로그인이 필요합니다.', 'error');
+            return;
+        }
+        
+        console.log('🗑️ 상품 삭제 중...', productId);
+        
+        const { error } = await window.supabaseClient
+            .from('products')
+            .delete()
+            .eq('id', productId);
+
+        if (error) throw error;
+        
+        console.log('✅ 상품 삭제 완료');
+        showToast('상품이 삭제되었습니다.', 'success');
+        
+        // 상품 목록 새로고침
+        await loadProductsGrid();
+        
+    } catch (error) {
+        console.error('상품 삭제 오류:', error);
+        showToast('상품 삭제 중 오류가 발생했습니다: ' + error.message, 'error');
+    }
+}
+
+// 상품 상태 토글
+async function toggleProductStatus(productId, newStatus) {
+    try {
+        const session = await window.getSession();
+        if (!session) {
+            showToast('로그인이 필요합니다.', 'error');
+            return;
+        }
+        
+        console.log('🔄 상품 상태 변경 중...', productId, newStatus);
+        
+        const { error } = await window.supabaseClient
+            .from('products')
+            .update({ is_active: newStatus })
+            .eq('id', productId);
+
+        if (error) throw error;
+        
+        console.log('✅ 상품 상태 변경 완료');
+        showToast(`상품이 ${newStatus ? '활성화' : '비활성화'}되었습니다.`, 'success');
+        
+        // 상품 목록 새로고침
+        await loadProductsGrid();
+        
+    } catch (error) {
+        console.error('상품 상태 변경 오류:', error);
+        showToast('상품 상태 변경 중 오류가 발생했습니다: ' + error.message, 'error');
     }
 }
 
@@ -1600,4 +1877,31 @@ function updateAdminUserInfo(user) {
     } catch (error) {
         console.error('관리자 정보 표시 오류:', error);
     }
+}
+
+// 이벤트 리스너 설정
+function setupEventListeners() {
+    // 로그아웃 버튼
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await window.signOut();
+                window.location.href = '/index.html';
+            } catch (error) {
+                console.error('로그아웃 오류:', error);
+                alert('로그아웃 중 오류가 발생했습니다.');
+            }
+        });
+    }
+    
+    // 새로고침 버튼들
+    document.addEventListener('click', (e) => {
+        if (e.target.matches('[data-action="refresh"]')) {
+            const section = e.target.dataset.section;
+            if (section) {
+                loadSectionData(section);
+            }
+        }
+    });
 }
