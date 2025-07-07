@@ -1,1732 +1,260 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-        <meta http-equiv="Pragma" content="no-cache" />
-        <meta http-equiv="Expires" content="0" />
-        <title>관리자 대시보드 - MCSELLER</title>
-
-        <!-- Bootstrap CSS -->
-        <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-        />
-        <!-- Font Awesome -->
-        <link
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-            rel="stylesheet"
-        />
-        <!-- Handsontable CSS -->
-        <link
-            href="https://cdn.jsdelivr.net/npm/handsontable@13.1.0/dist/handsontable.full.min.css"
-            rel="stylesheet"
-        />
-        <!-- Chart.js -->
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <!-- Supabase -->
-        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-        <!-- Google Fonts -->
-        <link
-            href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap"
-            rel="stylesheet"
-        />
-
-        <style>
-            /* MCSELLER Admin Theme */
-            :root {
-                --primary-gradient: linear-gradient(
-                    135deg,
-                    #111111 0%,
-                    #23272f 100%
-                );
-                --accent-gradient: linear-gradient(90deg, #ff9900, #ffe259);
-                --sidebar-gradient: linear-gradient(
-                    180deg,
-                    #1a1a1a 0%,
-                    #2d3748 100%
-                );
-                --card-gradient: linear-gradient(
-                    135deg,
-                    rgba(255, 255, 255, 0.1) 0%,
-                    rgba(255, 255, 255, 0.05) 100%
-                );
-                --text-light: #e0e0e0;
-                --text-muted: #b5b5b5;
-                --white: #ffffff;
-                --dark: #111111;
-                --success: #28a745;
-                --warning: #ffc107;
-                --danger: #dc3545;
-                --info: #17a2b8;
-                --border-color: rgba(255, 153, 0, 0.2);
-            }
-
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-
-            body {
-                font-family: "Noto Sans KR", sans-serif;
-                background: var(--primary-gradient);
-                color: var(--text-light);
-                line-height: 1.6;
-                min-height: 100vh;
-            }
-
-            /* Navigation Bar */
-            .navbar {
-                background: var(--accent-gradient) !important;
-                backdrop-filter: blur(10px);
-                border-bottom: 2px solid rgba(255, 153, 0, 0.3);
-                box-shadow: 0 2px 20px rgba(255, 153, 0, 0.2);
-            }
-
-            .navbar-brand {
-                color: var(--dark) !important;
-                font-weight: 900;
-                font-size: 1.4rem;
-                text-shadow: none;
-            }
-
-            .navbar-brand:hover {
-                color: var(--dark) !important;
-                transform: scale(1.05);
-                transition: all 0.3s ease;
-            }
-
-            .navbar .nav-link {
-                color: var(--dark) !important;
-                font-weight: 600;
-                transition: all 0.3s ease;
-            }
-
-            .navbar .nav-link:hover {
-                color: var(--white) !important;
-                transform: translateY(-2px);
-            }
-
-            .dropdown-menu {
-                background: rgba(17, 17, 17, 0.95);
-                border: 1px solid var(--border-color);
-                backdrop-filter: blur(10px);
-            }
-
-            .dropdown-item {
-                color: var(--text-light);
-                transition: all 0.3s ease;
-            }
-
-            .dropdown-item:hover {
-                background: var(--accent-gradient);
-                color: var(--dark);
-            }
-
-            /* Sidebar */
-            .sidebar {
-                background: var(--sidebar-gradient) !important;
-                backdrop-filter: blur(10px);
-                border-right: 2px solid var(--border-color);
-                box-shadow: 2px 0 20px rgba(0, 0, 0, 0.3);
-                min-height: calc(100vh - 56px);
-            }
-
-            .sidebar .nav-link {
-                color: var(--text-light);
-                padding: 15px 20px;
-                margin: 5px 10px;
-                border-radius: 10px;
-                transition: all 0.3s ease;
-                border-left: 3px solid transparent;
-                font-weight: 500;
-            }
-
-            .sidebar .nav-link:hover {
-                background: rgba(255, 153, 0, 0.1);
-                color: #ff9900;
-                transform: translateX(5px);
-                border-left-color: #ff9900;
-            }
-
-            .sidebar .nav-link.active {
-                background: var(--accent-gradient);
-                color: var(--dark);
-                font-weight: 700;
-                border-left-color: var(--dark);
-                box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
-            }
-
-            /* Main Content */
-            main {
-                background: transparent;
-                min-height: calc(100vh - 56px);
-                padding-top: 20px;
-            }
-
-            /* Cards */
-            .card {
-                background: var(--card-gradient);
-                border: 1px solid var(--border-color);
-                border-radius: 15px;
-                backdrop-filter: blur(10px);
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-                transition: all 0.3s ease;
-            }
-
-            .card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 15px 40px rgba(255, 153, 0, 0.2);
-            }
-
-            .card-header {
-                background: transparent;
-                border-bottom: 1px solid var(--border-color);
-                padding: 20px;
-            }
-
-            .card-body {
-                color: var(--text-light);
-                padding: 20px;
-            }
-
-            /* Stats Cards */
-            .border-left-primary {
-                border-left: 4px solid #ff9900 !important;
-                background: linear-gradient(
-                    135deg,
-                    rgba(255, 153, 0, 0.1),
-                    rgba(255, 226, 89, 0.1)
-                );
-            }
-
-            .border-left-success {
-                border-left: 4px solid var(--success) !important;
-                background: linear-gradient(
-                    135deg,
-                    rgba(40, 167, 69, 0.1),
-                    rgba(72, 187, 120, 0.1)
-                );
-            }
-
-            .border-left-info {
-                border-left: 4px solid var(--info) !important;
-                background: linear-gradient(
-                    135deg,
-                    rgba(23, 162, 184, 0.1),
-                    rgba(56, 178, 172, 0.1)
-                );
-            }
-
-            .border-left-warning {
-                border-left: 4px solid var(--warning) !important;
-                background: linear-gradient(
-                    135deg,
-                    rgba(255, 193, 7, 0.1),
-                    rgba(255, 206, 84, 0.1)
-                );
-            }
-
-            .text-primary {
-                color: #ff9900 !important;
-            }
-
-            .text-success {
-                color: var(--success) !important;
-            }
-
-            .text-info {
-                color: var(--info) !important;
-            }
-
-            .text-warning {
-                color: var(--warning) !important;
-            }
-
-            .text-gray-800 {
-                color: var(--white) !important;
-                font-weight: 700;
-            }
-
-            .text-gray-300 {
-                color: var(--text-muted) !important;
-            }
-
-            .text-xs {
-                font-size: 0.75rem;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                font-weight: 600;
-            }
-
-            /* Buttons */
-            .btn-primary {
-                background: var(--accent-gradient);
-                border: none;
-                color: var(--dark);
-                font-weight: 700;
-                border-radius: 8px;
-                transition: all 0.3s ease;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-
-            .btn-primary:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 8px 25px rgba(255, 153, 0, 0.4);
-                color: var(--dark);
-            }
-
-            .btn-success {
-                background: linear-gradient(90deg, var(--success), #34d058);
-                border: none;
-                color: white;
-                font-weight: 600;
-                border-radius: 8px;
-                transition: all 0.3s ease;
-            }
-
-            .btn-success:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
-            }
-
-            .btn-outline-secondary {
-                border: 2px solid var(--text-muted);
-                color: var(--text-light);
-                font-weight: 600;
-                border-radius: 8px;
-                transition: all 0.3s ease;
-            }
-
-            .btn-outline-secondary:hover {
-                background: var(--text-light);
-                color: var(--dark);
-                transform: translateY(-2px);
-            }
-
-            .btn-sm {
-                padding: 8px 16px;
-                font-size: 0.875rem;
-            }
-
-            /* Form Controls */
-            .form-control,
-            .form-select {
-                background: rgba(255, 255, 255, 0.1);
-                border: 1px solid var(--border-color);
-                border-radius: 8px;
-                color: var(--white);
-                padding: 12px 15px;
-                transition: all 0.3s ease;
-            }
-
-            .form-control:focus,
-            .form-select:focus {
-                background: rgba(255, 255, 255, 0.15);
-                border-color: #ff9900;
-                box-shadow: 0 0 0 0.2rem rgba(255, 153, 0, 0.25);
-                color: var(--white);
-            }
-
-            .form-control::placeholder {
-                color: var(--text-muted);
-            }
-
-            .form-label {
-                color: var(--text-light);
-                font-weight: 600;
-                margin-bottom: 8px;
-            }
-
-            .form-check-input:checked {
-                background-color: #ff9900;
-                border-color: #ff9900;
-            }
-
-            .form-check-label {
-                color: var(--text-light);
-            }
-
-            /* Tables */
-            .table {
-                color: var(--text-light);
-                border-color: var(--border-color);
-            }
-
-            .table thead th {
-                background: rgba(255, 153, 0, 0.1);
-                border-color: var(--border-color);
-                color: #ff9900;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                font-size: 0.875rem;
-            }
-
-            .table tbody td {
-                border-color: var(--border-color);
-                color: var(--text-light);
-            }
-
-            .table-bordered {
-                border-color: var(--border-color);
-            }
-
-            /* Modal */
-            .modal-content {
-                background: var(--primary-gradient);
-                border: 2px solid var(--border-color);
-                border-radius: 15px;
-                backdrop-filter: blur(10px);
-            }
-
-            .modal-header {
-                border-bottom: 1px solid var(--border-color);
-                background: rgba(255, 153, 0, 0.05);
-            }
-
-            .modal-title {
-                color: var(--white);
-                font-weight: 700;
-            }
-
-            .btn-close {
-                filter: invert(1);
-            }
-
-            .modal-footer {
-                border-top: 1px solid var(--border-color);
-            }
-
-            /* Alerts */
-            .alert-info {
-                background: rgba(23, 162, 184, 0.15);
-                border: 1px solid rgba(23, 162, 184, 0.3);
-                color: #8dd3e8;
-            }
-
-            /* Section Headers */
-            .border-bottom {
-                border-color: var(--border-color) !important;
-            }
-
-            h1,
-            h2,
-            h3,
-            h4,
-            h5,
-            h6 {
-                color: var(--white);
-                font-weight: 700;
-            }
-
-            h1.h2 {
-                background: var(--accent-gradient);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
-                display: inline-block;
-            }
-
-            /* Custom Scrollbar */
-            ::-webkit-scrollbar {
-                width: 8px;
-            }
-
-            ::-webkit-scrollbar-track {
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 10px;
-            }
-
-            ::-webkit-scrollbar-thumb {
-                background: var(--accent-gradient);
-                border-radius: 10px;
-            }
-
-            ::-webkit-scrollbar-thumb:hover {
-                background: linear-gradient(90deg, #e68900, #f0d147);
-            }
-
-            /* Handsontable Custom Styling */
-            .handsontable {
-                color: var(--text-light) !important;
-                background: transparent !important;
-            }
-
-            .handsontable table {
-                color: var(--text-light) !important;
-            }
-
-            .handsontable th {
-                background: rgba(255, 153, 0, 0.1) !important;
-                color: #ff9900 !important;
-                font-weight: 700 !important;
-            }
-
-            .handsontable td {
-                background: rgba(255, 255, 255, 0.05) !important;
-                border-color: var(--border-color) !important;
-                color: var(--text-light) !important;
-            }
-
-            /* Loading Animation */
-            @keyframes shimmer {
-                0% {
-                    background-position: -200px 0;
-                }
-                100% {
-                    background-position: calc(200px + 100%) 0;
-                }
-            }
-
-            .shimmer {
-                background: linear-gradient(
-                    90deg,
-                    transparent,
-                    rgba(255, 255, 255, 0.1),
-                    transparent
-                );
-                background-size: 200px 100%;
-                animation: shimmer 1.5s infinite;
-            }
-
-            /* Enhanced Visual Effects */
-            .shadow {
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
-            }
-
-            .shadow-lg {
-                box-shadow: 0 15px 40px rgba(255, 153, 0, 0.2) !important;
-            }
-
-            /* Status Badges */
-            .badge {
-                font-weight: 600;
-                padding: 8px 12px;
-                border-radius: 6px;
-            }
-
-            .bg-success {
-                background: linear-gradient(
-                    90deg,
-                    var(--success),
-                    #34d058
-                ) !important;
-            }
-
-            .bg-warning {
-                background: linear-gradient(
-                    90deg,
-                    var(--warning),
-                    #ffd93d
-                ) !important;
-                color: var(--dark) !important;
-            }
-
-            .bg-danger {
-                background: linear-gradient(
-                    90deg,
-                    var(--danger),
-                    #f56565
-                ) !important;
-            }
-
-            .bg-primary {
-                background: var(--accent-gradient) !important;
-                color: var(--dark) !important;
-            }
-
-            /* Responsive Design */
-            @media (max-width: 768px) {
-                .sidebar {
-                    position: fixed;
-                    top: 56px;
-                    left: -100%;
-                    width: 100%;
-                    height: calc(100vh - 56px);
-                    z-index: 1000;
-                    transition: left 0.3s ease;
-                }
-
-                .sidebar.show {
-                    left: 0;
-                }
-
-                main {
-                    margin-left: 0 !important;
-                }
-
-                .card {
-                    margin-bottom: 20px;
-                }
-
-                .btn-toolbar {
-                    flex-direction: column;
-                    gap: 10px;
-                }
-
-                .btn-group {
-                    width: 100%;
-                }
-
-                .btn-sm {
-                    padding: 10px 15px;
-                    font-size: 0.9rem;
-                }
-            }
-
-            /* Chart Container Styling */
-            canvas {
-                background: rgba(255, 255, 255, 0.05);
-                border-radius: 10px;
-                padding: 10px;
-            }
-
-            /* Form Text */
-            .form-text {
-                color: var(--text-muted) !important;
-            }
-
-            /* List Group */
-            .list-group-item {
-                background: rgba(255, 255, 255, 0.05);
-                border: 1px solid var(--border-color);
-                color: var(--text-light);
-            }
-
-            /* Progress Bars */
-            .progress {
-                background: rgba(255, 255, 255, 0.1);
-                height: 8px;
-                border-radius: 10px;
-            }
-
-            .progress-bar {
-                background: var(--accent-gradient);
-                border-radius: 10px;
-            }
-
-            /* Tooltip Custom */
-            .tooltip {
-                --bs-tooltip-bg: rgba(17, 17, 17, 0.9);
-                --bs-tooltip-border-color: var(--border-color);
-            }
-
-            /* Animation for content sections */
-            .content-section {
-                animation: fadeInUp 0.5s ease-out;
-            }
-
-            @keyframes fadeInUp {
-                from {
-                    opacity: 0;
-                    transform: translateY(30px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-
-            /* Enhanced hover effects for interactive elements */
-            .card,
-            .btn,
-            .nav-link {
-                position: relative;
-                overflow: hidden;
-            }
-
-            .card::before,
-            .btn::before {
-                content: "";
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(
-                    90deg,
-                    transparent,
-                    rgba(255, 255, 255, 0.1),
-                    transparent
-                );
-                transition: left 0.5s;
-                z-index: 1;
-            }
-
-            .card:hover::before,
-            .btn:hover::before {
-                left: 100%;
-            }
-
-            /* Text selection */
-            ::selection {
-                background: rgba(255, 153, 0, 0.3);
-                color: var(--white);
-            }
-        </style>
-    </head>
-    <body>
-        <!-- Navigation -->
-        <nav class="navbar navbar-expand-lg navbar-dark">
-            <div class="container-fluid">
-                <a class="navbar-brand fw-bold" href="index.html">
-                    <i class="fas fa-graduation-cap me-2"></i>MCSELLER 관리자
-                </a>
-
-                <div class="navbar-nav ms-auto">
-                    <div class="nav-item dropdown">
-                        <a
-                            class="nav-link dropdown-toggle"
-                            href="#"
-                            id="adminDropdown"
-                            role="button"
-                            data-bs-toggle="dropdown"
-                        >
-                            <i class="fas fa-user-circle me-2"></i
-                            ><span id="admin-name">관리자</span>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCSELLER 관리자</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar { min-height: 100vh; background: #f8f9fa; }
+        .nav-link.active { background: #007bff; color: white !important; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 사이드바 -->
+            <div class="col-md-2 sidebar p-3">
+                <h5>MCSELLER 관리자</h5>
+                <hr>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-section="users">
+                            <i class="fas fa-users me-2"></i>회원관리
                         </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a class="dropdown-item" href="index.html"
-                                    ><i class="fas fa-home me-2"></i>메인
-                                    사이트</a
-                                >
-                            </li>
-                            <li><hr class="dropdown-divider" /></li>
-                            <li>
-                                <a
-                                    class="dropdown-item"
-                                    href="#"
-                                    id="admin-logout"
-                                    ><i class="fas fa-sign-out-alt me-2"></i
-                                    >로그아웃</a
-                                >
-                            </li>
-                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-section="coupons">
+                            <i class="fas fa-ticket-alt me-2"></i>할인쿠폰
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-section="points">
+                            <i class="fas fa-coins me-2"></i>적립금관리
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-section="content">
+                            <i class="fas fa-book me-2"></i>콘텐츠관리
+                        </a>
+                    </li>
+                </ul>
+                <hr>
+                <button class="btn btn-outline-danger btn-sm" onclick="logout()">로그아웃</button>
+            </div>
+
+            <!-- 메인 콘텐츠 -->
+            <div class="col-md-10 p-4">
+                <!-- 회원관리 -->
+                <div id="users-section" class="content-section active">
+                    <h3>회원관리</h3>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <input type="text" id="userSearch" class="form-control" placeholder="이메일로 검색...">
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-primary" onclick="searchUsers()">검색</button>
+                            <button class="btn btn-secondary" onclick="loadAllUsers()">전체보기</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>이메일</th>
+                                    <th>이름</th>
+                                    <th>역할</th>
+                                    <th>적립금</th>
+                                    <th>가입일</th>
+                                    <th>액션</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTable">
+                                <tr><td colspan="6">로딩 중...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            </div>
-        </nav>
 
-        <div class="container-fluid">
-            <div class="row">
-                <!-- Sidebar -->
-                <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
-                    <div class="position-sticky pt-3">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link active"
-                                    href="#dashboard"
-                                    data-section="dashboard"
-                                >
-                                    <i class="fas fa-tachometer-alt me-2"></i
-                                    >대시보드
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link"
-                                    href="#products"
-                                    data-section="products"
-                                >
-                                    <i class="fas fa-box me-2"></i>상품 관리
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link"
-                                    href="#orders"
-                                    data-section="orders"
-                                >
-                                    <i class="fas fa-shopping-cart me-2"></i
-                                    >주문 관리
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link"
-                                    href="#users"
-                                    data-section="users"
-                                >
-                                    <i class="fas fa-users me-2"></i>회원 관리
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link"
-                                    href="#reviews"
-                                    data-section="reviews"
-                                >
-                                    <i class="fas fa-star me-2"></i>후기 관리
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link"
-                                    href="#contents"
-                                    data-section="contents"
-                                >
-                                    <i class="fas fa-file-alt me-2"></i>콘텐츠 관리
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link"
-                                    href="#analytics"
-                                    data-section="analytics"
-                                >
-                                    <i class="fas fa-chart-bar me-2"></i>통계
-                                    분석
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link"
-                                    href="#promotions"
-                                    data-section="promotions"
-                                >
-                                    <i class="fas fa-tags me-2"></i>프로모션
-                                    관리
-                                </a>
-                            </li>
-                        </ul>
+                <!-- 할인쿠폰 관리 -->
+                <div id="coupons-section" class="content-section">
+                    <h3>할인쿠폰 관리</h3>
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <button class="btn btn-success" onclick="showAddCouponModal()">새 쿠폰 생성</button>
+                        </div>
                     </div>
-                </nav>
-
-                <!-- Main Content -->
-                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                    <!-- Dashboard Section -->
-                    <section id="dashboard-section" class="content-section">
-                        <div
-                            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
-                        >
-                            <h1 class="h2">대시보드</h1>
-                            <div class="btn-toolbar mb-2 mb-md-0">
-                                <div class="btn-group me-2">
-                                    <button
-                                        type="button"
-                                        class="btn btn-sm btn-outline-secondary"
-                                    >
-                                        오늘
-                                    </button>
-                                    <button
-                                        type="button"
-                                        class="btn btn-sm btn-outline-secondary"
-                                    >
-                                        이번 주
-                                    </button>
-                                    <button
-                                        type="button"
-                                        class="btn btn-sm btn-outline-secondary"
-                                    >
-                                        이번 달
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Stats Cards -->
-                        <div class="row mb-4">
-                            <div class="col-xl-3 col-md-6 mb-4">
-                                <div
-                                    class="card border-left-primary shadow h-100 py-2"
-                                >
-                                    <div class="card-body">
-                                        <div
-                                            class="row no-gutters align-items-center"
-                                        >
-                                            <div class="col mr-2">
-                                                <div
-                                                    class="text-xs font-weight-bold text-primary text-uppercase mb-1"
-                                                >
-                                                    총 매출
-                                                </div>
-                                                <div
-                                                    class="h5 mb-0 font-weight-bold text-gray-800"
-                                                    id="total-revenue"
-                                                >
-                                                    ₩0
-                                                </div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <i
-                                                    class="fas fa-won-sign fa-2x text-gray-300"
-                                                ></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-xl-3 col-md-6 mb-4">
-                                <div
-                                    class="card border-left-success shadow h-100 py-2"
-                                >
-                                    <div class="card-body">
-                                        <div
-                                            class="row no-gutters align-items-center"
-                                        >
-                                            <div class="col mr-2">
-                                                <div
-                                                    class="text-xs font-weight-bold text-success text-uppercase mb-1"
-                                                >
-                                                    총 주문
-                                                </div>
-                                                <div
-                                                    class="h5 mb-0 font-weight-bold text-gray-800"
-                                                    id="total-orders"
-                                                >
-                                                    0
-                                                </div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <i
-                                                    class="fas fa-shopping-cart fa-2x text-gray-300"
-                                                ></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-xl-3 col-md-6 mb-4">
-                                <div
-                                    class="card border-left-info shadow h-100 py-2"
-                                >
-                                    <div class="card-body">
-                                        <div
-                                            class="row no-gutters align-items-center"
-                                        >
-                                            <div class="col mr-2">
-                                                <div
-                                                    class="text-xs font-weight-bold text-info text-uppercase mb-1"
-                                                >
-                                                    활성 상품
-                                                </div>
-                                                <div
-                                                    class="h5 mb-0 font-weight-bold text-gray-800"
-                                                    id="active-products"
-                                                >
-                                                    0
-                                                </div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <i
-                                                    class="fas fa-box fa-2x text-gray-300"
-                                                ></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-xl-3 col-md-6 mb-4">
-                                <div
-                                    class="card border-left-warning shadow h-100 py-2"
-                                >
-                                    <div class="card-body">
-                                        <div
-                                            class="row no-gutters align-items-center"
-                                        >
-                                            <div class="col mr-2">
-                                                <div
-                                                    class="text-xs font-weight-bold text-warning text-uppercase mb-1"
-                                                >
-                                                    총 회원
-                                                </div>
-                                                <div
-                                                    class="h5 mb-0 font-weight-bold text-gray-800"
-                                                    id="total-users"
-                                                >
-                                                    0
-                                                </div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <i
-                                                    class="fas fa-users fa-2x text-gray-300"
-                                                ></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Charts -->
-                        <div class="row">
-                            <div class="col-xl-8 col-lg-7">
-                                <div class="card shadow mb-4">
-                                    <div class="card-header py-3">
-                                        <h6
-                                            class="m-0 font-weight-bold text-primary"
-                                        >
-                                            매출 추이
-                                        </h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <canvas id="revenueChart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-xl-4 col-lg-5">
-                                <div class="card shadow mb-4">
-                                    <div class="card-header py-3">
-                                        <h6
-                                            class="m-0 font-weight-bold text-primary"
-                                        >
-                                            상품 분포
-                                        </h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <canvas id="productChart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Products Section -->
-                    <section
-                        id="products-section"
-                        class="content-section d-none"
-                    >
-                        <div
-                            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
-                        >
-                            <h1 class="h2">상품 관리</h1>
-                            <div class="btn-toolbar mb-2 mb-md-0">
-                                <div class="btn-group me-2">
-                                    <button
-                                        type="button"
-                                        class="btn btn-sm btn-primary"
-                                        onclick="showAddProductModal()"
-                                    >
-                                        <i class="fas fa-plus me-1"></i>상품
-                                        추가
-                                    </button>
-                                    <button
-                                        type="button"
-                                        class="btn btn-sm btn-success"
-                                        id="import-csv"
-                                    >
-                                        <i class="fas fa-upload me-1"></i>CSV
-                                        가져오기
-                                    </button>
-                                    <button
-                                        type="button"
-                                        class="btn btn-sm btn-outline-secondary"
-                                        id="export-csv"
-                                    >
-                                        <i class="fas fa-download me-1"></i>CSV
-                                        내보내기
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-body">
-                                <div id="products-grid" class="row g-3"></div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Orders Section -->
-                    <section id="orders-section" class="content-section d-none">
-                        <div
-                            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
-                        >
-                            <h1 class="h2">주문 관리</h1>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-body">
-                                <div id="orders-grid"></div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Users Section -->
-                    <section id="users-section" class="content-section d-none">
-                        <div
-                            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
-                        >
-                            <h1 class="h2">회원 관리</h1>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-body">
-                                <div id="users-grid"></div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Reviews Section -->
-                    <section
-                        id="reviews-section"
-                        class="content-section d-none"
-                    >
-                        <div
-                            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
-                        >
-                            <h1 class="h2">후기 관리</h1>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-body">
-                                <div id="reviews-grid"></div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Contents Management Section -->
-                    <section id="contents-section" class="content-section d-none">
-                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                            <h1 class="h2">콘텐츠 관리</h1>
-                            <div class="btn-toolbar mb-2 mb-md-0">
-                                <div class="btn-group me-2">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addNewContent()">
-                                        <i class="fas fa-plus"></i> 새 콘텐츠 추가
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 콘텐츠 타입 탭 -->
-                        <ul class="nav nav-tabs" id="contentTabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="ebooks-tab" data-bs-toggle="tab" data-bs-target="#ebooks" type="button" role="tab">
-                                    <i class="fas fa-book me-2"></i>전자책
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="videos-tab" data-bs-toggle="tab" data-bs-target="#videos" type="button" role="tab">
-                                    <i class="fas fa-video me-2"></i>강의
-                                </button>
-                            </li>
-                        </ul>
-
-                        <div class="tab-content" id="contentTabContent">
-                            <!-- 전자책 관리 -->
-                            <div class="tab-pane fade show active" id="ebooks" role="tabpanel">
-                                <div class="card mt-3">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h5>전자책 목록</h5>
-                                        <button class="btn btn-primary btn-sm" onclick="addEbook()">
-                                            <i class="fas fa-plus me-2"></i>전자책 추가
-                                        </button>
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="ebooks-list">
-                                            <!-- 전자책 목록이 여기에 표시됩니다 -->
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 강의 관리 -->
-                            <div class="tab-pane fade" id="videos" role="tabpanel">
-                                <div class="card mt-3">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h5>강의 목록</h5>
-                                        <button class="btn btn-primary btn-sm" onclick="addCourse()">
-                                            <i class="fas fa-plus me-2"></i>강의 추가
-                                        </button>
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="courses-list">
-                                            <!-- 강의 목록이 여기에 표시됩니다 -->
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Analytics Section -->
-                    <section
-                        id="analytics-section"
-                        class="content-section d-none"
-                    >
-                        <div
-                            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
-                        >
-                            <h1 class="h2">통계 분석</h1>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="card shadow mb-4">
-                                    <div class="card-header py-3">
-                                        <h6
-                                            class="m-0 font-weight-bold text-primary"
-                                        >
-                                            상세 분석
-                                        </h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <canvas id="analyticsChart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Promotions Section -->
-                    <section
-                        id="promotions-section"
-                        class="content-section d-none"
-                    >
-                        <div
-                            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
-                        >
-                            <h1 class="h2">프로모션 관리</h1>
-                        </div>
-
-                        <div class="row">
-                            <!-- 신규 회원 적립금 설정 -->
-                            <div class="col-md-6">
-                                <div class="card shadow mb-4">
-                                    <div class="card-header py-3">
-                                        <h6
-                                            class="m-0 font-weight-bold text-primary"
-                                        >
-                                            신규 회원 적립금 설정
-                                        </h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="mb-3">
-                                            <label
-                                                for="newUserPoints"
-                                                class="form-label"
-                                                >적립금 (원)</label
-                                            >
-                                            <input
-                                                type="number"
-                                                class="form-control"
-                                                id="newUserPoints"
-                                                value="31500"
-                                                min="0"
-                                            />
-                                            <small class="form-text text-muted"
-                                                >신규 회원가입 시 지급할
-                                                적립금을 설정하세요.</small
-                                            >
-                                        </div>
-                                        <button
-                                            type="button"
-                                            class="btn btn-primary"
-                                            id="saveNewUserPoints"
-                                        >
-                                            적립금 설정 저장
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 할인 코드 관리 -->
-                            <div class="col-md-6">
-                                <div class="card shadow mb-4">
-                                    <div
-                                        class="card-header py-3 d-flex justify-content-between align-items-center"
-                                    >
-                                        <h6
-                                            class="m-0 font-weight-bold text-primary"
-                                        >
-                                            할인 코드 관리
-                                        </h6>
-                                        <button
-                                            type="button"
-                                            class="btn btn-sm btn-success"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#addDiscountCodeModal"
-                                        >
-                                            <i class="fas fa-plus"></i> 코드
-                                            추가
-                                        </button>
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="discountCodesContainer">
-                                            <!-- 할인 코드 목록이 여기에 표시됩니다 -->
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 활성 프로모션 현황 -->
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="card shadow mb-4">
-                                    <div class="card-header py-3">
-                                        <h6
-                                            class="m-0 font-weight-bold text-primary"
-                                        >
-                                            활성 프로모션 현황
-                                        </h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table
-                                                class="table table-bordered"
-                                                id="promotionsTable"
-                                            >
-                                                <thead>
-                                                    <tr>
-                                                        <th>프로모션 유형</th>
-                                                        <th>코드/설정값</th>
-                                                        <th>할인율/금액</th>
-                                                        <th>사용 횟수</th>
-                                                        <th>상태</th>
-                                                        <th>작업</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="promotionsTableBody">
-                                                    <!-- 프로모션 데이터가 여기에 표시됩니다 -->
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </main>
-            </div>
-        </div>
-
-        <!-- Product Modal -->
-        <div class="modal fade" id="productModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="productModalLabel">상품 추가</h5>
-                        <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                        ></button>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>쿠폰코드</th>
+                                    <th>할인율/금액</th>
+                                    <th>사용횟수</th>
+                                    <th>만료일</th>
+                                    <th>상태</th>
+                                    <th>액션</th>
+                                </tr>
+                            </thead>
+                            <tbody id="couponsTable">
+                                <tr><td colspan="6">로딩 중...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="modal-body">
-                        <form id="productForm">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="product-name" class="form-label">상품명 *</label>
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                            id="product-name"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="product-type" class="form-label">상품 유형 *</label>
-                                        <select class="form-select" id="product-type" required>
-                                            <option value="">선택하세요</option>
-                                            <option value="ebook">전자책</option>
-                                            <option value="course">강의</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="product-description" class="form-label">상품 설명</label>
-                                <textarea
-                                    class="form-control"
-                                    id="product-description"
-                                    rows="3"
-                                    placeholder="상품에 대한 자세한 설명을 입력하세요"
-                                ></textarea>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="product-price" class="form-label">가격 (원) *</label>
-                                        <input
-                                            type="number"
-                                            class="form-control"
-                                            id="product-price"
-                                            min="0"
-                                            step="1000"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="product-active" class="form-label">상태</label>
-                                        <div class="form-check form-switch">
-                                            <input
-                                                class="form-check-input"
-                                                type="checkbox"
-                                                id="product-active"
-                                                checked
-                                            />
-                                            <label class="form-check-label" for="product-active">
-                                                활성화
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="product-image-url" class="form-label">이미지 URL</label>
-                                <input
-                                    type="url"
-                                    class="form-control"
-                                    id="product-image-url"
-                                    placeholder="https://example.com/image.jpg"
-                                />
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="product-content-url" class="form-label">콘텐츠 URL</label>
-                                <input
-                                    type="url"
-                                    class="form-control"
-                                    id="product-content-url"
-                                    placeholder="https://example.com/content"
-                                />
-                            </div>
-                        </form>
+                </div>
+
+                <!-- 적립금 관리 -->
+                <div id="points-section" class="content-section">
+                    <h3>적립금 관리</h3>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <input type="email" id="pointUserEmail" class="form-control" placeholder="사용자 이메일">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="number" id="pointAmount" class="form-control" placeholder="금액">
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary" onclick="addPoints()">적립금 추가</button>
+                        </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            취소
-                        </button>
-                        <button type="button" class="btn btn-primary" onclick="saveProduct()">
-                            저장
-                        </button>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>이메일</th>
+                                    <th>현재 적립금</th>
+                                    <th>액션</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pointsTable">
+                                <tr><td colspan="3">로딩 중...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 콘텐츠 관리 -->
+                <div id="content-section" class="content-section">
+                    <h3>콘텐츠 관리</h3>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <button class="btn btn-success me-2" onclick="showAddContentModal('ebook')">전자책 추가</button>
+                            <button class="btn btn-success" onclick="showAddContentModal('lecture')">강의 추가</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>제목</th>
+                                    <th>타입</th>
+                                    <th>가격</th>
+                                    <th>상태</th>
+                                    <th>등록일</th>
+                                    <th>액션</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contentTable">
+                                <tr><td colspan="6">로딩 중...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label
-                                            for="productType"
-                                            class="form-label"
-                                            >유형</label
-                                        >
-                                        <select
-                                            class="form-select"
-                                            id="productType"
-                                            required
-                                        >
-                                            <option value="">선택하세요</option>
-                                            <option value="lecture">
-                                                강의
-                                            </option>
-                                            <option value="ebook">
-                                                전자책
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
+    </div>
 
-                            <div class="mb-3">
-                                <label
-                                    for="productDescription"
-                                    class="form-label"
-                                    >설명</label
-                                >
-                                <textarea
-                                    class="form-control"
-                                    id="productDescription"
-                                    rows="3"
-                                    required
-                                ></textarea>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label
-                                            for="productPrice"
-                                            class="form-label"
-                                            >가격</label
-                                        >
-                                        <input
-                                            type="number"
-                                            class="form-control"
-                                            id="productPrice"
-                                            min="0"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label
-                                            for="productImage"
-                                            class="form-label"
-                                            >이미지 URL</label
-                                        >
-                                        <input
-                                            type="url"
-                                            class="form-control"
-                                            id="productImage"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div
-                                class="mb-3"
-                                id="lectureFields"
-                                style="display: none"
-                            >
-                                <label for="youtubeUrl" class="form-label"
-                                    >YouTube URL</label
-                                >
-                                <input
-                                    type="url"
-                                    class="form-control"
-                                    id="youtubeUrl"
-                                />
-                            </div>
-
-                            <div
-                                class="mb-3"
-                                id="ebookFields"
-                                style="display: none"
-                            >
-                                <label for="contentUrl" class="form-label"
-                                    >콘텐츠 URL</label
-                                >
-                                <input
-                                    type="url"
-                                    class="form-control"
-                                    id="contentUrl"
-                                />
-                            </div>
-
-                            <div class="form-check">
-                                <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    id="productActive"
-                                    checked
-                                />
-                                <label
-                                    class="form-check-label"
-                                    for="productActive"
-                                >
-                                    활성화
-                                </label>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button
-                            type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal"
-                        >
-                            취소
-                        </button>
-                        <button
-                            type="button"
-                            class="btn btn-primary"
-                            id="saveProduct"
-                        >
-                            저장
-                        </button>
-                    </div>
+    <!-- 쿠폰 추가 모달 -->
+    <div class="modal fade" id="addCouponModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">새 쿠폰 생성</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-            </div>
-        </div>
-
-        <!-- CSV Import Modal -->
-        <div class="modal fade" id="csvImportModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">CSV 파일 가져오기</h5>
-                        <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                        ></button>
-                    </div>
-                    <div class="modal-body">
+                <div class="modal-body">
+                    <form id="couponForm">
                         <div class="mb-3">
-                            <label for="csvFile" class="form-label"
-                                >CSV 파일 선택</label
-                            >
-                            <input
-                                type="file"
-                                class="form-control"
-                                id="csvFile"
-                                accept=".csv"
-                            />
+                            <label class="form-label">쿠폰 코드</label>
+                            <input type="text" class="form-control" id="couponCode" required>
                         </div>
-                        <div class="alert alert-info">
-                            <small>
-                                CSV 파일 형식: 제목, 설명, 유형, 가격,
-                                이미지URL, 콘텐츠URL, 활성화
-                            </small>
+                        <div class="mb-3">
+                            <label class="form-label">할인 타입</label>
+                            <select class="form-control" id="discountType" required>
+                                <option value="percent">할인율 (%)</option>
+                                <option value="amount">할인 금액 (원)</option>
+                            </select>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button
-                            type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal"
-                        >
-                            취소
-                        </button>
-                        <button
-                            type="button"
-                            class="btn btn-primary"
-                            id="importCsv"
-                        >
-                            가져오기
-                        </button>
-                    </div>
+                        <div class="mb-3">
+                            <label class="form-label">할인 값</label>
+                            <input type="number" class="form-control" id="discountValue" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">최대 사용 횟수</label>
+                            <input type="number" class="form-control" id="maxUses" value="1">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">만료일</label>
+                            <input type="date" class="form-control" id="expiryDate" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="saveCoupon()">저장</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Add Discount Code Modal -->
-        <div class="modal fade" id="addDiscountCodeModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">할인 코드 추가</h5>
-                        <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                        ></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="addDiscountCodeForm">
-                            <div class="mb-3">
-                                <label for="discountCode" class="form-label"
-                                    >할인 코드</label
-                                >
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="discountCode"
-                                    placeholder="예: SUPER15"
-                                    required
-                                />
-                                <small class="form-text text-muted"
-                                    >영문, 숫자만 사용 가능합니다.</small
-                                >
-                            </div>
-                            <div class="mb-3">
-                                <label for="discountType" class="form-label"
-                                    >할인 유형</label
-                                >
-                                <select
-                                    class="form-select"
-                                    id="discountType"
-                                    required
-                                >
-                                    <option value="">선택하세요</option>
-                                    <option value="percent">할인율 (%)</option>
-                                    <option value="amount">
-                                        할인금액 (원)
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="discountValue" class="form-label"
-                                    >할인값</label
-                                >
-                                <input
-                                    type="number"
-                                    class="form-control"
-                                    id="discountValue"
-                                    min="1"
-                                    required
-                                />
-                                <small
-                                    class="form-text text-muted"
-                                    id="discountValueHelp"
-                                    >할인율의 경우 1-99, 할인금액의 경우 최소
-                                    1000원</small
-                                >
-                            </div>
-                            <div class="mb-3">
-                                <label for="maxUses" class="form-label"
-                                    >최대 사용 횟수</label
-                                >
-                                <input
-                                    type="number"
-                                    class="form-control"
-                                    id="maxUses"
-                                    value="100"
-                                    min="1"
-                                    required
-                                />
-                            </div>
-                            <div class="mb-3">
-                                <label for="expiryDate" class="form-label"
-                                    >만료일 (선택사항)</label
-                                >
-                                <input
-                                    type="date"
-                                    class="form-control"
-                                    id="expiryDate"
-                                />
-                            </div>
-                            <div class="form-check">
-                                <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    id="isActive"
-                                    checked
-                                />
-                                <label class="form-check-label" for="isActive">
-                                    활성화
-                                </label>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button
-                            type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal"
-                        >
-                            취소
-                        </button>
-                        <button
-                            type="button"
-                            class="btn btn-primary"
-                            id="saveDiscountCode"
-                        >
-                            저장
-                        </button>
-                    </div>
+    <!-- 콘텐츠 추가 모달 -->
+    <div class="modal fade" id="addContentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="contentModalTitle">콘텐츠 추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="contentForm">
+                        <input type="hidden" id="contentType">
+                        <div class="mb-3">
+                            <label class="form-label">제목</label>
+                            <input type="text" class="form-control" id="contentTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">설명</label>
+                            <textarea class="form-control" id="contentDescription" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">가격</label>
+                            <input type="number" class="form-control" id="contentPrice" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">이미지 URL</label>
+                            <input type="url" class="form-control" id="contentImageUrl">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">콘텐츠 URL</label>
+                            <input type="url" class="form-control" id="contentUrl" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="saveContent()">저장</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Scripts -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/handsontable@13.1.0/dist/handsontable.full.min.js"></script>
-
-        <!-- Custom Scripts -->
-        <script src="js/supabase-client.js"></script>
-        <script src="js/admin.js"></script>
-    </body>
-</html>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html> 
