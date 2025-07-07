@@ -102,13 +102,34 @@ async function loadUserInfo(user) {
             console.warn('프로필 정보 조회 오류:', profileError);
         }
         
-        // 관리자 권한 확인 및 리다이렉트 (마이페이지에서만)
-        if (profile && profile.role === 'admin') {
+        // 관리자 권한 확인 및 리다이렉트 (강화된 로직)
+        console.log('🔍 마이페이지에서 관리자 권한 확인 - 사용자:', user.email);
+        
+        // 관리자 이메일 목록 (1차 확인)
+        const adminEmails = [
+            'admin@mcseller.co.kr',
+            'qwg18@naver.com',
+            'mcseller@gmail.com', 
+            'rvd3855@gmail.com'
+        ];
+        
+        let isAdmin = adminEmails.includes(user.email);
+        console.log('📧 이메일 기반 관리자 확인:', isAdmin);
+        
+        // 프로필 테이블에서도 확인 (2차 확인)
+        if (!isAdmin && profile && profile.role === 'admin') {
+            isAdmin = true;
+            console.log('🔑 Supabase profiles 테이블에서 관리자 권한 확인됨');
+        }
+        
+        if (isAdmin) {
             console.log("🔑 관리자 권한 감지 - 관리자 페이지로 리다이렉트");
             alert('관리자 계정입니다. 관리자 페이지로 이동합니다.');
             window.location.href = '/admin.html';
             return;
         }
+        
+        console.log('👤 일반 사용자 확인 - 마이페이지 계속 진행');
         
         // UI 업데이트 (실제 HTML ID와 일치하도록 수정)
         const userEmailElement = document.getElementById('user-email');

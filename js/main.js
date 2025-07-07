@@ -98,6 +98,38 @@ async function updateUIAccordingToAuthState() {
             // 로그인 상태 UI 업데이트
             console.log("✅ 로그인됨:", session.user.email);
             
+            // 관리자 권한 확인 (강화된 로직)
+            console.log('🔍 인덱스에서 관리자 권한 확인 - 사용자:', session.user.email);
+            
+            // 관리자 이메일 목록
+            const adminEmails = [
+                'admin@mcseller.co.kr',
+                'qwg18@naver.com',
+                'mcseller@gmail.com',
+                'rvd3855@gmail.com'
+            ];
+            
+            let isAdmin = adminEmails.includes(session.user.email);
+            console.log('📧 이메일 기반 관리자 확인:', isAdmin);
+            
+            // 추가로 Supabase profiles 테이블에서도 확인
+            if (!isAdmin) {
+                try {
+                    const { data: profile, error: profileError } = await window.supabaseClient
+                        .from('profiles')
+                        .select('role')
+                        .eq('id', session.user.id)
+                        .single();
+                    
+                    if (profile && profile.role === 'admin') {
+                        isAdmin = true;
+                        console.log('🔑 Supabase profiles 테이블에서 관리자 권한 확인됨');
+                    }
+                } catch (profileError) {
+                    console.log('⚠️ 프로필 테이블 조회 실패:', profileError);
+                }
+            }
+            
             const loginInfo = document.getElementById("login-info");
             const profileDropdown = document.getElementById("profile-dropdown");
             const startButton = document.getElementById("start-button");
@@ -113,7 +145,7 @@ async function updateUIAccordingToAuthState() {
             const profileMypageLink = document.querySelector("#profile-dropdown a[href*='mypage'], #profile-dropdown a[href*='admin']");
             
             if (profileText) {
-                profileText.innerHTML = '<i class="fas fa-user me-2"></i>회원';
+                profileText.innerHTML = isAdmin ? '<i class="fas fa-crown me-2"></i>관리자' : '<i class="fas fa-user me-2"></i>회원';
             }
             
             if (userEmailDisplay) {
@@ -121,9 +153,16 @@ async function updateUIAccordingToAuthState() {
             }
             
             if (profileMypageLink) {
-                profileMypageLink.href = "mypage.html";
-                profileMypageLink.innerHTML = '<i class="fas fa-user me-2"></i>마이페이지';
+                if (isAdmin) {
+                    profileMypageLink.href = "admin.html";
+                    profileMypageLink.innerHTML = '<i class="fas fa-cog me-2"></i>관리자 페이지';
+                } else {
+                    profileMypageLink.href = "mypage.html";
+                    profileMypageLink.innerHTML = '<i class="fas fa-user me-2"></i>마이페이지';
+                }
             }
+            
+            console.log(isAdmin ? '🔑 관리자 UI 설정 완료' : '👤 일반 사용자 UI 설정 완료');
             
             // 전역 사용자 정보 설정
             window.currentUser = session.user;
