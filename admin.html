@@ -11,6 +11,8 @@
         .nav-link.active { background: #007bff; color: white !important; }
         .content-section { display: none; }
         .content-section.active { display: block; }
+        .content-tab { display: none; }
+        .content-tab.active { display: block; }
     </style>
 </head>
 <body>
@@ -139,28 +141,121 @@
                 <!-- 콘텐츠 관리 -->
                 <div id="content-section" class="content-section">
                     <h3>콘텐츠 관리</h3>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <button class="btn btn-success me-2" onclick="showAddContentModal('ebook')">전자책 추가</button>
-                            <button class="btn btn-success" onclick="showAddContentModal('lecture')">강의 추가</button>
+                    
+                    <!-- 탭 네비게이션 -->
+                    <ul class="nav nav-tabs mb-3" id="contentTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" onclick="showContentTab('list')">콘텐츠 목록</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showContentTab('purchases')">구매자 관리</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showContentTab('editor')">콘텐츠 편집</a>
+                        </li>
+                    </ul>
+
+                    <!-- 콘텐츠 목록 탭 -->
+                    <div id="content-list-tab" class="content-tab active">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <button class="btn btn-success me-2" onclick="showAddContentModal('ebook')">전자책 추가</button>
+                                <button class="btn btn-success" onclick="showAddContentModal('lecture')">강의 추가</button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>제목</th>
+                                        <th>타입</th>
+                                        <th>가격</th>
+                                        <th>구매자 수</th>
+                                        <th>상태</th>
+                                        <th>등록일</th>
+                                        <th>액션</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="contentTable">
+                                    <tr><td colspan="7">로딩 중...</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>제목</th>
-                                    <th>타입</th>
-                                    <th>가격</th>
-                                    <th>상태</th>
-                                    <th>등록일</th>
-                                    <th>액션</th>
-                                </tr>
-                            </thead>
-                            <tbody id="contentTable">
-                                <tr><td colspan="6">로딩 중...</td></tr>
-                            </tbody>
-                        </table>
+
+                    <!-- 구매자 관리 탭 -->
+                    <div id="content-purchases-tab" class="content-tab" style="display:none;">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <select class="form-control" id="purchaseContentSelect" onchange="loadPurchasers()">
+                                    <option value="">콘텐츠를 선택하세요</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-primary" onclick="showAddPurchaseModal()">구매자 추가</button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>사용자 이메일</th>
+                                        <th>구매일</th>
+                                        <th>만료일</th>
+                                        <th>상태</th>
+                                        <th>액션</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="purchasersTable">
+                                    <tr><td colspan="5">콘텐츠를 선택하세요</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 콘텐츠 편집 탭 -->
+                    <div id="content-editor-tab" class="content-tab" style="display:none;">
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <select class="form-control" id="editorContentSelect" onchange="loadContentForEdit()">
+                                    <option value="">편집할 콘텐츠를 선택하세요</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-success" onclick="saveContentChanges()" disabled id="saveContentBtn">저장</button>
+                                <button class="btn btn-info" onclick="previewContent()" disabled id="previewContentBtn">미리보기</button>
+                            </div>
+                        </div>
+                        
+                        <div id="contentEditorArea" style="display:none;">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 id="editingContentTitle">콘텐츠 편집</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">제목</label>
+                                        <input type="text" class="form-control" id="editContentTitle">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">설명</label>
+                                        <textarea class="form-control" id="editContentDescription" rows="3"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">가격</label>
+                                        <input type="number" class="form-control" id="editContentPrice">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">이미지 URL</label>
+                                        <input type="url" class="form-control" id="editContentImageUrl">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">콘텐츠 내용 (HTML/유튜브 임베드)</label>
+                                        <textarea class="form-control" id="editContentData" rows="10" placeholder="HTML 코드나 유튜브 임베드 코드를 입력하세요"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -251,10 +346,39 @@
         </div>
     </div>
 
+    <!-- 구매자 추가 모달 -->
+    <div class="modal fade" id="addPurchaseModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">구매자 추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="purchaseForm">
+                        <div class="mb-3">
+                            <label class="form-label">사용자 이메일</label>
+                            <input type="email" class="form-control" id="purchaseUserEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">만료일 (선택사항)</label>
+                            <input type="date" class="form-control" id="purchaseExpiryDate">
+                            <small class="text-muted">비워두면 무제한</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="addPurchaser()">추가</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase-config.js?v=2.1"></script>
-    <script src="js/supabase-client.js?v=2.1"></script>
-    <script src="js/admin.js?v=2.1"></script>
+    <script src="js/supabase-config.js?v=3.0"></script>
+    <script src="js/supabase-client.js?v=3.0"></script>
+    <script src="js/admin.js?v=3.0"></script>
 </body>
 </html> 

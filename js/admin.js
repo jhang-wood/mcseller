@@ -1,5 +1,5 @@
-// MCSELLER 관리자 페이지 - 단순 기능 중심 v2.1
-console.log('🚀 관리자 페이지 JavaScript v2.1 로드됨 - 모든 오류 수정됨');
+// MCSELLER 관리자 페이지 - 완전한 콘텐츠 관리 시스템 v3.0
+console.log('🚀 관리자 페이지 JavaScript v3.0 로드됨 - 완전한 콘텐츠 관리 시스템');
 
 let currentUser = null;
 
@@ -276,7 +276,7 @@ async function loadCoupons() {
                         `${coupon.discount_amount}%` : 
                         `${coupon.discount_amount.toLocaleString()}원`}
                 </td>
-                <td>${coupon.current_uses || 0} / ${coupon.max_uses || '무제한'}</td>
+                <td>0 / ${coupon.max_uses || '무제한'}</td>
                 <td>${coupon.valid_until ? new Date(coupon.valid_until).toLocaleDateString() : '무제한'}</td>
                 <td>
                     <span class="badge bg-success">활성</span>
@@ -324,8 +324,7 @@ async function saveCoupon() {
                 discount_type: discountType,
                 discount_amount: discountValue,
                 max_uses: maxUses || null,
-                valid_until: expiryDate || null,
-                current_uses: 0
+                valid_until: expiryDate || null
             });
         
         if (error) throw error;
@@ -465,24 +464,74 @@ async function updateUserPointsByEmail(email, newPoints) {
 }
 
 // === 콘텐츠 관리 ===
+// 콘텐츠 탭 관리
+function showContentTab(tabName) {
+    // 모든 탭 비활성화
+    document.querySelectorAll('.content-tab').forEach(tab => {
+        tab.classList.remove('active');
+        tab.style.display = 'none';
+    });
+    
+    // 모든 탭 링크 비활성화
+    document.querySelectorAll('#contentTabs .nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    // 선택된 탭 활성화
+    document.getElementById(`content-${tabName}-tab`).classList.add('active');
+    document.getElementById(`content-${tabName}-tab`).style.display = 'block';
+    
+    // 탭 링크 활성화
+    event.target.classList.add('active');
+    
+    // 탭별 데이터 로드
+    switch(tabName) {
+        case 'list':
+            loadContent();
+            break;
+        case 'purchases':
+            loadContentSelectOptions();
+            break;
+        case 'editor':
+            loadContentSelectOptionsForEditor();
+            break;
+    }
+}
+
 async function loadContent() {
     try {
-        await ensureContentTable();
-        
         const { data: contents, error } = await window.supabaseClient
             .from('contents')
             .select('*')
             .order('created_at', { ascending: false });
         
-        if (error) throw error;
-        
         const tbody = document.getElementById('contentTable');
-        if (!contents || contents.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6">콘텐츠가 없습니다.</td></tr>';
+        
+        if (error) {
+            console.warn('콘텐츠 테이블 조회 오류:', error);
+            tbody.innerHTML = '<tr><td colspan="7">콘텐츠 테이블이 없습니다.</td></tr>';
             return;
         }
         
-        tbody.innerHTML = contents.map(content => `
+        if (!contents || contents.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7">콘텐츠가 없습니다.</td></tr>';
+            return;
+        }
+        
+        // 각 콘텐츠의 구매자 수 조회
+        const contentsWithPurchaseCount = await Promise.all(contents.map(async (content) => {
+            try {
+                const { count } = await window.supabaseClient
+                    .from('purchases')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('content_id', content.id);
+                return { ...content, purchaseCount: count || 0 };
+            } catch {
+                return { ...content, purchaseCount: 0 };
+            }
+        }));
+        
+        tbody.innerHTML = contentsWithPurchaseCount.map(content => `
             <tr>
                 <td><strong>${content.title}</strong></td>
                 <td>
@@ -490,17 +539,18 @@ async function loadContent() {
                         ${content.type === 'ebook' ? '전자책' : '강의'}
                     </span>
                 </td>
-                <td>${content.price.toLocaleString()}원</td>
+                <td>${content.price ? content.price.toLocaleString() : '0'}원</td>
+                <td>${content.purchaseCount}명</td>
                 <td>
-                    <span class="badge bg-${content.is_active ? 'success' : 'secondary'}">
-                        ${content.is_active ? '활성' : '비활성'}
+                    <span class="badge bg-${content.status === 'active' ? 'success' : 'secondary'}">
+                        ${content.status === 'active' ? '활성' : '비활성'}
                     </span>
                 </td>
-                <td>${new Date(content.created_at).toLocaleDateString()}</td>
+                <td>${content.created_at ? new Date(content.created_at).toLocaleDateString() : '날짜 없음'}</td>
                 <td>
-                    <button class="btn btn-sm btn-primary me-1" onclick="editContent('${content.id}')">수정</button>
-                    <button class="btn btn-sm btn-warning me-1" onclick="toggleContent('${content.id}', ${!content.is_active})">
-                        ${content.is_active ? '비활성화' : '활성화'}
+                    <button class="btn btn-sm btn-primary me-1" onclick="editContentInTab('${content.id}')">편집</button>
+                    <button class="btn btn-sm btn-warning me-1" onclick="toggleContent('${content.id}', '${content.status === 'active' ? 'inactive' : 'active'}')">
+                        ${content.status === 'active' ? '비활성화' : '활성화'}
                     </button>
                     <button class="btn btn-sm btn-danger" onclick="deleteContent('${content.id}')">삭제</button>
                 </td>
@@ -509,7 +559,7 @@ async function loadContent() {
         
     } catch (error) {
         console.error('콘텐츠 목록 로드 오류:', error);
-        document.getElementById('contentTable').innerHTML = '<tr><td colspan="6">로드 오류</td></tr>';
+        document.getElementById('contentTable').innerHTML = '<tr><td colspan="7">로드 오류</td></tr>';
     }
 }
 
@@ -528,6 +578,285 @@ function showAddContentModal(type) {
     modal.show();
 }
 
+// 구매자 관리 함수들
+async function loadContentSelectOptions() {
+    try {
+        const { data: contents, error } = await window.supabaseClient
+            .from('contents')
+            .select('id, title')
+            .eq('status', 'active');
+        
+        const select = document.getElementById('purchaseContentSelect');
+        select.innerHTML = '<option value="">콘텐츠를 선택하세요</option>';
+        
+        if (contents) {
+            contents.forEach(content => {
+                select.innerHTML += `<option value="${content.id}">${content.title}</option>`;
+            });
+        }
+    } catch (error) {
+        console.error('콘텐츠 목록 로드 오류:', error);
+    }
+}
+
+async function loadPurchasers() {
+    const contentId = document.getElementById('purchaseContentSelect').value;
+    const tbody = document.getElementById('purchasersTable');
+    
+    if (!contentId) {
+        tbody.innerHTML = '<tr><td colspan="5">콘텐츠를 선택하세요</td></tr>';
+        return;
+    }
+    
+    try {
+        const { data: purchases, error } = await window.supabaseClient
+            .from('purchases')
+            .select(`
+                *,
+                profiles!inner(email)
+            `)
+            .eq('content_id', contentId);
+        
+        if (error) {
+            console.warn('구매자 정보 조회 오류:', error);
+            tbody.innerHTML = '<tr><td colspan="5">구매자 정보를 불러올 수 없습니다.</td></tr>';
+            return;
+        }
+        
+        if (!purchases || purchases.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5">구매자가 없습니다.</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = purchases.map(purchase => `
+            <tr>
+                <td>${purchase.profiles.email}</td>
+                <td>${purchase.purchase_date ? new Date(purchase.purchase_date).toLocaleDateString() : '날짜 없음'}</td>
+                <td>${purchase.expiry_date ? new Date(purchase.expiry_date).toLocaleDateString() : '무제한'}</td>
+                <td>
+                    <span class="badge bg-${purchase.status === 'active' ? 'success' : 'secondary'}">
+                        ${purchase.status === 'active' ? '활성' : '비활성'}
+                    </span>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-danger" onclick="removePurchaser('${purchase.id}')">제거</button>
+                </td>
+            </tr>
+        `).join('');
+        
+    } catch (error) {
+        console.error('구매자 로드 오류:', error);
+        tbody.innerHTML = '<tr><td colspan="5">로드 오류</td></tr>';
+    }
+}
+
+function showAddPurchaseModal() {
+    const contentId = document.getElementById('purchaseContentSelect').value;
+    if (!contentId) {
+        alert('먼저 콘텐츠를 선택하세요.');
+        return;
+    }
+    
+    const modal = new bootstrap.Modal(document.getElementById('addPurchaseModal'));
+    document.getElementById('purchaseForm').reset();
+    modal.show();
+}
+
+async function addPurchaser() {
+    const contentId = document.getElementById('purchaseContentSelect').value;
+    const email = document.getElementById('purchaseUserEmail').value.trim();
+    const expiryDate = document.getElementById('purchaseExpiryDate').value;
+    
+    if (!email) {
+        alert('이메일을 입력하세요.');
+        return;
+    }
+    
+    try {
+        // 사용자 ID 조회
+        const { data: profiles, error: userError } = await window.supabaseClient
+            .from('profiles')
+            .select('id')
+            .eq('email', email);
+        
+        if (userError || !profiles || profiles.length === 0) {
+            alert('해당 이메일의 사용자를 찾을 수 없습니다.');
+            return;
+        }
+        
+        const userId = profiles[0].id;
+        
+        // 구매 기록 추가
+        const { error } = await window.supabaseClient
+            .from('purchases')
+            .insert({
+                user_id: userId,
+                content_id: contentId,
+                purchase_date: new Date().toISOString(),
+                expiry_date: expiryDate || null,
+                status: 'active'
+            });
+        
+        if (error) throw error;
+        
+        alert('구매자가 추가되었습니다.');
+        bootstrap.Modal.getInstance(document.getElementById('addPurchaseModal')).hide();
+        loadPurchasers();
+        
+    } catch (error) {
+        console.error('구매자 추가 오류:', error);
+        alert('구매자 추가에 실패했습니다: ' + error.message);
+    }
+}
+
+async function removePurchaser(purchaseId) {
+    if (!confirm('정말 제거하시겠습니까?')) return;
+    
+    try {
+        const { error } = await window.supabaseClient
+            .from('purchases')
+            .delete()
+            .eq('id', purchaseId);
+        
+        if (error) throw error;
+        
+        loadPurchasers();
+        
+    } catch (error) {
+        console.error('구매자 제거 오류:', error);
+        alert('구매자 제거에 실패했습니다.');
+    }
+}
+
+// 콘텐츠 편집 함수들
+async function loadContentSelectOptionsForEditor() {
+    try {
+        const { data: contents, error } = await window.supabaseClient
+            .from('contents')
+            .select('id, title')
+            .order('created_at', { ascending: false });
+        
+        const select = document.getElementById('editorContentSelect');
+        select.innerHTML = '<option value="">편집할 콘텐츠를 선택하세요</option>';
+        
+        if (contents) {
+            contents.forEach(content => {
+                select.innerHTML += `<option value="${content.id}">${content.title}</option>`;
+            });
+        }
+    } catch (error) {
+        console.error('콘텐츠 목록 로드 오류:', error);
+    }
+}
+
+let currentEditingContent = null;
+
+async function loadContentForEdit() {
+    const contentId = document.getElementById('editorContentSelect').value;
+    const editorArea = document.getElementById('contentEditorArea');
+    
+    if (!contentId) {
+        editorArea.style.display = 'none';
+        document.getElementById('saveContentBtn').disabled = true;
+        document.getElementById('previewContentBtn').disabled = true;
+        return;
+    }
+    
+    try {
+        const { data: content, error } = await window.supabaseClient
+            .from('contents')
+            .select('*')
+            .eq('id', contentId)
+            .single();
+        
+        if (error) throw error;
+        
+        currentEditingContent = content;
+        
+        // 폼에 데이터 채우기
+        document.getElementById('editingContentTitle').textContent = `${content.title} 편집`;
+        document.getElementById('editContentTitle').value = content.title || '';
+        document.getElementById('editContentDescription').value = content.description || '';
+        document.getElementById('editContentPrice').value = content.price || '';
+        document.getElementById('editContentImageUrl').value = content.image_url || '';
+        document.getElementById('editContentData').value = content.content || '';
+        
+        editorArea.style.display = 'block';
+        document.getElementById('saveContentBtn').disabled = false;
+        document.getElementById('previewContentBtn').disabled = false;
+        
+    } catch (error) {
+        console.error('콘텐츠 로드 오류:', error);
+        alert('콘텐츠를 불러올 수 없습니다.');
+    }
+}
+
+async function saveContentChanges() {
+    if (!currentEditingContent) return;
+    
+    try {
+        const updatedData = {
+            title: document.getElementById('editContentTitle').value,
+            description: document.getElementById('editContentDescription').value,
+            price: parseInt(document.getElementById('editContentPrice').value) || 0,
+            image_url: document.getElementById('editContentImageUrl').value,
+            content: document.getElementById('editContentData').value,
+            updated_at: new Date().toISOString()
+        };
+        
+        const { error } = await window.supabaseClient
+            .from('contents')
+            .update(updatedData)
+            .eq('id', currentEditingContent.id);
+        
+        if (error) throw error;
+        
+        alert('콘텐츠가 저장되었습니다.');
+        loadContent(); // 목록 새로고침
+        
+    } catch (error) {
+        console.error('콘텐츠 저장 오류:', error);
+        alert('콘텐츠 저장에 실패했습니다.');
+    }
+}
+
+function previewContent() {
+    if (!currentEditingContent) return;
+    
+    const content = document.getElementById('editContentData').value;
+    const title = document.getElementById('editContentTitle').value;
+    
+    // 새 창에서 미리보기
+    const previewWindow = window.open('', '_blank');
+    previewWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>${title} - 미리보기</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        </head>
+        <body>
+            <div class="container mt-4">
+                <h1>${title}</h1>
+                <hr>
+                <div class="content-preview">
+                    ${content}
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
+}
+
+function editContentInTab(contentId) {
+    // 편집 탭으로 이동
+    showContentTab('editor');
+    
+    // 콘텐츠 선택
+    document.getElementById('editorContentSelect').value = contentId;
+    loadContentForEdit();
+}
+
 async function saveContent() {
     try {
         const type = document.getElementById('contentType').value;
@@ -537,8 +866,8 @@ async function saveContent() {
         const imageUrl = document.getElementById('contentImageUrl').value;
         const contentUrl = document.getElementById('contentUrl').value;
         
-        if (!title || !price || !contentUrl) {
-            alert('필수 필드를 입력해주세요.');
+        if (!title || !contentUrl) {
+            alert('제목과 콘텐츠 URL은 필수입니다.');
             return;
         }
         
@@ -548,10 +877,10 @@ async function saveContent() {
                 title,
                 description,
                 type,
-                price,
+                price: price || 0,
                 image_url: imageUrl,
                 content_url: contentUrl,
-                is_active: true
+                status: 'active'
             });
         
         if (error) throw error;
@@ -562,15 +891,15 @@ async function saveContent() {
         
     } catch (error) {
         console.error('콘텐츠 추가 오류:', error);
-        alert('콘텐츠 추가에 실패했습니다.');
+        alert('콘텐츠 추가에 실패했습니다: ' + error.message);
     }
 }
 
-async function toggleContent(contentId, isActive) {
+async function toggleContent(contentId, newStatus) {
     try {
         const { error } = await window.supabaseClient
             .from('contents')
-            .update({ is_active: isActive })
+            .update({ status: newStatus })
             .eq('id', contentId);
         
         if (error) throw error;
