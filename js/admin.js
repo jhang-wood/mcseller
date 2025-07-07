@@ -174,7 +174,7 @@ async function loadDashboardData() {
 async function loadDashboardStats() {
     try {
         // 총 매출
-        const { data: orders } = await supabaseClient
+        const { data: orders } = await window.supabaseClient
             .from('orders')
             .select('total_amount')
             .eq('status', 'completed');
@@ -182,18 +182,18 @@ async function loadDashboardStats() {
         const totalRevenue = orders?.reduce((sum, order) => sum + order.total_amount, 0) || 0;
         
         // 총 주문
-        const { data: allOrders, count: totalOrders } = await supabaseClient
+        const { data: allOrders, count: totalOrders } = await window.supabaseClient
             .from('orders')
             .select('*', { count: 'exact' });
         
         // 활성 상품
-        const { data: products, count: activeProducts } = await supabaseClient
+        const { data: products, count: activeProducts } = await window.supabaseClient
             .from('products')
             .select('*', { count: 'exact' })
             .eq('is_active', true);
         
         // 총 회원
-        const { data: users, count: totalUsers } = await supabaseClient
+        const { data: users, count: totalUsers } = await window.supabaseClient
             .from('users')
             .select('*', { count: 'exact' });
         
@@ -303,7 +303,7 @@ async function loadProductChart() {
     if (!ctx) return;
     
     try {
-        const { data: products } = await supabaseClient
+        const { data: products } = await window.supabaseClient
             .from('products')
             .select('type')
             .eq('is_active', true);
@@ -355,7 +355,7 @@ async function getRevenueData() {
         labels.push(date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }));
         
         try {
-            const { data: orders } = await supabaseClient
+            const { data: orders } = await window.supabaseClient
                 .from('orders')
                 .select('total_amount')
                 .eq('status', 'completed')
@@ -379,7 +379,7 @@ async function loadProductsGrid() {
     if (!container) return;
     
     try {
-        const { data: products, error } = await supabaseClient
+        const { data: products, error } = await window.supabaseClient
             .from('products')
             .select('*')
             .order('created_at', { ascending: false });
@@ -433,7 +433,7 @@ async function saveProductChanges(changes) {
             const rowData = handsontables.products.getDataAtRow(row);
             const productId = rowData[0]; // ID 컬럼
             
-            const { error } = await supabaseClient
+            const { error } = await window.supabaseClient
                 .from('products')
                 .update({ [prop]: newValue })
                 .eq('id', productId);
@@ -456,7 +456,7 @@ async function loadOrdersGrid() {
     if (!container) return;
     
     try {
-        const { data: orders, error } = await supabaseClient
+        const { data: orders, error } = await window.supabaseClient
             .from('orders')
             .select(`
                 *,
@@ -525,7 +525,7 @@ async function saveOrderChanges(changes) {
             const rowData = handsontables.orders.getDataAtRow(row);
             const orderId = rowData[0]; // ID 컬럼
             
-            const { error } = await supabaseClient
+            const { error } = await window.supabaseClient
                 .from('orders')
                 .update({ [prop]: newValue })
                 .eq('id', orderId);
@@ -548,7 +548,7 @@ async function loadUsersGrid() {
     if (!container) return;
     
     try {
-        const { data: users, error } = await supabaseClient
+        const { data: users, error } = await window.supabaseClient
             .from('users')
             .select('*')
             .order('created_at', { ascending: false });
@@ -603,7 +603,7 @@ async function saveUserChanges(changes) {
             const rowData = handsontables.users.getDataAtRow(row);
             const userId = rowData[0]; // ID 컬럼
             
-            const { error } = await supabaseClient
+            const { error } = await window.supabaseClient
                 .from('users')
                 .update({ [prop]: newValue })
                 .eq('id', userId);
@@ -626,7 +626,7 @@ async function loadReviewsGrid() {
     if (!container) return;
     
     try {
-        const { data: reviews, error } = await supabaseClient
+        const { data: reviews, error } = await window.supabaseClient
             .from('reviews')
             .select(`
                 *,
@@ -692,7 +692,7 @@ async function saveReviewChanges(changes) {
             const rowData = handsontables.reviews.getDataAtRow(row);
             const reviewId = rowData[0]; // ID 컬럼
             
-            const { error } = await supabaseClient
+            const { error } = await window.supabaseClient
                 .from('reviews')
                 .update({ [prop]: newValue })
                 .eq('id', reviewId);
@@ -789,7 +789,7 @@ async function getMonthlyAnalytics() {
         
         try {
             // 매출 데이터
-            const { data: monthOrders } = await supabaseClient
+            const { data: monthOrders } = await window.supabaseClient
                 .from('orders')
                 .select('total_amount')
                 .eq('status', 'completed')
@@ -1162,7 +1162,7 @@ async function saveNewProduct() {
     }
     
     try {
-        const { error } = await supabaseClient
+        const { error } = await window.supabaseClient
             .from('products')
             .insert([productData]);
         
@@ -1193,7 +1193,7 @@ async function saveNewProduct() {
 // CSV 내보내기
 async function exportProductsCSV() {
     try {
-        const { data: products, error } = await supabaseClient
+        const { data: products, error } = await window.supabaseClient
             .from('products')
             .select('*')
             .order('created_at', { ascending: false });
@@ -1275,7 +1275,7 @@ async function importProductsCSV() {
             return;
         }
         
-        const { error } = await supabaseClient
+        const { error } = await window.supabaseClient
             .from('products')
             .insert(products);
         
