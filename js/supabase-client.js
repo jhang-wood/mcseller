@@ -3,53 +3,49 @@
  * supabase-config.js의 중앙 설정을 사용합니다.
  */
 
-// 전역 변수
-let supabaseClient = null;
+// 전역 Supabase 클라이언트 변수
+window.supabaseClient = null;
+window.currentUser = null;
 
-// Supabase 클라이언트 초기화 함수
+/**
+ * Supabase 클라이언트 초기화
+ */
 async function initializeSupabaseClient() {
-    console.log('🔄 Supabase 클라이언트 초기화 시작...');
-    
     try {
-        // 환경변수 로드 시도
-        let config;
-        if (typeof loadEnvironmentConfig === 'function') {
-            try {
-                config = await loadEnvironmentConfig();
-                console.log('✅ 환경변수 로드 성공');
-            } catch (envError) {
-                console.log('⚠️ 환경변수 로드 실패, 기본 설정 사용:', envError.message);
-                config = null;
-            }
-        } else {
-            console.log('⚠️ 환경변수 로더 없음 - 기본 설정 사용');
-            config = null;
+        console.log('🚀 Supabase 클라이언트 초기화 시작...');
+        
+        // 설정 파일 로드 대기
+        let config = window.SUPABASE_CONFIG;
+        let retryCount = 0;
+        const maxRetries = 10;
+        
+        while (!config && retryCount < maxRetries) {
+            console.log('⏳ Supabase 설정 로드 대기 중...', retryCount + 1);
+            await new Promise(resolve => setTimeout(resolve, 500));
+            config = window.SUPABASE_CONFIG;
+            retryCount++;
         }
         
-        // 기본 설정 (환경변수가 없을 때)
         if (!config) {
-            console.log('⚠️ 환경변수 설정이 없음 - 기본 설정 사용');
-            config = {
-                url: 'https://rpcctgtmtplfahwtnglq.supabase.co',
-                anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwY2N0Z3RtdHBsZmFod3RuZ2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4MDIzMTIsImV4cCI6MjA2NjM3ODMxMn0.HQAQcjJNRy7YI_l9YVq6QCY8Hcx2Jx5LbNQGpbYOyJo'
-            };
+            throw new Error('Supabase 설정을 로드할 수 없습니다. js/supabase-config.js 파일을 확인하세요.');
         }
         
-        // Supabase 클라이언트 생성 (세션 지속성 강화)
+        // Supabase 클라이언트 생성 (향상된 설정)
         const supabaseClient = supabase.createClient(config.url, config.anonKey, {
             auth: {
                 flowType: 'pkce',
                 storage: window.localStorage,
-                storageKey: 'supabase.auth.token',
+                storageKey: 'mcseller.auth.token',
                 persistSession: true,
                 detectSessionInUrl: true,
                 autoRefreshToken: true,
-                debug: true
+                debug: false
             },
             global: {
                 headers: {
                     'apikey': config.anonKey,
-                    'Authorization': `Bearer ${config.anonKey}`
+                    'Authorization': `Bearer ${config.anonKey}`,
+                    'X-Client-Info': 'mcseller-web@1.0.0'
                 }
             },
             db: {
@@ -86,7 +82,7 @@ async function initializeSupabaseClient() {
         
         // 사용자에게 친화적인 오류 메시지
         const userMessage = `
-서비스 연결에 문제가 발생했습니다.
+🚨 서비스 연결에 문제가 발생했습니다.
 
 가능한 원인:
 1. Supabase Anon Key가 잘못되었거나 만료되었습니다.
@@ -99,7 +95,10 @@ async function initializeSupabaseClient() {
 3. 문제가 지속되면 관리자에게 문의하세요.
         `;
         
-        alert(userMessage.trim());
+        // 개발 환경에서만 알림 표시
+        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+            alert(userMessage.trim());
+        }
         throw error;
     }
 }
@@ -116,6 +115,7 @@ async function setupInitialSession(supabaseClient) {
         
         if (session) {
             console.log('✅ 초기 세션 확인됨:', session.user.email);
+            window.currentUser = session.user;
             
             // 인증 토큰을 헤더에 설정
             if (session.access_token) {
@@ -153,6 +153,9 @@ function setupGlobalAuthListener() {
     window.supabaseClient.auth.onAuthStateChange(async (event, session) => {
         console.log('🔄 전역 인증 상태 변화:', event);
         
+        // 현재 사용자 정보 업데이트
+        window.currentUser = session?.user || null;
+        
         // 세션이 변경될 때마다 토큰 업데이트
         if (session && session.access_token) {
             // 전역 fetch 요청에 인증 토큰 자동 포함
@@ -179,9 +182,6 @@ function setupGlobalAuthListener() {
         window.dispatchEvent(new CustomEvent('authStateChange', {
             detail: { event, session }
         }));
-        
-        // 현재 사용자 정보 업데이트
-        window.currentUser = session?.user || null;
     });
 }
 
@@ -226,35 +226,40 @@ async function waitForSession(maxWaitTime = 10000) {
                 continue;
             }
             
+            // 세션 확인
             const { data: { session }, error } = await window.supabaseClient.auth.getSession();
             
-            if (!error && session && session.user) {
+            if (error) {
+                console.warn('세션 확인 중 오류:', error.message);
+                await new Promise(resolve => setTimeout(resolve, 500));
+                retryCount++;
+                continue;
+            }
+            
+            if (session) {
                 console.log('✅ 세션 로드 완료:', session.user.email);
-                console.log('🔑 액세스 토큰 길이:', session.access_token?.length || 0);
+                window.currentUser = session.user;
                 return session;
             }
             
-            if (error) {
-                console.log('⚠️ 세션 로드 오류:', error.message);
-            } else {
-                console.log('⏳ 세션 대기 중... (시도', retryCount + 1, '/', maxRetries, ')');
-            }
+            // 세션이 없으면 계속 대기
+            console.log('⏳ 세션 대기 중... (' + (retryCount + 1) + '/' + maxRetries + ')');
+            await new Promise(resolve => setTimeout(resolve, 500));
+            retryCount++;
             
-        } catch (err) {
-            console.log('⏳ 세션 로드 재시도 중...', err.message);
+        } catch (error) {
+            console.warn('세션 대기 중 오류:', error.message);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            retryCount++;
         }
-        
-        // 500ms 대기 후 재시도
-        await new Promise(resolve => setTimeout(resolve, 500));
-        retryCount++;
     }
     
-    console.log('⚠️ 세션 로드 타임아웃 또는 최대 재시도 횟수 초과');
+    console.log('⚠️ 세션 로드 시간 초과 또는 최대 재시도 횟수 도달');
     return null;
 }
 
 /**
- * 현재 세션 가져오기 (재시도 로직 포함)
+ * 현재 세션 상태 확인
  */
 async function getSession() {
     if (!window.supabaseClient) {
@@ -263,53 +268,34 @@ async function getSession() {
     }
     
     try {
-        // 먼저 일반적인 방법으로 시도
         const { data: { session }, error } = await window.supabaseClient.auth.getSession();
-        if (!error && session) {
-            return session;
-        }
-        
-        // 세션이 없으면 잠시 대기 후 재시도
-        console.log('🔄 세션 재로드 시도...');
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        const { data: { session: retrySession }, error: retryError } = await window.supabaseClient.auth.getSession();
-        if (!retryError && retrySession) {
-            console.log('✅ 세션 재로드 성공');
-            return retrySession;
-        }
-        
-        if (retryError) throw retryError;
-        return null;
+        if (error) throw error;
+        return session;
     } catch (error) {
-        console.error('세션 가져오기 실패:', error);
+        console.error('세션 확인 실패:', error);
         return null;
     }
 }
 
 /**
- * 구매 확인 함수
+ * 사용자의 구매 내역 확인
  */
 async function checkPurchase(productId) {
-    if (!window.supabaseClient) {
-        console.error('구매 확인 실패: Supabase 클라이언트가 준비되지 않았습니다.');
-        return false;
-    }
-
+    const user = await getCurrentUser();
+    if (!user) return false;
+    
     try {
-        const user = await getCurrentUser();
-        if (!user) return false;
-
         const { data, error } = await window.supabaseClient
             .from('purchases')
-            .select('id', { count: 'exact', head: true })
+            .select('*')
             .eq('user_id', user.id)
-            .eq('product_id', productId);
-
-        if (error) throw error;
-        return data.count > 0;
-    } catch (err) {
-        console.error('구매 확인 중 오류 발생:', err);
+            .eq('product_id', productId)
+            .eq('status', 'completed')
+            .single();
+            
+        return !error && data;
+    } catch (error) {
+        console.error('구매 확인 실패:', error);
         return false;
     }
 }
@@ -319,7 +305,7 @@ async function checkPurchase(productId) {
  */
 async function signOut() {
     if (!window.supabaseClient) {
-        console.error('로그아웃 실패: Supabase 클라이언트가 준비되지 않았습니다.');
+        console.error('Supabase 클라이언트가 초기화되지 않았습니다.');
         return false;
     }
     
@@ -327,7 +313,8 @@ async function signOut() {
         const { error } = await window.supabaseClient.auth.signOut();
         if (error) throw error;
         
-        console.log('✅ 로그아웃 성공');
+        window.currentUser = null;
+        console.log('✅ 로그아웃 완료');
         return true;
     } catch (error) {
         console.error('로그아웃 실패:', error);
@@ -335,17 +322,27 @@ async function signOut() {
     }
 }
 
-// 전역 함수 노출
-window.getCurrentUser = getCurrentUser;
-window.getSession = getSession;
-window.waitForSession = waitForSession;
-window.checkPurchase = checkPurchase;
-window.signOut = signOut;
+// 초기화 함수 자동 실행
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎯 DOM 로드 완료 - Supabase 클라이언트 초기화 예약');
+    
+    // 설정 파일이 로드될 때까지 대기 후 초기화
+    if (window.SUPABASE_CONFIG) {
+        initializeSupabaseClient();
+    } else {
+        // 설정 로드 이벤트 리스너
+        document.addEventListener('supabaseConfigReady', function() {
+            initializeSupabaseClient();
+        });
+        
+        // 최대 5초 대기 후 강제 초기화 시도
+        setTimeout(() => {
+            if (!window.supabaseClient) {
+                console.warn('⚠️ 설정 대기 시간 초과 - 강제 초기화 시도');
+                initializeSupabaseClient();
+            }
+        }, 5000);
+    }
+});
 
-// 자동 초기화 (DOMContentLoaded 대기)
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeSupabaseClient);
-} else {
-    // 이미 로드된 경우 즉시 실행
-    initializeSupabaseClient();
-}
+console.log('📁 Supabase 클라이언트 파일 로드됨');
