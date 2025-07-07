@@ -158,42 +158,42 @@ ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
 -- 관리자 정책 (특정 이메일을 가진 사용자만 접근 가능)
 CREATE POLICY "관리자만 상품 관리 가능" ON products
     FOR ALL USING (
-        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com')
+        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com', 'rvd3855@gmail.com')
     );
 
 CREATE POLICY "관리자만 주문 관리 가능" ON orders
     FOR ALL USING (
-        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com')
+        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com', 'rvd3855@gmail.com')
     );
 
 CREATE POLICY "관리자만 사용자 관리 가능" ON users
     FOR ALL USING (
-        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com')
+        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com', 'rvd3855@gmail.com')
     );
 
 CREATE POLICY "관리자만 리뷰 관리 가능" ON reviews
     FOR ALL USING (
-        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com')
+        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com', 'rvd3855@gmail.com')
     );
 
 CREATE POLICY "관리자만 구매 접근 권한 관리 가능" ON purchase_access
     FOR ALL USING (
-        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com')
+        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com', 'rvd3855@gmail.com')
     );
 
 CREATE POLICY "관리자만 할인 코드 관리 가능" ON discount_codes
     FOR ALL USING (
-        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com')
+        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com', 'rvd3855@gmail.com')
     );
 
 CREATE POLICY "관리자만 프로모션 관리 가능" ON promotions
     FOR ALL USING (
-        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com')
+        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com', 'rvd3855@gmail.com')
     );
 
 CREATE POLICY "관리자만 사이트 설정 관리 가능" ON site_settings
     FOR ALL USING (
-        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com')
+        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com', 'rvd3855@gmail.com')
     );
 
 -- 기본 사이트 설정 데이터 삽입
