@@ -113,56 +113,58 @@ async function handleLogin(e) {
     submitBtn.disabled = true;
     
     try {
-        // 1. 아이디로 프로필 정보(이메일) 조회 (RPC 함수 사용으로 변경)
-        const { data: email, error: rpcError } = await window.supabaseClient
-            .rpc('get_email_for_username', { p_username: id });
-
-        if (rpcError || !email) {
-            throw new Error('아이디 또는 비밀번호가 올바르지 않습니다.');
+        console.log('🔄 로그인 시도:', id);
+        
+        // 입력된 값이 이메일 형식인지 확인
+        const isEmail = id.includes('@');
+        let email = id;
+        
+        if (!isEmail) {
+            // 아이디로 입력된 경우, 일반적인 이메일 형식으로 변환 시도
+            // 또는 직접 이메일 입력을 요구할 수 있습니다
+            showToast('이메일 주소를 입력해주세요. (예: user@example.com)', 'warning');
+            return;
         }
-
-        // 2. 조회한 이메일로 로그인 시도
+        
+        // Supabase 인증으로 로그인 시도
         const { data, error } = await window.supabaseClient.auth.signInWithPassword({
-            email: email, // RPC로부터 받은 이메일 사용
+            email: email,
             password: password
         });
         
         if (error) {
-             // signInWithPassword에서도 비밀번호 오류는 'Invalid login credentials'로 반환
-             throw new Error('아이디 또는 비밀번호가 올바르지 않습니다.');
+            console.error('로그인 오류:', error);
+            
+            if (error.message?.includes('Invalid login credentials')) {
+                throw new Error('이메일 또는 비밀번호가 올바르지 않습니다.');
+            } else if (error.message?.includes('Email not confirmed')) {
+                throw new Error('이메일 인증이 필요합니다. 이메일을 확인해주세요.');
+            } else {
+                throw new Error('로그인 중 오류가 발생했습니다: ' + error.message);
+            }
         }
         
         if (data.user) {
+            console.log('✅ 로그인 성공:', data.user.email);
             showToast('로그인 성공!', 'success');
             
-            // 사용자 프로필 정보를 조회하여 관리자 권한 확인
-            setTimeout(async () => {
-                try {
-                    const { data: profile, error: profileError } = await window.supabaseClient
-                        .from('profiles')
-                        .select('role')
-                        .eq('id', data.user.id)
-                        .single();
-                    
-                    // 관리자 권한이 있는 경우 관리자 페이지로 이동
-                    if (profile && profile.role === 'admin') {
-                        showToast('관리자 페이지로 이동합니다.', 'info');
-                        // 세션이 완전히 저장될 시간을 더 충분히 줌
-                        setTimeout(() => {
-                            window.location.href = '/admin.html';
-                        }, 2000);
-                        return;
-                    }
-                    
-                    // 일반 사용자는 마이페이지 또는 리다이렉트 URL로 이동
-                    const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/mypage.html';
+            // 관리자 권한 확인 (임시로 특정 이메일을 관리자로 설정)
+            const adminEmails = [
+                'admin@mcseller.co.kr',
+                'qwg18@naver.com',  // 사용자 이메일을 여기에 추가
+                'mcseller@gmail.com'
+            ];
+            
+            const isAdmin = adminEmails.includes(data.user.email);
+            
+            setTimeout(() => {
+                if (isAdmin) {
+                    showToast('관리자 페이지로 이동합니다.', 'info');
                     setTimeout(() => {
-                        window.location.href = redirectUrl;
-                    }, 1500);
-                    
-                } catch (profileError) {
-                    console.error('프로필 조회 오류:', profileError);
-                    // 프로필 조회 실패 시 기본 페이지로 이동
+                        window.location.href = '/admin.html';
+                    }, 2000);
+                } else {
+                    // 일반 사용자는 마이페이지 또는 리다이렉트 URL로 이동
                     const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/mypage.html';
                     setTimeout(() => {
                         window.location.href = redirectUrl;
@@ -171,9 +173,8 @@ async function handleLogin(e) {
             }, 1000);
         }
     } catch (error) {
-        console.error('로그인 오류:', error);
-        // 모든 로그인 관련 에러를 하나의 메시지로 통일하여 보안 강화
-        showToast('아이디 또는 비밀번호가 올바르지 않습니다.', 'error');
+        console.error('로그인 처리 오류:', error);
+        showToast(error.message || '로그인 중 오류가 발생했습니다.', 'error');
     } finally {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
@@ -212,74 +213,61 @@ async function handleSignup(e) {
     submitBtn.disabled = true;
     
     try {
-        // 1. 아이디(username) 중복 확인 (RPC 함수 사용으로 변경)
-        const { data: usernameExists, error: checkError } = await window.supabaseClient
-            .rpc('check_username_exists', { p_username: id });
-
-        if (checkError) {
-            console.error('아이디 중복 확인 오류:', checkError);
-            throw new Error('아이디 중복 확인 중 오류가 발생했습니다.');
-        }
-
-        if (usernameExists) {
-            throw new Error('이미 사용 중인 아이디입니다.');
-        }
-
-        // 2. 이메일로 회원가입
+        console.log('🔄 회원가입 시도:', email);
+        
+        // Supabase 인증으로 회원가입
         const { data: signUpData, error: signUpError } = await window.supabaseClient.auth.signUp({
             email: email,
-            password: password
-            // 이메일 확인 비활성화는 Supabase 프로젝트 설정에서 처리하는 것을 권장
+            password: password,
+            options: {
+                data: {
+                    full_name: name,
+                    username: id
+                }
+            }
         });
         
         if (signUpError) {
-            // Supabase의 기본 오류 메시지를 그대로 사용하거나 여기서 재정의
+            console.error('회원가입 오류:', signUpError);
             throw signUpError;
         }
         
-        // 3. profiles 테이블에 추가 정보(이름, 아이디) 업데이트 (RPC 함수 사용)
         if (signUpData.user) {
-            // 'handle_new_user' 트리거가 실행될 시간을 약간 기다려줌
-            await new Promise(r => setTimeout(r, 1000)); // 1초로 늘림
-
-            const { data: updateSuccess, error: updateError } = await window.supabaseClient
-                .rpc('update_user_profile', { 
-                    p_user_id: signUpData.user.id,
-                    p_username: id,
-                    p_full_name: name 
-                });
-
-            if (updateError || !updateSuccess) {
-                console.error('프로필 업데이트 오류:', updateError);
-                throw new Error(`프로필 정보 저장에 실패했습니다. 아이디: ${id}, 오류: ${updateError?.message || '알 수 없는 오류'}`);
+            console.log('✅ 회원가입 성공:', signUpData.user.email);
+            showToast('🎉 가입이 완료되었습니다!', 'success');
+            
+            // 이메일 확인이 필요한 경우
+            if (!signUpData.session) {
+                showToast('이메일 확인이 필요합니다. 이메일을 확인해주세요.', 'info');
+                setTimeout(() => {
+                    showLoginForm();
+                }, 2000);
+            } else {
+                // 자동 로그인된 경우
+                setTimeout(() => {
+                    const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/mypage.html';
+                    window.location.href = redirectUrl;
+                }, 1500);
             }
-            
-            showToast('🎉 가입이 완료되었습니다. 바로 로그인됩니다.', 'success');
-            
-            // signUp 후 세션이 자동으로 설정되므로, 페이지 리디렉션만 수행
-            setTimeout(() => {
-                const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/index.html';
-                window.location.href = redirectUrl;
-            }, 1500);
         } else {
-             throw new Error('회원가입에 실패했으나 사용자가 생성되지 않았습니다.');
+            throw new Error('회원가입에 실패했습니다.');
         }
 
     } catch (error) {
-        console.error('회원가입 오류:', error);
+        console.error('회원가입 처리 오류:', error);
         
         let errorMessage = '회원가입 중 오류가 발생했습니다.';
         if (error.message) {
             if (error.message.includes('User already registered')) {
                 errorMessage = '이미 가입된 이메일입니다.';
-            } else if (error.message.includes('이미 사용 중인 아이디')) {
-                errorMessage = '이미 사용 중인 아이디입니다.';
-            } else if (error.message.includes('should be at least 6 characters')) {
+            } else if (error.message.includes('Password should be at least 6 characters')) {
                 errorMessage = '비밀번호는 최소 6자 이상이어야 합니다.';
             } else if (error.message.includes('rate limit')) {
                 errorMessage = '너무 많은 요청을 보냈습니다. 잠시 후 다시 시도해주세요.';
+            } else if (error.message.includes('Invalid email')) {
+                errorMessage = '올바른 이메일 형식을 입력해주세요.';
             } else {
-                errorMessage = error.message; // 직접 던진 오류 메시지 포함
+                errorMessage = error.message;
             }
         }
         showToast(errorMessage, 'error');

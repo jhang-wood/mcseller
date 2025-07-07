@@ -155,77 +155,45 @@ ALTER TABLE discount_codes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE promotions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
 
--- 관리자 정책 (profiles 테이블에서 role이 'admin'인 사용자만 접근 가능)
+-- 관리자 정책 (특정 이메일을 가진 사용자만 접근 가능)
 CREATE POLICY "관리자만 상품 관리 가능" ON products
     FOR ALL USING (
-        EXISTS (
-            SELECT 1 FROM profiles 
-            WHERE profiles.id = auth.uid() 
-            AND profiles.role = 'admin'
-        )
+        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com')
     );
 
 CREATE POLICY "관리자만 주문 관리 가능" ON orders
     FOR ALL USING (
-        EXISTS (
-            SELECT 1 FROM profiles 
-            WHERE profiles.id = auth.uid() 
-            AND profiles.role = 'admin'
-        )
+        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com')
     );
 
 CREATE POLICY "관리자만 사용자 관리 가능" ON users
     FOR ALL USING (
-        EXISTS (
-            SELECT 1 FROM profiles 
-            WHERE profiles.id = auth.uid() 
-            AND profiles.role = 'admin'
-        )
+        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com')
     );
 
 CREATE POLICY "관리자만 리뷰 관리 가능" ON reviews
     FOR ALL USING (
-        EXISTS (
-            SELECT 1 FROM profiles 
-            WHERE profiles.id = auth.uid() 
-            AND profiles.role = 'admin'
-        )
+        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com')
     );
 
 CREATE POLICY "관리자만 구매 접근 권한 관리 가능" ON purchase_access
     FOR ALL USING (
-        EXISTS (
-            SELECT 1 FROM profiles 
-            WHERE profiles.id = auth.uid() 
-            AND profiles.role = 'admin'
-        )
+        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com')
     );
 
 CREATE POLICY "관리자만 할인 코드 관리 가능" ON discount_codes
     FOR ALL USING (
-        EXISTS (
-            SELECT 1 FROM profiles 
-            WHERE profiles.id = auth.uid() 
-            AND profiles.role = 'admin'
-        )
+        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com')
     );
 
 CREATE POLICY "관리자만 프로모션 관리 가능" ON promotions
     FOR ALL USING (
-        EXISTS (
-            SELECT 1 FROM profiles 
-            WHERE profiles.id = auth.uid() 
-            AND profiles.role = 'admin'
-        )
+        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com')
     );
 
 CREATE POLICY "관리자만 사이트 설정 관리 가능" ON site_settings
     FOR ALL USING (
-        EXISTS (
-            SELECT 1 FROM profiles 
-            WHERE profiles.id = auth.uid() 
-            AND profiles.role = 'admin'
-        )
+        auth.email() IN ('admin@mcseller.co.kr', 'qwg18@naver.com', 'mcseller@gmail.com')
     );
 
 -- 기본 사이트 설정 데이터 삽입
@@ -234,25 +202,32 @@ INSERT INTO site_settings (key, value, description) VALUES
     ('site_title', 'MCSELLER', '사이트 제목'),
     ('site_description', '온라인 강의 및 전자책 판매 플랫폼', '사이트 설명'),
     ('contact_email', 'admin@mcsell.co.kr', '고객 문의 이메일'),
-    ('kakao_channel_url', 'http://pf.kakao.com/_pWbgxj', '카카오 채널 URL')
+    ('kakao_channel_url', 'http://pf.kakao.com/_pWbgxj', '카카오 채널 URL'),
+    ('maintenance_mode', 'false', '유지보수 모드')
 ON CONFLICT (key) DO NOTHING;
 
 -- 샘플 데이터 삽입
 INSERT INTO products (title, description, type, price, image_url, content_url, is_active) VALUES
     ('온라인 수익화 전략서 1탄', '온라인에서 수익을 창출하는 다양한 전략을 소개하는 전자책입니다.', 'ebook', 29000, '/images/ebook1.jpg', '/ebook1-landing.html', true),
     ('실전 수익화 가이드북 2탄', '실무에서 바로 적용할 수 있는 수익화 가이드북입니다.', 'ebook', 39000, '/images/ebook2.jpg', '/ebook2-landing.html', true),
-    ('AI 마스터 실전 과정', 'AI 기술을 활용한 실전 과정 강의입니다.', 'lecture', 99000, '/images/ai-course.jpg', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', true)
+    ('AI 마스터 실전 과정', 'AI 기술을 활용한 실전 과정 강의입니다.', 'lecture', 99000, '/images/ai-course.jpg', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', true),
+    ('마케팅 완전정복', '디지털 마케팅의 모든 것을 담은 강의', 'lecture', 299000, 'https://via.placeholder.com/400x300', true),
+    ('파이썬 프로그래밍', 'Python 기초부터 고급까지 완전 가이드', 'ebook', 49000, 'https://via.placeholder.com/400x300', true),
+    ('비즈니스 전략 수립', '성공하는 비즈니스 전략 수립 방법', 'lecture', 199000, 'https://via.placeholder.com/400x300', true)
 ON CONFLICT DO NOTHING;
 
 -- 샘플 할인 코드 삽입
-INSERT INTO discount_codes (code, type, value, max_uses, is_active) VALUES
-    ('WELCOME10', 'percent', 10, 100, true),
-    ('SAVE5000', 'amount', 5000, 50, true),
-    ('FIRST20', 'percent', 20, 200, true)
+INSERT INTO discount_codes (code, type, value, max_uses, is_active, expires_at) VALUES
+    ('WELCOME10', 'percent', 10, 100, true, NOW() + INTERVAL '30 days'),
+    ('SAVE5000', 'amount', 5000, 50, true, NOW() + INTERVAL '7 days'),
+    ('WELCOME20', 'percent', 20, 100, true, NOW() + INTERVAL '30 days'),
+    ('SAVE10000', 'amount', 10000, 50, true, NOW() + INTERVAL '7 days')
 ON CONFLICT (code) DO NOTHING;
 
 -- 샘플 프로모션 삽입
-INSERT INTO promotions (title, description, type, content, starts_at, ends_at) VALUES
-    ('신규 회원 할인', '신규 회원 대상 20% 할인 이벤트', 'banner', '첫 구매 시 20% 할인 혜택을 받으세요!', NOW(), NOW() + INTERVAL '30 days'),
-    ('여름 특가 이벤트', '여름 시즌 특가 이벤트', 'popup', '모든 상품 최대 50% 할인!', NOW(), NOW() + INTERVAL '15 days')
+INSERT INTO promotions (title, description, type, content, is_active, starts_at, ends_at) VALUES
+    ('신규 회원 할인', '신규 회원 대상 20% 할인 이벤트', 'banner', '첫 구매 시 20% 할인 혜택을 받으세요!', true, NOW(), NOW() + INTERVAL '30 days'),
+    ('여름 특가 이벤트', '여름 시즌 특가 이벤트', 'popup', '모든 상품 최대 50% 할인!', true, NOW(), NOW() + INTERVAL '15 days'),
+    ('신규 회원 환영 이벤트', '신규 가입 회원 20% 할인', 'banner', '지금 가입하고 20% 할인 혜택을 받으세요!', true, NOW(), NOW() + INTERVAL '30 days'),
+    ('한정 특가 세일', '인기 강의 특가 판매', 'popup', '놓치면 후회하는 특가! 지금 바로 확인하세요', true, NOW(), NOW() + INTERVAL '7 days')
 ON CONFLICT DO NOTHING; 

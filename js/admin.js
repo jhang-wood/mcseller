@@ -133,28 +133,16 @@ async function checkAdminAccess() {
         // 사용자 정보 표시
         updateAdminUserInfo(session.user);
         
-        // 프로필에서 관리자 권한 확인 (인증 토큰 포함)
-        const { data: profile, error: profileError } = await window.supabaseClient
-            .from('profiles')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
+        // 관리자 권한 확인 (이메일 기반)
+        const adminEmails = [
+            'admin@mcseller.co.kr',
+            'qwg18@naver.com',  // 사용자 이메일
+            'mcseller@gmail.com'
+        ];
         
-        if (profileError) {
-            console.error('관리자 권한 확인 오류:', profileError);
-            
-            // 프로필 테이블이 없는 경우 기본 관리자로 처리
-            if (profileError.code === 'PGRST116' || profileError.message?.includes('does not exist')) {
-                console.log('⚠️ 프로필 테이블이 없음 - 기본 관리자 권한 부여');
-                return true;
-            }
-            
-            alert('권한 확인 중 오류가 발생했습니다.');
-            window.location.href = '/index.html';
-            return false;
-        }
+        const isAdmin = adminEmails.includes(session.user.email);
         
-        if (profile?.role !== 'admin') {
+        if (!isAdmin) {
             console.log('❌ 관리자 권한 없음 - 메인페이지로 리다이렉트');
             alert('관리자 권한이 없습니다.');
             window.location.href = '/index.html';
