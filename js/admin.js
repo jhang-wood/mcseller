@@ -133,19 +133,39 @@ async function checkAdminAccess() {
         // 사용자 정보 표시
         updateAdminUserInfo(session.user);
         
-        // 관리자 권한 확인 (이메일 기반)
-        const adminEmails = [
-            'admin@mcseller.co.kr',
-            'qwg18@naver.com',  // 사용자 이메일
-            'mcseller@gmail.com'
-        ];
-        
-        const isAdmin = adminEmails.includes(session.user.email);
+        // 프로필 정보에서 관리자 권한 확인
+        let isAdmin = false;
+        try {
+            const { data: profile, error: profileError } = await window.supabaseClient
+                .from('profiles')
+                .select('role')
+                .eq('id', session.user.id)
+                .single();
+            
+            if (profile && profile.role === 'admin') {
+                isAdmin = true;
+                console.log('🔑 데이터베이스에서 관리자 권한 확인됨');
+            }
+        } catch (profileError) {
+            console.log('⚠️ 프로필 조회 실패, 이메일 기반 권한 확인 시도');
+            
+            // 데이터베이스 확인 실패 시 이메일 기반 백업 체크
+            const adminEmails = [
+                'admin@mcseller.co.kr',
+                'qwg18@naver.com',
+                'mcseller@gmail.com'
+            ];
+            
+            isAdmin = adminEmails.includes(session.user.email);
+            if (isAdmin) {
+                console.log('🔑 이메일 기반 관리자 권한 확인됨');
+            }
+        }
         
         if (!isAdmin) {
-            console.log('❌ 관리자 권한 없음 - 메인페이지로 리다이렉트');
-            alert('관리자 권한이 없습니다.');
-            window.location.href = '/index.html';
+            console.log('❌ 관리자 권한 없음 - 마이페이지로 리다이렉트');
+            alert('관리자 권한이 없습니다. 마이페이지로 이동합니다.');
+            window.location.href = '/mypage.html';
             return false;
         }
         

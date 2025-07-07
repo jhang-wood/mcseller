@@ -84,15 +84,8 @@ function setupAuthStateListener() {
             // 즉시 로그인 페이지로 리다이렉트
             const currentPath = window.location.pathname;
             window.location.href = `/auth.html?redirect=${encodeURIComponent(currentPath)}`;
-        } else if (event === 'SIGNED_IN' && session?.user) {
-            console.log('✅ 새로운 로그인 감지:', session.user.email);
-            window.currentUser = session.user;
-            
-            // 페이지 새로고침하여 최신 데이터 로드
-            if (confirm('새로운 계정으로 로그인되었습니다. 페이지를 새로고침하시겠습니까?')) {
-                window.location.reload();
-            }
         }
+        // 새로운 로그인 감지 시 팝업 제거 - 불필요한 알림 방지
     });
 }
 

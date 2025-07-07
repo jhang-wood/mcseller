@@ -615,6 +615,14 @@
                     padding: 6px 15px;
                     font-size: 0.9rem;
                 }
+
+                .kakao-chat-btn {
+                    bottom: 20px;
+                    right: 20px;
+                    width: 55px;
+                    height: 55px;
+                    font-size: 1.1rem;
+                }
             }
 
             /* Loading Animation */
@@ -1396,14 +1404,7 @@
                 // Mock data initialization (remove in production)
                 console.log("MCSELLER 마이페이지가 로드되었습니다.");
 
-                // Welcome message for new users
-                setTimeout(() => {
-                    showNotification(
-                        "환영합니다! 학습을 시작해보세요 🚀",
-                        "success",
-                        5000,
-                    );
-                }, 1500);
+                // 환영 메시지 제거 (불필요한 팝업 방지)
             });
         </script>
     </body>

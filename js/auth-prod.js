@@ -148,22 +148,43 @@ async function handleLogin(e) {
             console.log('✅ 로그인 성공:', data.user.email);
             showToast('로그인 성공!', 'success');
             
-            // 관리자 권한 확인 (임시로 특정 이메일을 관리자로 설정)
-            const adminEmails = [
-                'admin@mcseller.co.kr',
-                'qwg18@naver.com',  // 사용자 이메일을 여기에 추가
-                'mcseller@gmail.com'
-            ];
-            
-            const isAdmin = adminEmails.includes(data.user.email);
+            // 프로필 정보에서 관리자 권한 확인
+            let isAdmin = false;
+            try {
+                const { data: profile, error: profileError } = await window.supabaseClient
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', data.user.id)
+                    .single();
+                
+                if (profile && profile.role === 'admin') {
+                    isAdmin = true;
+                    console.log('🔑 데이터베이스에서 관리자 권한 확인됨');
+                }
+            } catch (profileError) {
+                console.log('⚠️ 프로필 조회 실패, 이메일 기반 권한 확인 시도');
+                
+                // 데이터베이스 확인 실패 시 이메일 기반 백업 체크
+                const adminEmails = [
+                    'admin@mcseller.co.kr',
+                    'qwg18@naver.com',
+                    'mcseller@gmail.com'
+                ];
+                
+                isAdmin = adminEmails.includes(data.user.email);
+                if (isAdmin) {
+                    console.log('🔑 이메일 기반 관리자 권한 확인됨');
+                }
+            }
             
             setTimeout(() => {
                 if (isAdmin) {
                     showToast('관리자 페이지로 이동합니다.', 'info');
                     setTimeout(() => {
                         window.location.href = '/admin.html';
-                    }, 2000);
+                    }, 1500);
                 } else {
+                    showToast('마이페이지로 이동합니다.', 'info');
                     // 일반 사용자는 마이페이지 또는 리다이렉트 URL로 이동
                     const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/mypage.html';
                     setTimeout(() => {
