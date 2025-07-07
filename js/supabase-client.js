@@ -25,18 +25,29 @@ async function initializeSupabaseClient() {
             console.log('✅ Supabase 라이브러리 로드 완료');
         }
         
-        // 설정 파일이 로드되었는지 확인
+        // 설정 파일이 로드되었는지 확인, 없으면 기본 설정 사용
+        let config;
         if (!window.SUPABASE_CONFIG) {
-            console.error('❌ Supabase 설정이 로드되지 않았습니다.');
-            throw new Error('Supabase configuration not loaded');
+            console.warn('⚠️ 환경변수 설정이 없음 - 기본 설정 사용');
+            // 기본 설정 (실제 프로덕션 값)
+            config = {
+                url: 'https://rpcctgtmtplfahwtnglq.supabase.co',
+                anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwY2N0Z3RtdHBsZmFod3RuZ2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUzNzE3MDgsImV4cCI6MjA1MDk0NzcwOH0.Qk7QkQONlQZLdIZFkL8gqQl4RQGLvI8Nt_l9iAhYGKI',
+                options: {
+                    auth: {
+                        autoRefreshToken: true,
+                        persistSession: true,
+                        detectSessionInUrl: true
+                    }
+                }
+            };
+        } else {
+            // 설정 검증
+            if (!window.validateSupabaseConfig()) {
+                throw new Error('Invalid Supabase configuration');
+            }
+            config = window.SUPABASE_CONFIG;
         }
-        
-        // 설정 검증
-        if (!window.validateSupabaseConfig()) {
-            throw new Error('Invalid Supabase configuration');
-        }
-        
-        const config = window.SUPABASE_CONFIG;
         
         // Supabase 클라이언트 생성
         supabaseClient = supabase.createClient(config.url, config.anonKey, config.options);

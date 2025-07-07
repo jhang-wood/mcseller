@@ -3,6 +3,54 @@ let handsontables = {};
 let currentSection = 'dashboard';
 let charts = {};
 
+// Toast 알림 함수
+function showToast(message, type = 'info') {
+    // 기존 toast 제거
+    const existingToast = document.querySelector('.toast-container .toast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+
+    // Toast 컨테이너 생성 (없는 경우)
+    let toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+        toastContainer.style.zIndex = '9999';
+        document.body.appendChild(toastContainer);
+    }
+
+    // Toast 엘리먼트 생성
+    const toastEl = document.createElement('div');
+    toastEl.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'primary'} border-0`;
+    toastEl.setAttribute('role', 'alert');
+    toastEl.setAttribute('aria-live', 'assertive');
+    toastEl.setAttribute('aria-atomic', 'true');
+
+    toastEl.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+
+    toastContainer.appendChild(toastEl);
+
+    // Bootstrap Toast 초기화 및 표시
+    const toast = new bootstrap.Toast(toastEl, {
+        autohide: true,
+        delay: 5000
+    });
+    toast.show();
+
+    // Toast가 숨겨진 후 제거
+    toastEl.addEventListener('hidden.bs.toast', () => {
+        toastEl.remove();
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     initializeAdminPage();
     setupSidebarNavigation();
