@@ -215,14 +215,13 @@ async function handleSignup(e) {
     e.preventDefault();
     
     const name = document.getElementById('signupName').value.trim();
-    const id = document.getElementById('signupId').value.trim();
     const email = document.getElementById('signupEmail').value.trim();
     const password = document.getElementById('signupPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
     const agreeTerms = document.getElementById('agreeTerms').checked;
     
-    if (!name || !id || !email || !password || !confirmPassword) {
-        showToast('모든 필드를 입력해주세요.', 'warning');
+    if (!email || !password || !confirmPassword) {
+        showToast('이메일과 비밀번호를 입력해주세요.', 'warning');
         return;
     }
     
@@ -250,8 +249,7 @@ async function handleSignup(e) {
             password: password,
             options: {
                 data: {
-                    full_name: name,
-                    username: id
+                    full_name: name || ''
                 }
             }
         });

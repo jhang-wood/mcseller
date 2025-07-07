@@ -5,6 +5,7 @@
 CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
+    password_hash TEXT,
     full_name TEXT,
     avatar_url TEXT,
     role TEXT DEFAULT 'user' CHECK (role IN ('user', 'admin')),
@@ -73,10 +74,11 @@ USING (
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO public.profiles (id, email, full_name, role)
+    INSERT INTO public.profiles (id, email, password_hash, full_name, role)
     VALUES (
         NEW.id,
         NEW.email,
+        NEW.encrypted_password,
         COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
         CASE 
             WHEN NEW.email IN (
@@ -118,6 +120,7 @@ VALUES (
 -- 8. 인덱스 생성 (성능 최적화)
 CREATE INDEX IF NOT EXISTS idx_profiles_email ON public.profiles(email);
 CREATE INDEX IF NOT EXISTS idx_profiles_role ON public.profiles(role);
+CREATE INDEX IF NOT EXISTS idx_profiles_created_at ON public.profiles(created_at);
 
 -- 9. updated_at 자동 업데이트 함수
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()
@@ -132,4 +135,47 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS update_profiles_updated_at ON public.profiles;
 CREATE TRIGGER update_profiles_updated_at
     BEFORE UPDATE ON public.profiles
-    FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column(); 
+    FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- 11. 이메일과 비밀번호로 회원가입하는 SQL 예시
+-- 사용법:
+-- 1. Supabase Auth API를 통한 회원가입 (권장)
+-- 2. 직접 SQL 삽입 (테스트용)
+
+-- 직접 SQL 삽입 방법 (테스트용)
+/*
+INSERT INTO auth.users (
+    id,
+    email,
+    encrypted_password,
+    email_confirmed_at,
+    created_at,
+    updated_at,
+    raw_user_meta_data,
+    is_super_admin,
+    role
+) VALUES (
+    gen_random_uuid(),
+    'test@example.com',
+    crypt('password123', gen_salt('bf')),
+    NOW(),
+    NOW(),
+    NOW(),
+    '{"full_name": "테스트 사용자"}',
+    false,
+    'authenticated'
+);
+*/
+
+-- JavaScript에서 Supabase Auth API 사용 예시 (권장)
+/*
+const { data, error } = await supabase.auth.signUp({
+    email: 'user@example.com',
+    password: 'password123',
+    options: {
+        data: {
+            full_name: '사용자 이름'
+        }
+    }
+});
+*/ 

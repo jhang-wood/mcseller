@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 - MCSELLER</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modern-style.css">
+    <style>
+        .signup-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .signup-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input {
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #4A90E2;
+        }
+        
+        .signup-btn {
+            background: #4A90E2;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .signup-btn:hover:not(:disabled) {
+            background: #357ABD;
+        }
+        
+        .signup-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+        
+        .login-link a {
+            color: #4A90E2;
+            text-decoration: none;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            color: #666;
+        }
+        
+        .password-requirements {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .email-confirmation {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background: #e7f3ff;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .resend-btn {
+            background: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .resend-btn:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="logo" style="text-align: center; margin-bottom: 30px;">
+            <img src="https://via.placeholder.com/150x50/4A90E2/FFFFFF?text=MCSELLER" alt="MCSELLER" style="max-width: 150px;">
+        </div>
+        
+        <h2 style="text-align: center; margin-bottom: 30px; color: #333;">회원가입</h2>
+        
+        <div id="message" class="message"></div>
+        <div id="loading" class="loading">처리 중...</div>
+        
+        <form id="signupForm" class="signup-form">
+            <div class="form-group">
+                <label for="email">이메일</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required 
+                    placeholder="예: user@example.com"
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="fullName">이름 (선택)</label>
+                <input 
+                    type="text" 
+                    id="fullName" 
+                    name="fullName" 
+                    placeholder="예: 홍길동"
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required 
+                    placeholder="최소 6자 이상"
+                >
+                <div class="password-requirements">
+                    비밀번호는 최소 6자 이상이어야 합니다.
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmPassword">비밀번호 확인</label>
+                <input 
+                    type="password" 
+                    id="confirmPassword" 
+                    name="confirmPassword" 
+                    required 
+                    placeholder="비밀번호를 다시 입력하세요"
+                >
+            </div>
+            
+            <button type="submit" class="signup-btn" id="signupBtn">
+                회원가입
+            </button>
+        </form>
+        
+        <div class="login-link">
+            이미 계정이 있으신가요? <a href="auth.html">로그인</a>
+        </div>
+        
+        <div id="emailConfirmation" class="email-confirmation">
+            <h3>이메일 인증</h3>
+            <p>회원가입이 완료되었습니다!</p>
+            <p>이메일을 확인하여 계정을 활성화해주세요.</p>
+            <button id="resendBtn" class="resend-btn">인증 이메일 재전송</button>
+        </div>
+    </div>
+
+    <!-- Supabase 설정 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/auth-signup.js"></script>
+    
+    <script>
+        let currentEmail = '';
+        
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const fullName = document.getElementById('fullName').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // 비밀번호 확인
+            if (password !== confirmPassword) {
+                showMessage('비밀번호가 일치하지 않습니다.', 'error');
+                return;
+            }
+            
+            // 로딩 상태 표시
+            setLoadingState(true);
+            
+            try {
+                // Supabase 클라이언트 초기화 대기
+                if (!window.supabaseClient) {
+                    await initializeSupabaseClient();
+                }
+                
+                // 회원가입 처리
+                const result = await signUpWithEmail(email, password, fullName);
+                
+                if (result.success) {
+                    currentEmail = email;
+                    
+                    if (result.needsEmailConfirmation) {
+                        // 이메일 인증 필요
+                        showEmailConfirmation();
+                        showMessage(result.message, 'success');
+                    } else {
+                        // 바로 로그인 완료
+                        showMessage(result.message, 'success');
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 2000);
+                    }
+                } else {
+                    showMessage(result.message, 'error');
+                }
+                
+            } catch (error) {
+                console.error('회원가입 처리 중 오류:', error);
+                showMessage('회원가입 처리 중 오류가 발생했습니다.', 'error');
+            } finally {
+                setLoadingState(false);
+            }
+        });
+        
+        // 인증 이메일 재전송
+        document.getElementById('resendBtn').addEventListener('click', async function() {
+            if (!currentEmail) {
+                showMessage('이메일 주소를 찾을 수 없습니다.', 'error');
+                return;
+            }
+            
+            this.disabled = true;
+            this.textContent = '전송 중...';
+            
+            try {
+                const result = await resendEmailConfirmation(currentEmail);
+                
+                if (result.success) {
+                    showMessage(result.message, 'success');
+                } else {
+                    showMessage(result.message, 'error');
+                }
+                
+            } catch (error) {
+                showMessage('이메일 재전송에 실패했습니다.', 'error');
+            } finally {
+                this.disabled = false;
+                this.textContent = '인증 이메일 재전송';
+            }
+        });
+        
+        // 실시간 비밀번호 확인
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+            
+            if (confirmPassword && password !== confirmPassword) {
+                this.style.borderColor = '#dc3545';
+            } else {
+                this.style.borderColor = '#e1e5e9';
+            }
+        });
+        
+        // 유틸리티 함수들
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            // 3초 후 자동 숨김
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function setLoadingState(loading) {
+            const loadingDiv = document.getElementById('loading');
+            const signupBtn = document.getElementById('signupBtn');
+            
+            if (loading) {
+                loadingDiv.style.display = 'block';
+                signupBtn.disabled = true;
+                signupBtn.textContent = '처리 중...';
+            } else {
+                loadingDiv.style.display = 'none';
+                signupBtn.disabled = false;
+                signupBtn.textContent = '회원가입';
+            }
+        }
+        
+        function showEmailConfirmation() {
+            const confirmationDiv = document.getElementById('emailConfirmation');
+            confirmationDiv.style.display = 'block';
+            
+            // 폼 숨김
+            document.getElementById('signupForm').style.display = 'none';
+        }
+        
+        // 페이지 로드 시 Supabase 초기화 확인
+        window.addEventListener('load', function() {
+            if (!window.supabaseClient) {
+                console.log('Supabase 클라이언트 초기화 대기 중...');
+            }
+        });
+    </script>
+</body>
+</html>
