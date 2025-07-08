@@ -272,11 +272,11 @@ async function loadCoupons() {
             <tr>
                 <td><strong>${coupon.code}</strong></td>
                 <td>
-                    ${coupon.discount_type === 'percent' ? 
-                        `${coupon.discount_amount}%` : 
-                        `${coupon.discount_amount.toLocaleString()}원`}
+                    ${coupon.discount_type === 'percentage' ?
+                        `${coupon.discount_value}%` :
+                        `${coupon.discount_value.toLocaleString()}원`}
                 </td>
-                <td>0 / ${coupon.max_uses || '무제한'}</td>
+                <td>${coupon.used_count} / ${coupon.max_uses || '무제한'}</td>
                 <td>${coupon.valid_until ? new Date(coupon.valid_until).toLocaleDateString() : '무제한'}</td>
                 <td>
                     <span class="badge bg-success">활성</span>
@@ -322,7 +322,7 @@ async function saveCoupon() {
             .insert({
                 code: code.toUpperCase(),
                 discount_type: discountType,
-                discount_amount: discountValue,
+                discount_value: discountValue,
                 max_uses: maxUses || null,
                 valid_until: expiryDate || null
             });
