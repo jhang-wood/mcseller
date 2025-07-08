@@ -73,7 +73,7 @@ app.post('/api/webhook/payapp', async (req, res) => {
 
             // Supabase를 통한 주문 정보 저장
             const supabaseUrl = process.env.SUPABASE_URL;
-            const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+            const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
             
             if (supabaseUrl && supabaseKey) {
                 const { createClient } = require('@supabase/supabase-js');
