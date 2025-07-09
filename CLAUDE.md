@@ -8,10 +8,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm start` - Start the Express.js development server on port 5000
 - `node server.js` - Alternative way to start the server
 
+### Quick Development Workflow
+- `./save_and_push.sh` - Automated git add, commit, and push script for development changes
+
 ### Database Setup
 - Execute `database-schema.sql` in Supabase SQL Editor to create all tables
 - Execute `admin-database-schema.sql` for admin-specific tables
 - Execute `profiles-table-schema.sql` for user profile tables
+- Execute `supabase-setup.sql` for initial configuration
 
 ### Environment Variables Required
 ```
@@ -19,6 +23,12 @@ SUPABASE_URL=your_supabase_url
 SUPABASE_ANON_KEY=your_supabase_anon_key
 SLACK_WEBHOOK_URL=your_slack_webhook_url
 ```
+
+### Setup References
+- `ADMIN-SETUP.md` - Complete admin account creation guide
+- `PAYAPP-SETUP.md` - Payment system integration guide
+- `SETUP-GUIDE.md` - Production deployment checklist
+- `DEPLOY-INSTRUCTIONS.md` - Deployment procedures
 
 ## Architecture Overview
 
@@ -81,3 +91,15 @@ SLACK_WEBHOOK_URL=your_slack_webhook_url
 - Payment processing is fully automated via webhooks
 - Admin features require elevated permissions in profiles table
 - Content access is immediate upon successful payment verification
+
+### Critical Authentication Flow
+1. Authentication system uses `js/auth-clean.js` (NOT `js/auth.js` which was removed)
+2. Session management handled by `js/supabase-client.js`
+3. UI state updates managed by `js/main.js` with proper element targeting
+4. Login redirects to `index.html` for better UX, not `mypage.html`
+
+### Webhook Integration
+- Payapp webhook endpoint: `/api/webhook/payapp`
+- Automatic order creation and content access granting
+- Slack notifications for successful payments
+- All payment processing is automated without manual intervention
