@@ -8,7 +8,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         .sidebar { min-height: 100vh; background: #f8f9fa; }
-        .nav-link.active { background: #007bff; color: white !important; }
+        .nav-link.active { background: #003366; color: white !important; }
+        .nav-link.active:hover { background: #004488; color: white !important; }
         .content-section { display: none; }
         .content-section.active { display: block; }
         .content-tab { display: none; }
@@ -45,6 +46,9 @@
                     </li>
                 </ul>
                 <hr>
+                <button class="btn btn-outline-primary btn-sm mb-2" onclick="goToMainPage()">
+                    <i class="fas fa-home me-2"></i>소개 페이지로 이동
+                </button>
                 <button class="btn btn-outline-danger btn-sm" onclick="logout()">로그아웃</button>
             </div>
 

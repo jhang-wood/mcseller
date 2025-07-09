@@ -124,12 +124,19 @@ function loadSection(sectionName) {
 // === 회원관리 ===
 async function loadAllUsers() {
     try {
+        console.log('📋 회원 목록 로드 시작...');
+        
         const { data: profiles, error } = await window.supabaseClient
             .from('profiles')
             .select('*')
-            .order('updated_at', { ascending: false });
+            .order('created_at', { ascending: false });
         
-        if (error) throw error;
+        if (error) {
+            console.error('Supabase 오류:', error);
+            throw error;
+        }
+        
+        console.log('✅ 회원 데이터 로드 완료:', profiles?.length || 0, '명');
         
         const tbody = document.getElementById('usersTable');
         if (!profiles || profiles.length === 0) {
@@ -139,7 +146,7 @@ async function loadAllUsers() {
         
         tbody.innerHTML = profiles.map(user => `
             <tr>
-                <td>${user.email}</td>
+                <td>${user.email || '이메일 없음'}</td>
                 <td>${user.full_name || '미설정'}</td>
                 <td>
                     <select class="form-control form-control-sm" onchange="updateUserRole('${user.id}', this.value)">
@@ -148,7 +155,7 @@ async function loadAllUsers() {
                     </select>
                 </td>
                 <td>${(user.points || 0).toLocaleString()}원</td>
-                <td>${user.updated_at ? new Date(user.updated_at).toLocaleDateString() : '날짜 없음'}</td>
+                <td>${user.created_at ? new Date(user.created_at).toLocaleDateString() : '날짜 없음'}</td>
                 <td>
                     <button class="btn btn-sm btn-primary" onclick="editUserPoints('${user.id}', ${user.points || 0})">
                         적립금 수정
@@ -159,7 +166,13 @@ async function loadAllUsers() {
         
     } catch (error) {
         console.error('회원 목록 로드 오류:', error);
-        document.getElementById('usersTable').innerHTML = '<tr><td colspan="6">로드 오류</td></tr>';
+        const tbody = document.getElementById('usersTable');
+        tbody.innerHTML = `
+            <tr><td colspan="6">
+                로드 오류: ${error.message || '알 수 없는 오류'}<br>
+                <small>콘솔에서 자세한 오류 내용을 확인하세요.</small>
+            </td></tr>
+        `;
     }
 }
 
@@ -272,14 +285,16 @@ async function loadCoupons() {
             <tr>
                 <td><strong>${coupon.code}</strong></td>
                 <td>
-                    ${coupon.discount_type === 'percent' ? 
-                        `${coupon.discount_amount}%` : 
-                        `${coupon.discount_amount.toLocaleString()}원`}
+                    ${coupon.discount_type === 'percentage' ? 
+                        `${coupon.discount_value}%` : 
+                        `${coupon.discount_value.toLocaleString()}원`}
                 </td>
-                <td>0 / ${coupon.max_uses || '무제한'}</td>
+                <td>${coupon.used_count || 0} / ${coupon.max_uses || '무제한'}</td>
                 <td>${coupon.valid_until ? new Date(coupon.valid_until).toLocaleDateString() : '무제한'}</td>
                 <td>
-                    <span class="badge bg-success">활성</span>
+                    <span class="badge ${coupon.is_active ? 'bg-success' : 'bg-secondary'}">
+                        ${coupon.is_active ? '활성' : '비활성'}
+                    </span>
                 </td>
                 <td>
                     <button class="btn btn-sm btn-danger" onclick="deleteCoupon('${coupon.id}')">삭제</button>
@@ -306,6 +321,8 @@ function showAddCouponModal() {
 
 async function saveCoupon() {
     try {
+        console.log('🎫 새 쿠폰 생성 시작...');
+        
         const code = document.getElementById('couponCode').value;
         const discountType = document.getElementById('discountType').value;
         const discountValue = parseInt(document.getElementById('discountValue').value);
@@ -317,18 +334,30 @@ async function saveCoupon() {
             return;
         }
         
+        console.log('쿠폰 데이터:', {
+            code: code.toUpperCase(),
+            discount_type: discountType,
+            discount_value: discountValue,
+            max_uses: maxUses || null,
+            valid_until: expiryDate || null
+        });
+        
         const { error } = await window.supabaseClient
             .from('coupons')
             .insert({
                 code: code.toUpperCase(),
                 discount_type: discountType,
-                discount_amount: discountValue,
+                discount_value: discountValue,
                 max_uses: maxUses || null,
                 valid_until: expiryDate || null
             });
         
-        if (error) throw error;
+        if (error) {
+            console.error('Supabase 쿠폰 생성 오류:', error);
+            throw error;
+        }
         
+        console.log('✅ 쿠폰 생성 성공!');
         alert('쿠폰이 생성되었습니다.');
         bootstrap.Modal.getInstance(document.getElementById('addCouponModal')).hide();
         loadCoupons();
@@ -825,27 +854,140 @@ function previewContent() {
     
     const content = document.getElementById('editContentData').value;
     const title = document.getElementById('editContentTitle').value;
+    const contentType = currentEditingContent.type || 'course';
     
-    // 새 창에서 미리보기
-    const previewWindow = window.open('', '_blank');
-    previewWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>${title} - 미리보기</title>
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        </head>
-        <body>
-            <div class="container mt-4">
-                <h1>${title}</h1>
-                <hr>
-                <div class="content-preview">
-                    ${content}
+    // 콘텐츠 유형에 따라 적절한 뷰어로 미리보기
+    if (contentType === 'course') {
+        // 동영상 강의용 뷰어
+        const previewWindow = window.open('', '_blank');
+        previewWindow.document.write(`
+            <!DOCTYPE html>
+            <html lang="ko">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>${title} - 미리보기</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+                <style>
+                    body { font-family: 'Noto Sans KR', sans-serif; }
+                    .sidebar { 
+                        position: fixed; left: 0; top: 0; height: 100vh; width: 300px; 
+                        background: #f8f9fa; border-right: 1px solid #dee2e6; z-index: 1000;
+                        transition: transform 0.3s ease; overflow-y: auto;
+                    }
+                    .content { margin-left: 300px; padding: 20px; transition: margin-left 0.3s ease; }
+                    .video-container { position: relative; width: 100%; height: 0; padding-bottom: 56.25%; margin-bottom: 20px; }
+                    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+                    .lesson-description { background: #f8f9fa; padding: 20px; border-radius: 8px; }
+                    .lesson-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #eee; }
+                    .lesson-item:hover { background: #e9ecef; }
+                    .lesson-item.active { background: #007bff; color: white; }
+                    .preview-badge { position: fixed; top: 10px; right: 10px; z-index: 1051; }
+                </style>
+            </head>
+            <body>
+                <span class="badge bg-warning text-dark preview-badge">관리자 미리보기</span>
+                
+                <!-- 사이드바 -->
+                <div class="sidebar">
+                    <div class="p-3 border-bottom">
+                        <h5><i class="fas fa-play-circle me-2"></i>강의 목차</h5>
+                    </div>
+                    <div class="lesson-item active">
+                        <div class="fw-bold">${title}</div>
+                        <small class="text-muted">미리보기</small>
+                    </div>
+                    <div class="p-3 border-top">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            미리보기 모드
+                        </small>
+                    </div>
                 </div>
-            </div>
-        </body>
-        </html>
-    `);
+
+                <!-- 상단 네비게이션 -->
+                <nav class="navbar navbar-dark bg-dark">
+                    <div class="container-fluid">
+                        <a class="navbar-brand" href="#">
+                            <i class="fas fa-eye me-2"></i>미리보기 모드
+                        </a>
+                        <span class="navbar-text">${title}</span>
+                    </div>
+                </nav>
+
+                <!-- 메인 콘텐츠 -->
+                <div class="content">
+                    <div class="lesson-description">
+                        ${content}
+                    </div>
+                </div>
+            </body>
+            </html>
+        `);
+    } else if (contentType === 'ebook') {
+        // 전자책용 뷰어
+        const previewWindow = window.open('', '_blank');
+        previewWindow.document.write(`
+            <!DOCTYPE html>
+            <html lang="ko">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>${title} - 전자책 미리보기</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+                <style>
+                    body { font-family: 'Noto Sans KR', sans-serif; background: #f7f3e9; color: #5d4037; line-height: 1.7; }
+                    .sidebar { position: fixed; left: 0; top: 0; height: 100vh; width: 300px; background: #f4ead5; border-right: 1px solid #d7ccc8; z-index: 1000; overflow-y: auto; }
+                    .content { margin-left: 300px; padding: 20px; max-width: 800px; }
+                    .ebook-content { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 20px rgba(139, 110, 92, 0.15); }
+                    .chapter-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #d7ccc8; }
+                    .chapter-item:hover { background: #f0e6d2; }
+                    .chapter-item.active { background: #8d6e63; color: white; }
+                    .preview-badge { position: fixed; top: 10px; right: 10px; z-index: 1051; }
+                </style>
+            </head>
+            <body>
+                <span class="badge bg-warning text-dark preview-badge">관리자 미리보기</span>
+                
+                <!-- 사이드바 -->
+                <div class="sidebar">
+                    <div class="p-3 border-bottom">
+                        <h5><i class="fas fa-book me-2"></i>목차</h5>
+                    </div>
+                    <div class="chapter-item active">
+                        <div class="fw-bold">${title}</div>
+                        <small class="text-muted">미리보기</small>
+                    </div>
+                    <div class="p-3 border-top">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            미리보기 모드
+                        </small>
+                    </div>
+                </div>
+
+                <!-- 상단 네비게이션 -->
+                <nav class="navbar navbar-dark bg-dark">
+                    <div class="container-fluid">
+                        <a class="navbar-brand" href="#">
+                            <i class="fas fa-eye me-2"></i>전자책 미리보기
+                        </a>
+                        <span class="navbar-text">${title}</span>
+                    </div>
+                </nav>
+
+                <!-- 메인 콘텐츠 -->
+                <div class="content">
+                    <div class="ebook-content">
+                        ${content}
+                    </div>
+                </div>
+            </body>
+            </html>
+        `);
+    }
 }
 
 function editContentInTab(contentId) {
@@ -937,6 +1079,10 @@ async function editContent(contentId) {
 }
 
 // === 공통 함수 ===
+function goToMainPage() {
+    window.location.href = '/index.html';
+}
+
 async function logout() {
     try {
         const { error } = await window.supabaseClient.auth.signOut();
