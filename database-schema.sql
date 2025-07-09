@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS public.reviews (
     rating INTEGER CHECK (rating >= 1 AND rating <= 5),
     comment TEXT,
     is_verified_purchase BOOLEAN DEFAULT true,
+    is_visible BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );

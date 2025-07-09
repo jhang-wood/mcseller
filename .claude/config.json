@@ -1,0 +1,5 @@
+{
+  "commands": {
+    "defaultMCP": "supabase"
+  }
+}

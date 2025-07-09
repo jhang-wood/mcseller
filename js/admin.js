@@ -117,6 +117,9 @@ function loadSection(sectionName) {
             case 'content':
                 loadContent();
                 break;
+            case 'reviews':
+                loadReviews();
+                break;
         }
     }
 }
@@ -1093,6 +1096,203 @@ async function logout() {
     } catch (error) {
         console.error('로그아웃 오류:', error);
         alert('로그아웃에 실패했습니다.');
+    }
+}
+
+// === 후기 관리 ===
+async function loadReviews() {
+    try {
+        console.log('📝 후기 목록 로드 시작...');
+        
+        const { data: reviews, error } = await window.supabaseClient
+            .from('reviews')
+            .select(`
+                *,
+                profiles!user_id (email, full_name),
+                products!product_id (title)
+            `)
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error('후기 조회 오류:', error);
+            throw error;
+        }
+        
+        console.log('✅ 후기 데이터 로드 완료:', reviews?.length || 0, '개');
+        
+        // 상품 필터 옵션 업데이트
+        const productSelect = document.getElementById('reviewProductFilter');
+        const products = [...new Set(reviews.map(r => r.products?.title).filter(Boolean))];
+        productSelect.innerHTML = '<option value="">모든 상품</option>' + 
+            products.map(title => `<option value="${title}">${title}</option>`).join('');
+        
+        const tbody = document.getElementById('reviewsTable');
+        if (!reviews || reviews.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7">후기가 없습니다.</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = reviews.map(review => `
+            <tr>
+                <td>${review.products?.title || '삭제된 상품'}</td>
+                <td>${review.profiles?.email || '알 수 없음'}</td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}
+                        <span class="ms-2">${review.rating}/5</span>
+                    </div>
+                </td>
+                <td>
+                    <div style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${review.comment || '내용 없음'}
+                    </div>
+                </td>
+                <td>${review.created_at ? new Date(review.created_at).toLocaleDateString() : '날짜 없음'}</td>
+                <td>
+                    <span class="badge ${review.is_visible !== false ? 'bg-success' : 'bg-secondary'}">
+                        ${review.is_visible !== false ? '표시' : '숨김'}
+                    </span>
+                </td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-sm ${review.is_visible !== false ? 'btn-warning' : 'btn-success'}" 
+                                onclick="toggleReviewVisibility('${review.id}', ${review.is_visible !== false})">
+                            ${review.is_visible !== false ? '숨기기' : '표시'}
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteReview('${review.id}')">
+                            삭제
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+        
+    } catch (error) {
+        console.error('후기 목록 로드 오류:', error);
+        const tbody = document.getElementById('reviewsTable');
+        tbody.innerHTML = `
+            <tr><td colspan="7">
+                로드 오류: ${error.message || '알 수 없는 오류'}<br>
+                <small>콘솔에서 자세한 오류 내용을 확인하세요.</small>
+            </td></tr>
+        `;
+    }
+}
+
+async function filterReviews() {
+    const productFilter = document.getElementById('reviewProductFilter').value;
+    const statusFilter = document.getElementById('reviewStatusFilter').value;
+    
+    try {
+        let query = window.supabaseClient
+            .from('reviews')
+            .select(`
+                *,
+                profiles!user_id (email, full_name),
+                products!product_id (title)
+            `)
+            .order('created_at', { ascending: false });
+        
+        // 상품 필터 적용
+        if (productFilter) {
+            query = query.eq('products.title', productFilter);
+        }
+        
+        // 상태 필터 적용
+        if (statusFilter === 'visible') {
+            query = query.neq('is_visible', false);
+        } else if (statusFilter === 'hidden') {
+            query = query.eq('is_visible', false);
+        }
+        
+        const { data: reviews, error } = await query;
+        
+        if (error) throw error;
+        
+        const tbody = document.getElementById('reviewsTable');
+        if (!reviews || reviews.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7">필터 조건에 맞는 후기가 없습니다.</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = reviews.map(review => `
+            <tr>
+                <td>${review.products?.title || '삭제된 상품'}</td>
+                <td>${review.profiles?.email || '알 수 없음'}</td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}
+                        <span class="ms-2">${review.rating}/5</span>
+                    </div>
+                </td>
+                <td>
+                    <div style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${review.comment || '내용 없음'}
+                    </div>
+                </td>
+                <td>${review.created_at ? new Date(review.created_at).toLocaleDateString() : '날짜 없음'}</td>
+                <td>
+                    <span class="badge ${review.is_visible !== false ? 'bg-success' : 'bg-secondary'}">
+                        ${review.is_visible !== false ? '표시' : '숨김'}
+                    </span>
+                </td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-sm ${review.is_visible !== false ? 'btn-warning' : 'btn-success'}" 
+                                onclick="toggleReviewVisibility('${review.id}', ${review.is_visible !== false})">
+                            ${review.is_visible !== false ? '숨기기' : '표시'}
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteReview('${review.id}')">
+                            삭제
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+        
+    } catch (error) {
+        console.error('후기 필터 오류:', error);
+        alert('후기 필터링에 실패했습니다: ' + error.message);
+    }
+}
+
+async function toggleReviewVisibility(reviewId, currentVisibility) {
+    try {
+        const newVisibility = !currentVisibility;
+        
+        const { error } = await window.supabaseClient
+            .from('reviews')
+            .update({ is_visible: newVisibility })
+            .eq('id', reviewId);
+        
+        if (error) throw error;
+        
+        console.log('후기 표시 상태 변경:', reviewId, '→', newVisibility);
+        loadReviews(); // 목록 새로고침
+        
+    } catch (error) {
+        console.error('후기 표시 상태 변경 오류:', error);
+        alert('후기 표시 상태 변경에 실패했습니다: ' + error.message);
+    }
+}
+
+async function deleteReview(reviewId) {
+    if (!confirm('정말 이 후기를 삭제하시겠습니까?')) return;
+    
+    try {
+        const { error } = await window.supabaseClient
+            .from('reviews')
+            .delete()
+            .eq('id', reviewId);
+        
+        if (error) throw error;
+        
+        console.log('후기 삭제 완료:', reviewId);
+        loadReviews(); // 목록 새로고침
+        
+    } catch (error) {
+        console.error('후기 삭제 오류:', error);
+        alert('후기 삭제에 실패했습니다: ' + error.message);
     }
 }
 

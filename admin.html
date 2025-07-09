@@ -44,6 +44,11 @@
                             <i class="fas fa-book me-2"></i>콘텐츠관리
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-section="reviews">
+                            <i class="fas fa-star me-2"></i>후기관리
+                        </a>
+                    </li>
                 </ul>
                 <hr>
                 <button class="btn btn-outline-primary btn-sm mb-2" onclick="goToMainPage()">
@@ -374,6 +379,43 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
                     <button type="button" class="btn btn-primary" onclick="addPurchaser()">추가</button>
+                </div>
+
+                <!-- 후기 관리 -->
+                <div id="reviews-section" class="content-section">
+                    <h3>후기 관리</h3>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <select class="form-control" id="reviewProductFilter" onchange="filterReviews()">
+                                <option value="">모든 상품</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-control" id="reviewStatusFilter" onchange="filterReviews()">
+                                <option value="">모든 상태</option>
+                                <option value="visible">표시</option>
+                                <option value="hidden">숨김</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>상품명</th>
+                                    <th>작성자</th>
+                                    <th>별점</th>
+                                    <th>내용</th>
+                                    <th>작성일</th>
+                                    <th>상태</th>
+                                    <th>액션</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reviewsTable">
+                                <tr><td colspan="7">로딩 중...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

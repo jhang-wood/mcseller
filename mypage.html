@@ -895,13 +895,22 @@
                                             <span>0%</span>
                                         </div>
                                     </div>
-                                    <a
-                                        href="ebook-viewer.html?id=ebook1"
-                                        class="btn btn-primary btn-sm"
-                                    >
-                                        <i class="fas fa-book-open me-1"></i
-                                        >읽기 시작
-                                    </a>
+                                    <div class="d-flex gap-2">
+                                        <a
+                                            href="ebook-viewer.html?id=ebook1"
+                                            class="btn btn-primary btn-sm"
+                                        >
+                                            <i class="fas fa-book-open me-1"></i
+                                            >읽기 시작
+                                        </a>
+                                        <button
+                                            class="btn btn-outline-warning btn-sm"
+                                            onclick="showReviewModal('ebook1', '온라인 수익화 전략서 1탄')"
+                                        >
+                                            <i class="fas fa-star me-1"></i
+                                            >후기 작성
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-6 mb-4">
@@ -925,12 +934,20 @@
                                             <span>0%</span>
                                         </div>
                                     </div>
-                                    <a
-                                        href="video-viewer.html?id=ai-master"
-                                        class="btn btn-primary btn-sm"
-                                    >
-                                        <i class="fas fa-play me-1"></i>시청하기
-                                    </a>
+                                    <div class="d-flex gap-2">
+                                        <a
+                                            href="video-viewer.html?id=ai-master"
+                                            class="btn btn-primary btn-sm"
+                                        >
+                                            <i class="fas fa-play me-1"></i>시청하기
+                                        </a>
+                                        <button
+                                            class="btn btn-outline-warning btn-sm"
+                                            onclick="showReviewModal('ai-master', 'AI 마스터 실전 과정')"
+                                        >
+                                            <i class="fas fa-star me-1"></i>후기 작성
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-6 mb-4">
@@ -1402,6 +1419,211 @@
 
                 // 환영 메시지 제거 (불필요한 팝업 방지)
             });
+
+            // 후기 작성 관련 함수들
+            let currentReviewProductId = null;
+            let currentReviewProductTitle = null;
+
+            function showReviewModal(productId, productTitle) {
+                currentReviewProductId = productId;
+                currentReviewProductTitle = productTitle;
+                
+                document.getElementById('reviewProductTitle').textContent = productTitle;
+                document.getElementById('reviewForm').reset();
+                
+                // 기존 후기 확인
+                loadExistingReview(productId);
+                
+                const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
+                modal.show();
+            }
+
+            async function loadExistingReview(productId) {
+                try {
+                    if (!window.supabaseClient) {
+                        console.log('Supabase 클라이언트가 로드되지 않았습니다.');
+                        return;
+                    }
+
+                    const { data: { user } } = await window.supabaseClient.auth.getUser();
+                    if (!user) return;
+
+                    const { data: reviews, error } = await window.supabaseClient
+                        .from('reviews')
+                        .select('*')
+                        .eq('user_id', user.id)
+                        .eq('product_id', productId)
+                        .limit(1);
+
+                    if (error) {
+                        console.error('후기 조회 오류:', error);
+                        return;
+                    }
+
+                    if (reviews && reviews.length > 0) {
+                        const review = reviews[0];
+                        document.getElementById('reviewRating').value = review.rating;
+                        document.getElementById('reviewComment').value = review.comment || '';
+                        document.getElementById('reviewSubmitBtn').textContent = '후기 수정';
+                        updateStarRating(review.rating);
+                    } else {
+                        document.getElementById('reviewSubmitBtn').textContent = '후기 작성';
+                    }
+                } catch (error) {
+                    console.error('후기 로드 중 오류:', error);
+                }
+            }
+
+            function updateStarRating(rating) {
+                const stars = document.querySelectorAll('.star-rating .star');
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.classList.add('active');
+                    } else {
+                        star.classList.remove('active');
+                    }
+                });
+            }
+
+            function setRating(rating) {
+                document.getElementById('reviewRating').value = rating;
+                updateStarRating(rating);
+            }
+
+            async function submitReview() {
+                try {
+                    if (!window.supabaseClient) {
+                        alert('시스템 오류가 발생했습니다. 페이지를 새로고침해주세요.');
+                        return;
+                    }
+
+                    const { data: { user } } = await window.supabaseClient.auth.getUser();
+                    if (!user) {
+                        alert('로그인이 필요합니다.');
+                        return;
+                    }
+
+                    const rating = parseInt(document.getElementById('reviewRating').value);
+                    const comment = document.getElementById('reviewComment').value.trim();
+
+                    if (!rating) {
+                        alert('별점을 선택해주세요.');
+                        return;
+                    }
+
+                    if (!comment) {
+                        alert('후기 내용을 입력해주세요.');
+                        return;
+                    }
+
+                    // 기존 후기 확인
+                    const { data: existingReviews } = await window.supabaseClient
+                        .from('reviews')
+                        .select('id')
+                        .eq('user_id', user.id)
+                        .eq('product_id', currentReviewProductId)
+                        .limit(1);
+
+                    let result;
+                    if (existingReviews && existingReviews.length > 0) {
+                        // 기존 후기 수정
+                        result = await window.supabaseClient
+                            .from('reviews')
+                            .update({
+                                rating,
+                                comment,
+                                updated_at: new Date().toISOString()
+                            })
+                            .eq('id', existingReviews[0].id);
+                    } else {
+                        // 새 후기 작성
+                        result = await window.supabaseClient
+                            .from('reviews')
+                            .insert({
+                                user_id: user.id,
+                                product_id: currentReviewProductId,
+                                rating,
+                                comment,
+                                is_verified_purchase: true
+                            });
+                    }
+
+                    if (result.error) {
+                        console.error('후기 저장 오류:', result.error);
+                        alert('후기 저장에 실패했습니다: ' + result.error.message);
+                        return;
+                    }
+
+                    showNotification('후기가 성공적으로 저장되었습니다!', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('reviewModal')).hide();
+
+                } catch (error) {
+                    console.error('후기 제출 중 오류:', error);
+                    alert('후기 제출 중 오류가 발생했습니다.');
+                }
+            }
         </script>
+
+        <!-- 후기 작성 모달 -->
+        <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content" style="background: var(--bg-primary, #1a1a1a); color: var(--text-light, #e0e0e0);">
+                    <div class="modal-header" style="border-bottom: 1px solid var(--border-color, rgba(255, 153, 0, 0.2));">
+                        <h5 class="modal-title" id="reviewModalLabel">
+                            <i class="fas fa-star text-warning me-2"></i>후기 작성
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="reviewForm">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold" id="reviewProductTitle">상품명</label>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">별점</label>
+                                <div class="star-rating d-flex gap-1">
+                                    <span class="star" onclick="setRating(1)">★</span>
+                                    <span class="star" onclick="setRating(2)">★</span>
+                                    <span class="star" onclick="setRating(3)">★</span>
+                                    <span class="star" onclick="setRating(4)">★</span>
+                                    <span class="star" onclick="setRating(5)">★</span>
+                                </div>
+                                <input type="hidden" id="reviewRating" value="0">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="reviewComment" class="form-label">후기 내용</label>
+                                <textarea class="form-control" id="reviewComment" rows="4" 
+                                    placeholder="상품에 대한 솔직한 후기를 남겨주세요..."
+                                    style="background: var(--bg-secondary, #2d3748); color: var(--text-light, #e0e0e0); border: 1px solid var(--border-color, rgba(255, 153, 0, 0.2));"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer" style="border-top: 1px solid var(--border-color, rgba(255, 153, 0, 0.2));">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-warning" id="reviewSubmitBtn" onclick="submitReview()">후기 작성</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .star-rating .star {
+                font-size: 2rem;
+                color: #6c757d;
+                cursor: pointer;
+                transition: color 0.2s ease;
+            }
+            
+            .star-rating .star:hover,
+            .star-rating .star.active {
+                color: #ffc107;
+            }
+            
+            .star-rating .star:hover ~ .star {
+                color: #6c757d;
+            }
+        </style>
     </body>
 </html>
