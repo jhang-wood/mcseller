@@ -131,7 +131,7 @@ async function loadAllUsers() {
         
         const { data: profiles, error } = await window.supabaseClient
             .from('profiles')
-            .select('*')
+            .select('id, email, full_name, role, points, created_at, updated_at')
             .order('created_at', { ascending: false });
         
         if (error) {
@@ -189,7 +189,7 @@ async function searchUsers() {
     try {
         const { data: profiles, error } = await window.supabaseClient
             .from('profiles')
-            .select('*')
+            .select('id, email, full_name, role, points, created_at, updated_at')
             .ilike('email', `%${email}%`);
         
         if (error) throw error;
@@ -268,7 +268,7 @@ async function loadCoupons() {
     try {
         const { data: coupons, error } = await window.supabaseClient
             .from('coupons')
-            .select('*')
+            .select('id, code, discount_type, discount_value, max_uses, used_count, is_active, created_at')
             .order('created_at', { ascending: false });
         
         const tbody = document.getElementById('couponsTable');
@@ -293,7 +293,7 @@ async function loadCoupons() {
                         `${coupon.discount_value.toLocaleString()}원`}
                 </td>
                 <td>${coupon.used_count || 0} / ${coupon.max_uses || '무제한'}</td>
-                <td>${coupon.valid_until ? new Date(coupon.valid_until).toLocaleDateString() : '무제한'}</td>
+                <td>무제한</td>
                 <td>
                     <span class="badge ${coupon.is_active ? 'bg-success' : 'bg-secondary'}">
                         ${coupon.is_active ? '활성' : '비활성'}
@@ -337,23 +337,22 @@ async function saveCoupon() {
             return;
         }
         
-        console.log('쿠폰 데이터:', {
+        // 쿠폰 데이터 구성 (선택적 필드 처리)
+        const couponData = {
             code: code.toUpperCase(),
             discount_type: discountType,
-            discount_value: discountValue,
-            max_uses: maxUses || null,
-            valid_until: expiryDate || null
-        });
+            discount_value: discountValue
+        };
+        
+        // 선택적 필드 추가
+        if (maxUses) couponData.max_uses = maxUses;
+        if (expiryDate) couponData.valid_until = expiryDate;
+        
+        console.log('쿠폰 데이터:', couponData);
         
         const { error } = await window.supabaseClient
             .from('coupons')
-            .insert({
-                code: code.toUpperCase(),
-                discount_type: discountType,
-                discount_value: discountValue,
-                max_uses: maxUses || null,
-                valid_until: expiryDate || null
-            });
+            .insert(couponData);
         
         if (error) {
             console.error('Supabase 쿠폰 생성 오류:', error);
